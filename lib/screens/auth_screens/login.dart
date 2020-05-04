@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
                           focusColor: Colors.red,
                           hintText: "Email",
                         ),
-                        validator: (val) => Validator.validateEmail(val),
+                        validator: (val) => Validator.validateEmailLogin(val),
                         onSaved: (val) => _email = val,
                       ),
                       TextFormField(
@@ -67,7 +67,7 @@ class _LoginState extends State<Login> {
                               right: 10,
                             ),
                             child: GestureDetector(
-                              onTap: () => {print('hello')},
+                              onTap: () => {Navigator.of(context).pushNamed('/forgot_password')},
                               child:  Text(
                             "Forgot?",
                             style: GoogleFonts.firaSans(
@@ -78,7 +78,7 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        validator: (val) => Validator.validatePassword(val),
+                        validator: (val) => Validator.validatePasswordLogin(val),
                         onSaved: (val) => _password = val,
                         obscureText: true,
                       ),
@@ -135,7 +135,7 @@ class _LoginState extends State<Login> {
                               style: TextStyle(color: Colors.red, fontSize: 15),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  print('tapped');
+                                  Navigator.of(context).pushReplacementNamed('/signup');
                                 })
                         ]),
                   ),

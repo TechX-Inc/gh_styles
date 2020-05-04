@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/signup.dart';
 import 'package:gh_styles/screens/item_profile.dart';
@@ -18,6 +19,9 @@ class RouteGenerator {
 
       case '/login':
         return MaterialPageRoute(builder: (_) => Login());
+
+      case '/forgot_password':
+        return MaterialPageRoute(builder: (_) => ForgotPassword());
 
       case '/item_profile':
         return MaterialPageRoute(builder: (_) => ItemProfile());
