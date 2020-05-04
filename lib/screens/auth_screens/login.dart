@@ -63,14 +63,12 @@ class _LoginState extends State<Login> {
                         onPressed: _submit,
                       ),
                         RaisedButton(
-                        // color: Colors.black,
                         child: FractionallySizedBox(
                           widthFactor: 1,
-                          // heightFactor: 0.7,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(FontAwesomeIcons.google, size: 14),
+                              Icon(FontAwesomeIcons.google, size: 18),
                               SizedBox(width: 10,),
                               Text('Login with google'),
                             ],
