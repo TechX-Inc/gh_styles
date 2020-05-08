@@ -3,7 +3,9 @@ import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/signup.dart';
 import 'package:gh_styles/screens/item_profile.dart';
+import 'package:gh_styles/screens/product_listing.dart';
 import 'package:gh_styles/screens/wrapper.dart';
+import 'package:gh_styles/screens/splash.dart';
 import '../main.dart';
 
 class RouteGenerator {
@@ -12,7 +14,13 @@ class RouteGenerator {
 
     switch (settings.name) {
       case '/':
+        return MaterialPageRoute(builder: (_) => SplashScreen());
+
+       case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
+
+       case '/products':
+        return MaterialPageRoute(builder: (_) => Products());
 
       case '/signup':
         return MaterialPageRoute(builder: (_) => SignUp());
@@ -38,9 +46,23 @@ class RouteGenerator {
 
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(builder: (_) {
-      return Scaffold(
-        body: Center(
-          child: Text("Error Route"),
+      return SafeArea(
+        child: Scaffold(
+          body: Center(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.asset("assets/images/error-404_64px.png"),
+              Text("Page not found"),
+              FlatButton(
+                onPressed: () {
+                  print("going home");
+                },
+                child: Text("Home", style: TextStyle(color: Colors.blueAccent),),
+              )
+            ],
+          )),
         ),
       );
     });

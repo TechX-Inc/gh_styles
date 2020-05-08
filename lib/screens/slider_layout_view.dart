@@ -41,7 +41,7 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
   }
 
   @override
-  Widget build(BuildContext context) => topSliderLayout();
+  Widget build(BuildContext context) => Scaffold(body: topSliderLayout());
 
   Widget topSliderLayout() => Container(
         child: Padding(
@@ -79,8 +79,8 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
                           padding: EdgeInsets.only(left: 15.0, bottom: 15.0),
                           child: FlatButton(
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/login');
-                    
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/products');
                             },
                             child: Text(
                               Constants.SKIP,
