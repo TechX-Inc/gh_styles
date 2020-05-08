@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "607292105092",
+    "firebase_url": "https://ghstyle-2de8f.firebaseio.com",
+    "project_id": "ghstyle-2de8f",
+    "storage_bucket": "ghstyle-2de8f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607292105092:android:d3726353edc5fa978dfdd1",
+        "android_client_info": {
+          "package_name": "com.example.gh_styles"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607292105092-mts65u7kog2i1vbdt2phlbl9ljonjqjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdAHzTLARGclww9GoAxbDXe862j7XHIpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607292105092-mts65u7kog2i1vbdt2phlbl9ljonjqjb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

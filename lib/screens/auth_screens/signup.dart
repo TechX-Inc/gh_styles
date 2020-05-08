@@ -16,6 +16,7 @@ class _SignUpState extends State<SignUp> {
 
   String _email;
   String _password;
+  String _username;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +57,7 @@ class _SignUpState extends State<SignUp> {
                           hintText: "Username",
                         ),
                         validator: (val) => Validator.validateUsername(val),
-                        onSaved: (val) => _email = val,
+                        onSaved: (val) => _username = val,
                       ),
                       TextFormField(
                         decoration: InputDecoration(
