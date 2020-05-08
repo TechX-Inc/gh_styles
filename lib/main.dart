@@ -3,15 +3,18 @@ import 'package:gh_styles/services/route_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 
+import 'package:gh_styles/shared_preferences/shared_prefs.dart';
+
 void main() {
   runApp(MyApp());
+  // SharedPrefs prefs = new SharedPrefs();
+  
 }
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatelessWidget {
   @override
-
   Widget build(BuildContext context) {
- SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness:
@@ -23,11 +26,11 @@ class MyApp extends StatelessWidget{
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-       theme: ThemeData(
+      theme: ThemeData(
         primarySwatch: Colors.blue,
         platform: TargetPlatform.android,
       ),
-      initialRoute : '/',
+      initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
