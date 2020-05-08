@@ -29,7 +29,6 @@ class _WrapperState extends State<Wrapper> {
         firstRun = true;
       });
     }
-    print(startup.toString());
     setState(() {
       firstRun = startup;
     });
@@ -38,8 +37,8 @@ class _WrapperState extends State<Wrapper> {
   @override
   void initState() {
     super.initState();
-    _setFirstInstance();
     _getFirstInstance();
+     _setFirstInstance();
   }
 
   @override
