@@ -6,6 +6,7 @@ import 'package:gh_styles/screens/item_profile.dart';
 import 'package:gh_styles/screens/product_listing.dart';
 import 'package:gh_styles/screens/wrapper.dart';
 import 'package:gh_styles/screens/splash.dart';
+import 'package:gh_styles/ui/screens/home.dart';
 import '../main.dart';
 
 class RouteGenerator {
@@ -16,11 +17,11 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => SplashScreen());
 
-       case '/wrapper':
+      case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
-       case '/products':
-        return MaterialPageRoute(builder: (_) => Products());
+      case '/products':
+        return MaterialPageRoute(builder: (_) => HomeScreen());
 
       case '/signup':
         return MaterialPageRoute(builder: (_) => SignUp());
@@ -59,7 +60,10 @@ class RouteGenerator {
                 onPressed: () {
                   print("going home");
                 },
-                child: Text("Home", style: TextStyle(color: Colors.blueAccent),),
+                child: Text(
+                  "Home",
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
               )
             ],
           )),

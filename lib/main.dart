@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/services/route_service.dart';
 import 'package:flutter/services.dart';
+import 'package:gh_styles/ui/screens/home.dart';
+//import 'package:gh_styles/ui/screens/orders.dart';
 import 'dart:io';
 
 import 'package:gh_styles/shared_preferences/shared_prefs.dart';
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
+      //home: HomeScreen(),
+      //routes: {'orderscreen': (ctx) => OrdersScreen()},
     );
   }
 }
