@@ -1,7 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:gh_styles/authentication/validation.dart';
+import 'package:gh_styles/models/users.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignUp extends StatefulWidget {
@@ -13,10 +15,12 @@ class _SignUpState extends State<SignUp> {
   final textController = new TextEditingController();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   final formKey = new GlobalKey<FormState>();
+  final AuthService _auth = new AuthService();
 
   String _email;
   String _password;
   String _username;
+  String emialExist = '';
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +45,12 @@ class _SignUpState extends State<SignUp> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            "Create an Account",
+                            "Register",
                             style: GoogleFonts.cinzel(
                                 textStyle: TextStyle(
                                     color: Colors.red,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 20)),
+                                    fontSize: 30)),
                           ),
                         ],
                       ),
@@ -61,7 +65,6 @@ class _SignUpState extends State<SignUp> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          // focusColor: Colors.red,
                           hintText: "Email",
                         ),
                         validator: (val) => Validator.validateEmail(val),
@@ -70,7 +73,6 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: "Password",
-                          // focusColor: Colors.red,
                         ),
                         validator: (val) => Validator.validatePassword(val),
                         onSaved: (val) => _password = val,
@@ -165,11 +167,14 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  void _submit() {
+  void _submit() async{
     final form = formKey.currentState;
     if (form.validate()) {
-      form.save();
-      //Login
+      form.save(); 
+      dynamic result = await _auth.register(_email.replaceAll(' ', ''), _password, _username.replaceAll(' ', '')); 
+      if   (result != null) {
+          Navigator.pushReplacementNamed(context, '/products');
+      }
     }
   }
 }

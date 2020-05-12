@@ -1,17 +1,22 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User {
 
    int join = new DateTime.now().millisecondsSinceEpoch;
-
+   final CollectionReference users = Firestore.instance.collection('Users');
+   
   final String uid;
-  // final String username;
   final String email;
   User({this.uid, this.email});
-
-  void saveUser(){
-
+  
+  Future saveUser(String uid, String username, String email) async{
+    return await users.document(uid).setData({
+      'username' : username,
+      'email' : email,
+      'has_shop' : false,
+      'active' : true,
+      'date_join' : FieldValue.serverTimestamp()
+    });
   }
 
 

@@ -3,12 +3,12 @@ import 'package:gh_styles/services/route_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 
-import 'package:gh_styles/shared_preferences/shared_prefs.dart';
+import 'package:provider/provider.dart';
+
+import 'authentication/auth_service.dart';
 
 void main() {
   runApp(MyApp());
-  // SharedPrefs prefs = new SharedPrefs();
-  
 }
 
 class MyApp extends StatelessWidget {
@@ -24,14 +24,17 @@ class MyApp extends StatelessWidget {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        platform: TargetPlatform.android,
+    return StreamProvider.value(
+      value: AuthService().user,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          platform: TargetPlatform.android,
+        ),
+        initialRoute: '/',
+        onGenerateRoute: RouteGenerator.generateRoute,
       ),
-      initialRoute: '/',
-      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

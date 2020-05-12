@@ -1,12 +1,18 @@
+import 'package:email_validator/email_validator.dart';
+import 'package:flutter/services.dart';
+
 class Validator {
-  static String validateEmail(String value) {
-    if (value.length <= 0) {
+  static String validateEmail(String email) {
+ 
+      String trimEmail = email.replaceAll(' ', '');
+         if (trimEmail.length <= 0) {
       return 'Enter an email';
-    } else if (!value.contains('@')) {
-      return 'Enter a valid email';
+    } else if (!EmailValidator.validate(trimEmail)) {
+      return 'Enter a valid email';      
     } else {
       return null;
     }
+   
   }
 
 

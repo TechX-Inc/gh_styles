@@ -41,8 +41,6 @@ class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: StreamProvider<User>.value(
-            value: AuthService().user,
-            child: firstStartup == true ? SliderLayoutView() : Products()));
+        child: firstStartup == true ? SliderLayoutView() : Products());
   }
 }
