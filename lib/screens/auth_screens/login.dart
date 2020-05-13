@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gh_styles/authentication/validation.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,7 @@ class _LoginState extends State<Login> {
   final textController = new TextEditingController();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   final formKey = new GlobalKey<FormState>();
+  final AuthService _auth = new AuthService();
 
   String _email;
   String _password;
@@ -98,7 +100,7 @@ class _LoginState extends State<Login> {
                         ),
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: _submit,
+                        onPressed: _emailLogin,
                       ),
                       RaisedButton(
                         color: Color.fromRGBO(229, 229, 229, 1),
@@ -116,7 +118,7 @@ class _LoginState extends State<Login> {
                             )),
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: _submit,
+                        onPressed: _googleAuth,
                       ),
                     ],
                   ),
@@ -146,11 +148,23 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _submit() {
+  Future<void> _emailLogin() async {
     final form = formKey.currentState;
     if (form.validate()) {
       form.save();
-      //Login
+      dynamic result = await _auth.login(_email.replaceAll(' ', ''), _password);
+      if (result != null) {
+        Navigator.pushReplacementNamed(context, '/products_wrapper');
+      }else{
+        print("NULL");
+      }
     }
+  }
+
+      void _googleAuth() async{
+    // final form = formKey.currentState;
+     if   (_auth.registerWithGoogle() != null) {
+          Navigator.pushReplacementNamed(context, '/products_wrapper');
+      }
   }
 }

@@ -78,7 +78,7 @@ class _SignUpState extends State<SignUp> {
                         onSaved: (val) => _password = val,
                         obscureText: true,
                       ),
-                      
+
                       // Row(
                       //   crossAxisAlignment: CrossAxisAlignment.start,
                       //   children: <Widget>[
@@ -101,7 +101,7 @@ class _SignUpState extends State<SignUp> {
                       //     ),
                       //   ],
                       // ),
-                      
+
                       SizedBox(
                         height: 40,
                       ),
@@ -118,7 +118,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: _submit,
+                        onPressed: _emailAuth,
                       ),
                       RaisedButton(
                         color: Color.fromRGBO(229, 229, 229, 1),
@@ -136,7 +136,7 @@ class _SignUpState extends State<SignUp> {
                             )),
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: _submit,
+                        onPressed: _googleAuth,
                       ),
                     ],
                   ),
@@ -167,14 +167,21 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  void _submit() async{
+  void _emailAuth() async {
     final form = formKey.currentState;
     if (form.validate()) {
-      form.save(); 
-      dynamic result = await _auth.register(_email.replaceAll(' ', ''), _password, _username.replaceAll(' ', '')); 
-      if   (result != null) {
-          Navigator.pushReplacementNamed(context, '/products');
+      form.save();
+      dynamic result = await _auth.register(
+          _email.replaceAll(' ', ''), _password, _username.replaceAll(' ', ''));
+      if (result != null) {
+        Navigator.pushReplacementNamed(context, '/products_wrapper');
       }
+    }
+  }
+
+  void _googleAuth() async {
+    if (_auth.registerWithGoogle() != null) {
+      Navigator.pushReplacementNamed(context, '/products_wrapper');
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/signup.dart';
 import 'package:gh_styles/screens/item_profile.dart';
 import 'package:gh_styles/screens/product_listing.dart';
+import 'package:gh_styles/screens/widgets/product_wrapper.dart';
 import 'package:gh_styles/screens/wrapper.dart';
 import 'package:gh_styles/screens/splash.dart';
 import '../main.dart';
@@ -21,6 +22,9 @@ class RouteGenerator {
 
        case '/products':
         return MaterialPageRoute(builder: (_) => Products());
+
+      case '/products_wrapper':
+        return MaterialPageRoute(builder: (_) => ProductWrap());
 
       case '/signup':
         return MaterialPageRoute(builder: (_) => SignUp());
