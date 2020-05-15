@@ -15,7 +15,7 @@ class AuthService {
     return _auth.onAuthStateChanged.map(_newUser);
   }
 
-  Future register(String email, String password, String username) async {
+  Future register(String email, [String password, String username]) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -26,9 +26,9 @@ class AuthService {
       return _newUser(user);
     } catch (e) {
       print(e);
-      // if (e.code == "ERROR_EMAIL_ALREADY_IN_USE") {
-      //   return "emailExist";
-      // }
+      if (e.code == "ERROR_EMAIL_ALREADY_IN_USE") {
+        return false;
+      }
       return null;
     }
   }

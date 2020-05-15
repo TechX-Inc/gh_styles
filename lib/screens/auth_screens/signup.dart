@@ -16,11 +16,12 @@ class _SignUpState extends State<SignUp> {
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   final formKey = new GlobalKey<FormState>();
   final AuthService _auth = new AuthService();
+  bool mailExist = false;
 
   String _email;
   String _password;
   String _username;
-  String emialExist = '';
+  // String emialExist = '';
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +61,14 @@ class _SignUpState extends State<SignUp> {
                           // focusColor: Colors.red,
                           hintText: "Username",
                         ),
-                        validator: (val) => Validator.validateUsername(val),
+                        validator: (val)=>Validator.validateUsername(val),                        
                         onSaved: (val) => _username = val,
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: "Email",
                         ),
-                        validator: (val) => Validator.validateEmail(val),
+                        validator: (val) => new Validator().validateEmail(val),
                         onSaved: (val) => _email = val,
                       ),
                       TextFormField(
@@ -173,8 +174,10 @@ class _SignUpState extends State<SignUp> {
       form.save();
       dynamic result = await _auth.register(
           _email.replaceAll(' ', ''), _password, _username.replaceAll(' ', ''));
-      if (result != null) {
+      if (result != null && result.runtimeType != bool) {
         Navigator.pushReplacementNamed(context, '/products_wrapper');
+      }else if(result.runtimeType == bool){
+        //email exist; errors not set yet
       }
     }
   }

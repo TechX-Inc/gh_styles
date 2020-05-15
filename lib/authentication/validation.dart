@@ -1,22 +1,22 @@
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter/services.dart';
+import 'package:gh_styles/authentication/auth_service.dart';
 
 class Validator {
-  static String validateEmail(String email) {
- 
-      String trimEmail = email.replaceAll(' ', '');
-         if (trimEmail.length <= 0) {
+  final AuthService _auth = new AuthService();
+
+  String validateEmail(String email){
+    String trimEmail = email.replaceAll(' ', '');
+    if (trimEmail.length <= 0) {
       return 'Enter an email';
     } else if (!EmailValidator.validate(trimEmail)) {
-      return 'Enter a valid email';      
-    } else {
+      return 'Enter a valid email';
+    }
+     else {
       return null;
     }
-   
   }
 
-
-    static String validateUsername(String value) {
+  static String validateUsername(String value) {
     if (value.length <= 0) {
       return 'Enter a username';
     } else {
@@ -34,9 +34,8 @@ class Validator {
     }
   }
 
-
-    static String validateEmailLogin(String value) {
-      //CHECK IF EMAIL EXIST
+  static String validateEmailLogin(String value) {
+    //CHECK IF EMAIL EXIST
     if (value.length <= 0) {
       return 'Email cannot be empty';
     } else if (!value.contains('@')) {
@@ -50,11 +49,8 @@ class Validator {
     //CHECK IF PASSWORDS MATCH CORRECT
     if (pass.length <= 0) {
       return 'Password cannot be empty';
-    }else {
+    } else {
       return null;
     }
   }
-
-
-
 }

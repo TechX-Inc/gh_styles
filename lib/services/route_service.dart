@@ -4,7 +4,7 @@ import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/signup.dart';
 import 'package:gh_styles/screens/item_profile.dart';
 import 'package:gh_styles/screens/product_listing.dart';
-import 'package:gh_styles/screens/widgets/product_wrapper.dart';
+import 'package:gh_styles/screens/products/product_wrapper.dart';
 import 'package:gh_styles/screens/wrapper.dart';
 import 'package:gh_styles/screens/splash.dart';
 import '../main.dart';

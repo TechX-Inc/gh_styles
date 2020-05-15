@@ -11,7 +11,7 @@ class Products extends StatefulWidget {
 class _ProductsState extends State<Products> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
+    
   
     return Scaffold(
       body: Center(
