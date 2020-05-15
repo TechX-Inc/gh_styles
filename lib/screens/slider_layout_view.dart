@@ -80,7 +80,7 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
                           child: FlatButton(
                             onPressed: () {
                               Navigator.of(context)
-                                  .pushReplacementNamed('/products');
+                                  .pushReplacementNamed('/products_wrapper');
                             },
                             child: Text(
                               Constants.SKIP,
