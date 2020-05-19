@@ -5,6 +5,7 @@ import 'package:gh_styles/screens/products/widgets/productcontainer.dart';
 import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:provider/provider.dart';
 import '../../test_data.dart';
+import 'package:sticky_headers/sticky_headers.dart';
 
 class HomeScreen extends StatelessWidget {
   final AuthService _auth = new AuthService();
@@ -47,34 +48,36 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {},
         ),
         actions: <Widget>[
-          
           Container(
             margin: EdgeInsets.only(top: 12, bottom: 12),
             child: ButtonTheme(
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              child: user == null ? OutlineButton(
-                padding: EdgeInsets.all(0),
-                onPressed: () {
-                  Navigator.pushNamed(context, "/login");
-                },
-                shape: StadiumBorder(),
-                child: Text("Sign In",),
-                borderSide: BorderSide(color: Colors.black),
-              ):OutlineButton(
-                padding: EdgeInsets.all(0),
-                onPressed: () {
-                  _auth.signOut();
-                },
-                shape: StadiumBorder(),
-                child: Text("Sign Out",),
-                borderSide: BorderSide(color: Colors.black),
-              )
-            ),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                child: user == null
+                    ? OutlineButton(
+                        padding: EdgeInsets.all(0),
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/login");
+                        },
+                        shape: StadiumBorder(),
+                        child: Text(
+                          "Sign In",
+                        ),
+                        borderSide: BorderSide(color: Colors.black),
+                      )
+                    : OutlineButton(
+                        padding: EdgeInsets.all(0),
+                        onPressed: () {
+                          _auth.signOut();
+                        },
+                        shape: StadiumBorder(),
+                        child: Text(
+                          "Sign Out",
+                        ),
+                        borderSide: BorderSide(color: Colors.black),
+                      )),
           ),
-
-
           IconButton(
-            icon: Icon(Icons.shopping_basket),
+            icon: Icon(Icons.shopping_cart),
             onPressed: () {},
           ),
         ],
@@ -109,9 +112,12 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 15,
             ),
-            Container(
-              height: 81,
-              child: CategoryContainer(),
+            StickyHeader(
+              content: Container(),
+              header: Container(
+                height: 30,
+                child: CategoryContainer(),
+              ),
             ),
             SizedBox(
               height: 15,

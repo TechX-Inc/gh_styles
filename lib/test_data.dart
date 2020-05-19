@@ -76,6 +76,9 @@ class Category {
 
 List<Category> cats = [
   Category(
+    title: "All Products",
+  ),
+  Category(
     title: "Footwear",
   ),
   Category(
