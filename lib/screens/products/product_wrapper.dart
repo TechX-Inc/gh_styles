@@ -5,6 +5,6 @@ import 'package:gh_styles/screens/products/home.dart';
 class ProductWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-      return HomeScreen();
+      return SafeArea(child: HomeScreen());
   }
 }
