@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../test_data.dart';
-//import 'package:gh_styles/ui/screens/details.dart';
+import 'package:gh_styles/screens/products/details.dart';
 
 class ProductContainer extends StatelessWidget {
   final int id;
@@ -9,10 +9,10 @@ class ProductContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      //onTap: () => Navigator.push(
-      //context,
-      // MaterialPageRoute(builder: (context) => DetailsScreen(id: id)),
-      //),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DetailsScreen(id: id)),
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: Color.fromRGBO(255, 255, 255, 1),
@@ -32,23 +32,22 @@ class ProductContainer extends StatelessWidget {
               ),
             ),
             SizedBox(
-              // height: 5.0,
-            ),
+                // height: 5.0,
+                ),
             Expanded(
               child: Align(
                 alignment: Alignment.center,
                 child: Hero(
-                  tag: '$id',
-                  child: FractionallySizedBox(
-                    widthFactor: 0.9,
-                    heightFactor: 1.0,
-                    child: Image.asset(
-                    "${productsList[id].img}",
-                    fit: BoxFit.fill,
-                    // width: double.infinity,
-                  ),
-                  )
-                ),
+                    tag: '$id',
+                    child: FractionallySizedBox(
+                      widthFactor: 0.9,
+                      heightFactor: 1.0,
+                      child: Image.asset(
+                        "${productsList[id].img}",
+                        fit: BoxFit.fill,
+                        // width: double.infinity,
+                      ),
+                    )),
               ),
             ),
             SizedBox(
