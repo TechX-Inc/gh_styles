@@ -20,8 +20,8 @@ class RouteGenerator {
        case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
-       case '/products':
-        return MaterialPageRoute(builder: (_) => Products());
+      //  case '/products':
+      //   return MaterialPageRoute(builder: (_) => Products());
 
       case '/products_wrapper':
         return MaterialPageRoute(builder: (_) => ProductWrap());
