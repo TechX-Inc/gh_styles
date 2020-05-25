@@ -73,7 +73,7 @@ class DetailsScreen extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           "${productsList[id].title}",
-                          style: Theme.of(context).textTheme.display1,
+                          style: Theme.of(context).textTheme.headline4,
                         ),
                         IconButton(
                           icon: Icon(
@@ -86,7 +86,7 @@ class DetailsScreen extends StatelessWidget {
                     ),
                     Text(
                       "Description",
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                     Text(
                       "${productsList[id].description}",
@@ -97,7 +97,7 @@ class DetailsScreen extends StatelessWidget {
                         Counter(),
                         Text(
                           "${productsList[id].price}",
-                          style: Theme.of(context).textTheme.title,
+                          style: Theme.of(context).textTheme.headline6,
                         ),
                       ],
                     ),

@@ -25,15 +25,15 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          TextField(
-            decoration: InputDecoration(
-              fillColor: Colors.white,
-              filled: true,
-              border: InputBorder.none,
-              prefixIcon: Icon(Icons.search),
-              hintText: "Search",
-            ),
-          ),
+          // TextField(
+          //   decoration: InputDecoration(
+          //     fillColor: Colors.white,
+          //     filled: true,
+          //     border: InputBorder.none,
+          //     prefixIcon: Icon(Icons.search),
+          //     hintText: "Search",
+          //   ),
+          // ),
           SizedBox(
             height: 15,
           ),

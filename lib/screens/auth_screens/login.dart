@@ -60,7 +60,7 @@ class _LoginState extends State<Login> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "Login",
+                                    "Sign In",
                                     style: GoogleFonts.cinzel(
                                         textStyle: TextStyle(
                                             color: Colors.red,
