@@ -7,6 +7,8 @@ import 'package:gh_styles/authentication/validation_signup.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignUp extends StatefulWidget {
+  final Function toggleView;
+  SignUp({this.toggleView});
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -148,8 +150,7 @@ class _SignUpState extends State<SignUp> {
                                           color: Colors.red, fontSize: 15),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
-                                          Navigator.of(context)
-                                              .pushReplacementNamed('/login');
+                                           widget.toggleView();
                                         })
                                 ]),
                           ),

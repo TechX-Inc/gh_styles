@@ -8,6 +8,8 @@ import 'package:gh_styles/models/users.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Login extends StatefulWidget {
+  final Function toggleView;
+  Login({this.toggleView});
   @override
   _LoginState createState() => _LoginState();
 }
@@ -141,9 +143,7 @@ class _LoginState extends State<Login> {
                                             color: Colors.red, fontSize: 15),
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
-                                            Navigator.of(context)
-                                                .pushReplacementNamed(
-                                                    '/signup');
+                                            widget.toggleView();
                                           })
                                   ]),
                             ),

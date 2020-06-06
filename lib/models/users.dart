@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User {
 
-   int join = new DateTime.now().millisecondsSinceEpoch;
    final CollectionReference users = Firestore.instance.collection('Users');
    
   final String uid;

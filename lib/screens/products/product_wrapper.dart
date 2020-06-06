@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
-import 'package:gh_styles/screens/auth_screens/login.dart';
+import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/products/favorites.dart';
 import 'package:gh_styles/screens/products/home.dart';
 import 'package:gh_styles/screens/add_shop.dart';
@@ -26,12 +26,14 @@ class _ProductWrapState extends State<ProductWrap> {
       HomeScreen(),
       AddShop(),
       Favorites(),
-      user == null ? Login() : UserProfile(),
+      user == null ? ToggleLoginSignUp() : UserProfile(),
     ];
+
+
     print(user);
     return SafeArea(
         child: Scaffold(
-      backgroundColor: Color(0xfff9f9f9),
+      backgroundColor: _selectedIndex == 1 ? Colors.white : Color(0xfff9f9f9),
       appBar: _showAppBar
           ? AppBar(
               iconTheme: IconThemeData(color: Colors.black54),
@@ -65,7 +67,7 @@ class _ProductWrapState extends State<ProductWrap> {
         onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.title),
+            icon: Icon(Icons.home),
             title: Text("Home"),
           ),
           BottomNavigationBarItem(
