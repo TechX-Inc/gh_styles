@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:gh_styles/authentication/shop_validator.dart';
 
 class AddShop extends StatefulWidget {
   @override
@@ -7,12 +8,6 @@ class AddShop extends StatefulWidget {
 }
 
 class _AddShopState extends State<AddShop> {
-  List<Widget> _images = [
-    Image.asset("assets/images/dress.jpg", fit: BoxFit.cover),
-    Image.asset("assets/images/fan.jpg", fit: BoxFit.cover),
-    Image.asset("assets/images/ring.jpg", fit: BoxFit.cover),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -21,15 +16,24 @@ class _AddShopState extends State<AddShop> {
         child: Stack(
           children: <Widget>[
             Container(
-              // color: Colors.blue,
               color: Color.fromRGBO(109, 0, 39, 1),
-              height: MediaQuery.of(context).size.height * 0.40,
+              height: MediaQuery.of(context).size.height * 0.35,
               width: double.infinity,
             ),
             Align(
                 alignment: Alignment.topCenter,
-                child: Padding(
-                    padding: const EdgeInsets.only(top: 0), child: AppLogo())),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    AppLogo(),
+                    Expanded(
+                      child: Text(
+                        "Business",
+                        style: TextStyle(color: Colors.white, fontSize: 25),
+                      ),
+                    )
+                  ],
+                )),
             Positioned(top: 140, left: 10, right: 10, child: NewShopForms())
           ],
         ),
@@ -43,13 +47,13 @@ class AppLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 20),
-      width: 90.0,
-      height: 90.0,
+      width: 60.0,
+      height: 60.0,
       decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
       child: Icon(
         Icons.business,
         color: Color.fromRGBO(109, 0, 39, 1),
-        size: 40.0,
+        size: 30.0,
       ),
     );
   }
@@ -61,10 +65,19 @@ class NewShopForms extends StatefulWidget {
 }
 
 class _NewShopFormsWidgetState extends State<NewShopForms> {
+  String _shopName;
+  String _shopOwnerLegalName;
+  String _shopPhone;
+  String _shopEmail;
+  String _shopLocation;
+  String _shopWebsite;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FocusNode myFocusNode = new FocusNode();
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: <Widget>[
           Card(
@@ -74,16 +87,12 @@ class _NewShopFormsWidgetState extends State<NewShopForms> {
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
               child: Column(
                 children: <Widget>[
-                  // Text("New Shop", style: TextStyle(
-                  //   fontSize: 25,
-                  //   fontWeight: FontWeight.bold
-                  // ),),
-                  _buildEmailField(),
-                  _buildPasswordField(),
-                  _buildPasswordField(),
-                  _buildPasswordField(),
-                  _buildPasswordField(),
-                  _buildPasswordField(),
+                  _shopNameField(),
+                  _ownerLegalNameField(),
+                  _shopEmailField(),
+                  _shopPhoneField(),
+                  _shopLocationField(),
+                  _websiteUrlField(),
                   SizedBox(height: 40),
                   _buildSubmitButton(),
                 ],
@@ -95,41 +104,101 @@ class _NewShopFormsWidgetState extends State<NewShopForms> {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _shopNameField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Shop Name",
-        labelStyle: TextStyle(
-            color: myFocusNode.hasFocus
-                ? Color.fromRGBO(109, 0, 39, 1)
-                : Color.fromRGBO(0, 0, 0, 0.6)),
+        labelText: "Shop Name *",
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
         ),
       ),
+      validator: (value) => ValidateShopData.checkRequired(value.trim()),
+      onSaved: (newValue) => newValue = _shopName,
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _ownerLegalNameField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Test Name",
-
+        labelText: "Owner Legal Name *",
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
         ),
       ),
+      validator: (value) => ValidateShopData.checkRequired(value),
+      onSaved: (newValue) => newValue = _shopOwnerLegalName,
+    );
+  }
+
+  Widget _shopEmailField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Email *",
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        ),
+      ),
+      validator: (value) => ValidateShopData.validateEmail(value.trim()),
+      onSaved: (newValue) => newValue = _shopEmail,
+    );
+  }
+
+  Widget _shopPhoneField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Phone Number *",
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        ),
+      ),
+      validator: (value) => ValidateShopData.validateNumber(value),
+      onSaved: (newValue) => newValue = _shopPhone,
+    );
+  }
+
+  Widget _shopLocationField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Location *",
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        ),
+      ),
+      validator: (value) => ValidateShopData.checkRequired(value),
+      onSaved: (newValue) => newValue = _shopLocation,
+    );
+  }
+
+  Widget _websiteUrlField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Website",
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        ),
+      ),
+      validator: (value) => ValidateShopData.validateUrl(value.trim()),
+      onSaved: (newValue) => newValue = _shopWebsite,
     );
   }
 
   Widget _buildSubmitButton() {
     return RaisedButton(
       color: Color.fromRGBO(109, 0, 39, 1),
-      onPressed: () {},
       child: Text(
         'Create Shop',
         style: TextStyle(color: Colors.white),
       ),
+      onPressed: _processAndSave,
     );
+  }
+
+  void _processAndSave() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    } else {
+      _formKey.currentState.save();
+      print("Valid data");
+    }
   }
 }

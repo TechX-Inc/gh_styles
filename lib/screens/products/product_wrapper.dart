@@ -71,11 +71,7 @@ class _ProductWrapState extends State<ProductWrap> {
             title: Text("Home"),
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/images/add_shop.png",
-              height: 24,
-              width: 24,
-            ),
+            icon: Icon(Icons.business),
             title: Text("New Shop"),
           ),
           BottomNavigationBarItem(
