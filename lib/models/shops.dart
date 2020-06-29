@@ -37,14 +37,14 @@ class Shop {
           shopContact != null &&
           shopEmail != null &&
           shopLocation != null) {
-        String downloadPath = await uploadImage(shopLogo);
+        dynamic downloadPath = await uploadImage(shopLogo);
         return await shops.document().setData({
           'shop_owner': shopOwner.document(uid),
           'shop_name': shopName,
           'shop_contact': shopContact,
           'shop_email': shopEmail,
           'shop_location': shopLocation,
-          'shop"_logo': downloadPath,
+          'shop"_logo': downloadPath != null ? downloadPath : "None",
           'shop_website': shopWebsite,
           'date_register': FieldValue.serverTimestamp()
         }).then((value) async {
