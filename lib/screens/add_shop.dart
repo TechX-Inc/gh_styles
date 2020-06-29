@@ -1,7 +1,7 @@
 import 'package:gh_styles/providers/add_shop_provider.dart';
 import 'package:gh_styles/utils/add_shop_forms.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/utils/business_logo.dart';
+import 'package:gh_styles/utils/business_logo_picker.dart';
 import 'package:provider/provider.dart';
 
 class AddShop extends StatefulWidget {
@@ -36,7 +36,9 @@ class _AddShopState extends State<AddShop> {
 
 class FormWrapper extends StatelessWidget {
   @override
+  AddShopProvider cancelUpload;
   Widget build(BuildContext context) {
+    cancelUpload = Provider.of<AddShopProvider>(context, listen: false);
     return Column(
       children: <Widget>[
         FractionallySizedBox(
@@ -51,9 +53,22 @@ class FormWrapper extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              Text(
-                "Add Logo",
-                style: TextStyle(fontSize: 20, color: Colors.white),
+              Consumer<AddShopProvider>(
+                builder: (context, data, _) {
+                  return data.image == null
+                      ? Text(
+                          "Add Logo",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        )
+                      : FlatButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          child: Icon(Icons.cancel, color: Colors.white),
+                          onPressed: () {
+                            data.removePhoto = null;
+                          },
+                        );
+                },
               ),
               SizedBox(
                 height: 40,

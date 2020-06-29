@@ -51,6 +51,11 @@ class AddShopProvider with ChangeNotifier {
     _shopWebsite = url;
   }
 
+  set removePhoto(File image) {
+    _shopAvatar = image;
+    notifyListeners();
+  }
+
   set userID(String uid) {
     _uid = uid;
   }
