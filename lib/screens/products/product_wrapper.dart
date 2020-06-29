@@ -29,8 +29,8 @@ class _ProductWrapState extends State<ProductWrap> {
       user == null ? ToggleLoginSignUp() : UserProfile(),
     ];
 
+    // print(user);
 
-    print(user);
     return SafeArea(
         child: Scaffold(
       backgroundColor: _selectedIndex == 1 ? Colors.white : Color(0xfff9f9f9),
@@ -39,22 +39,20 @@ class _ProductWrapState extends State<ProductWrap> {
               iconTheme: IconThemeData(color: Colors.black54),
               backgroundColor: Color(0xfff9f9f9),
               elevation: 0.0,
-              leading:  IconButton(
-                      icon: Icon(
-                        Icons.search,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        showSearch(
-                            context: context, delegate: SearchServices());
-                      },
-                    ),
+              leading: IconButton(
+                icon: Icon(
+                  Icons.search,
+                  size: 28,
+                ),
+                onPressed: () {
+                  showSearch(context: context, delegate: SearchServices());
+                },
+              ),
               actions: <Widget>[
-                    IconButton(
-                        icon: Icon(Icons.shopping_cart),
-                        onPressed: () {},
-                      )
-                    ,
+                IconButton(
+                  icon: Icon(Icons.shopping_cart),
+                  onPressed: () {},
+                ),
               ],
             )
           : null,
@@ -98,7 +96,7 @@ class _ProductWrapState extends State<ProductWrap> {
           });
           break;
         default:
-         setState(() {
+          setState(() {
             _showAppBar = true;
           });
       }
