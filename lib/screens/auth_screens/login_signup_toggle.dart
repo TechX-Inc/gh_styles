@@ -1,11 +1,6 @@
-
-//NOT USED
 import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/signup.dart';
-
-import '../slider_layout_view.dart';
-
 
 class ToggleLoginSignUp extends StatefulWidget {
   @override
@@ -13,9 +8,8 @@ class ToggleLoginSignUp extends StatefulWidget {
 }
 
 class _ToggleLoginSignUpState extends State<ToggleLoginSignUp> {
-
   bool _showSignIn = true;
-  void toggleView (){
+  void toggleView() {
     setState(() => _showSignIn = !_showSignIn);
   }
 

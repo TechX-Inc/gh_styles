@@ -50,6 +50,7 @@ class AuthService {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+
       FirebaseUser user = result?.user;
       return user;
     } on PlatformException catch (e) {

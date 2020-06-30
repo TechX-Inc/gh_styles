@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/shops.dart';
@@ -10,6 +9,7 @@ class AddShopProvider with ChangeNotifier {
   final picker = ImagePicker();
   File _shopAvatar;
   bool _autovalidate = false;
+  bool _loading = false;
 
   String _shopName;
   String _shopOwnerLegalName;
@@ -18,7 +18,6 @@ class AddShopProvider with ChangeNotifier {
   String _shopLocation;
   String _shopWebsite;
   String _uid;
-  bool _loading = false;
 
 //GETTERS
   GlobalKey<FormState> get formKey => _formKey;
@@ -107,6 +106,5 @@ class AddShopProvider with ChangeNotifier {
         notifyListeners();
       }
     }
-    notifyListeners();
   }
 }

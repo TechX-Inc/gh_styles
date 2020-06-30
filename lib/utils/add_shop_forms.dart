@@ -18,7 +18,7 @@ class _ShopFormsWidgetState extends State<ShopForms> {
     _addShopFormHandler = Provider.of<AddShopProvider>(context, listen: false);
 
     final user = Provider.of<User>(context);
-    String uid = user.uid;
+    String uid = user?.uid;
     _addShopFormHandler.userID = uid;
 
     return Form(
