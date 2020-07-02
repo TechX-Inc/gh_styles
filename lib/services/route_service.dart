@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
-import 'package:gh_styles/screens/auth_screens/signup.dart';
+import 'package:gh_styles/screens/auth_screens/register.dart';
 import 'package:gh_styles/screens/item_profile.dart';
 import 'package:gh_styles/screens/product_listing.dart';
 import 'package:gh_styles/screens/products/product_wrapper.dart';
@@ -17,7 +17,7 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => SplashScreen());
 
-       case '/wrapper':
+      case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
       //  case '/products':
@@ -63,7 +63,10 @@ class RouteGenerator {
                 onPressed: () {
                   print("going home");
                 },
-                child: Text("Home", style: TextStyle(color: Colors.blueAccent),),
+                child: Text(
+                  "Home",
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
               )
             ],
           )),

@@ -2,28 +2,28 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gh_styles/authentication/validation_login.dart';
+import 'package:gh_styles/authentication/validation_signup.dart';
+import 'package:gh_styles/providers/login_provider.dart';
+import 'package:gh_styles/providers/register_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:gh_styles/providers/login_provider.dart';
 
-class LoginForm extends StatefulWidget {
+class RegisterForm extends StatefulWidget {
   final dynamic widget;
-  LoginForm({this.widget});
-
+  RegisterForm({this.widget});
   @override
-  _LoginFormState createState() => _LoginFormState();
+  _RegisterFormState createState() => _RegisterFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
-  LoginProvider _loginHandler;
+class _RegisterFormState extends State<RegisterForm> {
+  RegisterProvider _registerHandler;
 
   @override
   Widget build(BuildContext context) {
-    _loginHandler = Provider.of<LoginProvider>(context, listen: false);
+    _registerHandler = Provider.of<RegisterProvider>(context, listen: false);
     return Form(
-      key: _loginHandler.formKey,
-      autovalidate: _loginHandler.autovalidate,
+      key: _registerHandler.formKey,
+      autovalidate: _registerHandler.autovalidate,
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -51,6 +51,7 @@ class _LoginFormState extends State<LoginForm> {
                     ],
                   ),
                   SizedBox(height: 20),
+                  _username(),
                   _emailField(),
                   _passwordField(),
                   SizedBox(
@@ -86,17 +87,26 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
+  Widget _username() {
+    return TextFormField(
+      keyboardType: TextInputType.multiline,
+      decoration: InputDecoration(hintText: "Username"),
+      validator: (value) => ValidateSignUp.validateUsername(value.trim()),
+      onSaved: (username) => _registerHandler.setUsename = username,
+    );
+  }
+
   Widget _emailField() {
     return TextFormField(
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(hintText: "Email"),
-      validator: (value) => ValidateLogin.validateEmail(value.trim()),
-      onSaved: (email) => _loginHandler.setEmail = email,
+      validator: (value) => ValidateSignUp.validateEmail(value.trim()),
+      onSaved: (email) => _registerHandler.setEmail = email,
     );
   }
 
   Widget _passwordField() {
-    return Consumer<LoginProvider>(builder: (context, data, _) {
+    return Consumer<RegisterProvider>(builder: (context, data, _) {
       return TextFormField(
         keyboardType: TextInputType.multiline,
         obscureText: data.maskPassword,
@@ -111,8 +121,8 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed: () {
                   data.setPasswordMask = !data.maskPassword;
                 })),
-        validator: (value) => ValidateLogin.validatePassword(value.trim()),
-        onSaved: (password) => _loginHandler.setPassword = password,
+        validator: (value) => ValidateSignUp.validatePassword(value.trim()),
+        onSaved: (password) => _registerHandler.setPassword = password,
       );
     });
   }
@@ -122,7 +132,7 @@ class _LoginFormState extends State<LoginForm> {
       color: Colors.black,
       child: FractionallySizedBox(
         widthFactor: 1,
-        child: Container(child: Consumer<LoginProvider>(
+        child: Container(child: Consumer<RegisterProvider>(
           builder: (context, data, _) {
             return !data.loading
                 ? Text(
@@ -139,7 +149,7 @@ class _LoginFormState extends State<LoginForm> {
       ),
       shape: new RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(30.0)),
-      onPressed: () => _loginHandler.processAndSave(context),
+      onPressed: () => _registerHandler.processAndSave(context),
     );
   }
 
@@ -160,7 +170,7 @@ class _LoginFormState extends State<LoginForm> {
           )),
       shape: new RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(30.0)),
-      onPressed: () => _loginHandler.googleAuth(),
+      onPressed: () => _registerHandler.googleAuth(),
     );
   }
 }

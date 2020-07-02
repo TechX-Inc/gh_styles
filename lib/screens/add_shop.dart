@@ -1,5 +1,5 @@
 import 'package:gh_styles/providers/add_shop_provider.dart';
-import 'package:gh_styles/utils/add_shop_forms.dart';
+import 'package:gh_styles/utils/add_shop_form.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/utils/business_logo_picker.dart';
 import 'package:provider/provider.dart';

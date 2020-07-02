@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
 
-class LoginProvider with ChangeNotifier {
+class RegisterProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _auth = new AuthService();
   bool _autovalidate = false;
-  bool _loading = false;
   bool _maskPassword = true;
+  bool _loading = false;
+  String _username;
   String _email;
   String _password;
 
@@ -21,6 +22,10 @@ class LoginProvider with ChangeNotifier {
   bool get maskPassword => _maskPassword;
 
 //SETTERS
+  set setUsename(String username) {
+    _username = username;
+  }
+
   set setEmail(String email) {
     _email = email;
   }
@@ -50,25 +55,20 @@ class LoginProvider with ChangeNotifier {
       _loading = true;
       notifyListeners();
 
-      dynamic result = await _auth.login(_email.trim(), _password.trim());
+      dynamic result =
+          await _auth.register(_username.trim(), _email.trim(), _password);
 
       if (result != FirebaseUser) {
         print(
-            "<<<<<<<<<<<<==================== INVALID LOGIN VALUES ==================>>>>>>>>>>>");
+            "<<<<<<<<<<<<==================== INVALID REGISTER VALUES ==================>>>>>>>>>>>");
         switch (result) {
-          case "ERROR_USER_NOT_FOUND":
+          case "ERROR_EMAIL_ALREADY_IN_USE":
             Scaffold.of(context)
-                .showSnackBar(snackBar("Email or password is incorrect"));
+                .showSnackBar(snackBar("This user already exist"));
             _loading = false;
             notifyListeners();
             break;
 
-          case "ERROR_WRONG_PASSWORD":
-            Scaffold.of(context)
-                .showSnackBar(snackBar("Email or password is incorrect"));
-            _loading = false;
-            notifyListeners();
-            break;
           default:
             print(
                 "UNEXPECTED ERROR <<<<<<<<<<<<==================== $result ==================>>>>>>>>>>>");

@@ -16,14 +16,16 @@ class AuthService {
     return _auth.onAuthStateChanged.map(_newUser);
   }
 
-  Future register(String email, String password, [String username]) async {
+  Future<dynamic> register(
+      String username, String email, String password) async {
     try {
-      AuthResult result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      FirebaseUser user = result?.user;
-      return _newUser(user);
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => _newUser(value?.user))
+          .catchError((onError) => throw new PlatformException(
+              code: onError.code, message: onError.message));
     } on PlatformException catch (e) {
-      return e;
+      return e.code;
     }
   }
 
@@ -46,13 +48,13 @@ class AuthService {
     }
   }
 
-  Future login(String email, String password) async {
+  Future<dynamic> login(String email, String password) async {
     try {
-      AuthResult result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-
-      FirebaseUser user = result?.user;
-      return user;
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) => value?.user)
+          .catchError((onError) => throw new PlatformException(
+              code: onError.code, message: onError.message));
     } on PlatformException catch (e) {
       return e.code;
     }

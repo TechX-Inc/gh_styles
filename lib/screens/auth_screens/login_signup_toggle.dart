@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
-import 'package:gh_styles/screens/auth_screens/signup.dart';
+import 'package:gh_styles/screens/auth_screens/register.dart';
 
 class ToggleLoginSignUp extends StatefulWidget {
   @override
