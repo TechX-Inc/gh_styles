@@ -17,11 +17,12 @@ class ProductWrap extends StatefulWidget {
 class _ProductWrapState extends State<ProductWrap> {
   int _selectedIndex = 0;
   bool _showAppBar = true;
-  final AuthService _auth = new AuthService();
+  // final AuthService _auth = new AuthService();
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
+    // print(user);
     List<Widget> bottomNavPages = [
       HomeScreen(),
       AddShop(),

@@ -5,6 +5,7 @@ import 'package:gh_styles/models/users.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
+  final User _user = new User();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleAuth = new GoogleSignIn();
 
@@ -21,7 +22,10 @@ class AuthService {
     try {
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => _newUser(value?.user))
+          .then((value) => {
+                _newUser(value?.user),
+                _user.saveUser(value.user.uid, username, email)
+              })
           .catchError((onError) => throw new PlatformException(
               code: onError.code, message: onError.message));
     } on PlatformException catch (e) {
@@ -39,7 +43,7 @@ class AuthService {
       final AuthResult result = await _auth.signInWithCredential(credential);
       final FirebaseUser user = result?.user;
       if (user != null) {
-        new User().saveUser(user.uid, user.displayName, user.email);
+        _user.saveUser(user.uid, user.displayName, user.email);
       }
       return _newUser(user);
     } on PlatformException catch (e) {

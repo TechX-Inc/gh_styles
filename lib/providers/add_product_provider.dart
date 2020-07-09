@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/authentication/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
 
-class RegisterProvider with ChangeNotifier {
+class AddProductProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _auth = new AuthService();
   bool _autovalidate = false;
-  bool _maskPassword = true;
   bool _loading = false;
-  String _username;
+  bool _maskPassword = true;
   String _email;
   String _password;
 
@@ -22,10 +21,6 @@ class RegisterProvider with ChangeNotifier {
   bool get maskPassword => _maskPassword;
 
 //SETTERS
-  set setUsename(String username) {
-    _username = username;
-  }
-
   set setEmail(String email) {
     _email = email;
   }
@@ -55,15 +50,22 @@ class RegisterProvider with ChangeNotifier {
       _loading = true;
       notifyListeners();
 
-      dynamic result =
-          await _auth.register(_username.trim(), _email.trim(), _password);
+      dynamic result = await _auth.login(_email.trim(), _password.trim());
+
       if (result != FirebaseUser) {
         print(
-            "<<<<<<<<<<<<==================== INVALID REGISTER VALUES ==================>>>>>>>>>>>");
+            "<<<<<<<<<<<<==================== INVALID LOGIN VALUES ==================>>>>>>>>>>>");
         switch (result) {
-          case "ERROR_EMAIL_ALREADY_IN_USE":
+          case "ERROR_USER_NOT_FOUND":
             Scaffold.of(context)
-                .showSnackBar(snackBar("This user already exist"));
+                .showSnackBar(snackBar("Email or password is incorrect"));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "ERROR_WRONG_PASSWORD":
+            Scaffold.of(context)
+                .showSnackBar(snackBar("Email or password is incorrect"));
             _loading = false;
             notifyListeners();
             break;
@@ -77,7 +79,7 @@ class RegisterProvider with ChangeNotifier {
         }
       } else {
         print(
-            "<<<<<<<<<<<<==================== VALID REGISTER VALUES ==================>>>>>>>>>>>");
+            "<<<<<<<<<<<<==================== VALID LOGIN VALUES ==================>>>>>>>>>>>");
         print(result.runtimeType);
         _loading = false;
         notifyListeners();

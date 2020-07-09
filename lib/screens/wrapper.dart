@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/screens/products/product_wrapper.dart';
+import 'package:gh_styles/screens/product_wrapper.dart';
 import 'package:gh_styles/screens/slider_layout_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
