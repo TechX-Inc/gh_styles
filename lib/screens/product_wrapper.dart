@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/authentication/auth_service.dart';
+import 'package:gh_styles/auth_and_validation/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/products/favorites.dart';
@@ -25,7 +25,7 @@ class _ProductWrapState extends State<ProductWrap> {
     // print(user);
     List<Widget> bottomNavPages = [
       HomeScreen(),
-      AddShop(),
+      user == null ? ToggleLoginSignUp() : AddShop(),
       Favorites(),
       user == null ? ToggleLoginSignUp() : UserProfile(),
     ];

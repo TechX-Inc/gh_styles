@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/authentication/auth_service.dart';
+import 'package:gh_styles/auth_and_validation/auth_service.dart';
 import 'package:gh_styles/widgets/confirm_delete.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
