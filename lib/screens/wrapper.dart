@@ -35,6 +35,8 @@ class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: firstStartup == true ? SliderLayoutView() : ProductWrap());
+      child: Scaffold(
+          body: firstStartup == true ? SliderLayoutView() : ProductWrap()),
+    );
   }
 }

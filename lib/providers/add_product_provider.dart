@@ -1,19 +1,26 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gh_styles/auth_and_validation/auth_service.dart';
-import 'package:gh_styles/models/users.dart';
-import 'package:gh_styles/services/products.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:gh_styles/services/products_services.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:toast/toast.dart';
 
 class AddProductProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKeyStepperOne = GlobalKey<FormState>();
+
   final AuthService _auth = new AuthService();
-  List<Asset> _images = List<Asset>();
-  bool _autovalidate = false;
+  List<File> _images = List();
   bool _loading = false;
+
+  Widget snackBar(error) => SnackBar(
+        content: Text(error),
+        backgroundColor: Colors.red,
+      );
 
   CollectionReference user = Firestore.instance.collection("Users");
   CollectionReference shop = Firestore.instance.collection("Shops");
@@ -25,17 +32,19 @@ class AddProductProvider with ChangeNotifier {
   String _productDescription;
   String _productPrice;
   String _productDiscount;
-  String _productType = 'Foot Wears';
+  String _productType = 'Footwears';
   String _gender = 'Male';
   String _productSize;
   String _collection = 'Kids';
 
 //GETTERS
   GlobalKey<FormState> get formKey => _formKey;
+  GlobalKey<FormState> get formKeyStepperOne => _formKeyStepperOne;
+
   AuthService get auth => _auth;
   bool get loading => _loading;
-  bool get autovalidate => _autovalidate;
-  List<Asset> get images => _images;
+
+  List<File> get images => _images;
 
   String get productType => _productType;
   String get gender => _gender;
@@ -60,10 +69,12 @@ class AddProductProvider with ChangeNotifier {
 
   set setproductType(String productType) {
     _productType = productType;
+    notifyListeners();
   }
 
   set setgender(String gender) {
     _gender = gender;
+    notifyListeners();
   }
 
   set setproductSize(String productSize) {
@@ -72,10 +83,16 @@ class AddProductProvider with ChangeNotifier {
 
   set setcollection(String collection) {
     _collection = collection;
+    notifyListeners();
   }
 
   set setUID(String uid) {
     _uid = uid;
+  }
+
+  set imageToRemoveIndex(int index) {
+    _images.removeAt(index);
+    notifyListeners();
   }
 
   Future<dynamic> findShop() async {
@@ -107,14 +124,8 @@ class AddProductProvider with ChangeNotifier {
     return await shopRef.get().then((shopData) => shopData.data);
   }
 
-  Widget snackBar(error) => SnackBar(
-        content: Text(error),
-        backgroundColor: Colors.red,
-      );
-
   Future<void> processAndSave(BuildContext context) async {
     if (!_formKey.currentState.validate()) {
-      _autovalidate = true;
       _formKey.currentState.build(context);
       notifyListeners();
       return;
@@ -131,63 +142,95 @@ class AddProductProvider with ChangeNotifier {
         _loading = false;
         notifyListeners();
       } else {
+        // print("NAME $_productName");
+        // print("QUANTITY $_productQuantity");
+        // print("DESCRIPTION $_productDescription");
+        // print("DISCOUNT $_productDiscount");
+        // print("PRICE $_productPrice");
+        // print("TYPE $_productType");
+        // print("SIZE $_productSize");
+        // print("GENDER $_gender");
+        // print("COLLECTION $_collection");
+
         ProductService newProduct = new ProductService(
             shopRef: shopRef,
-            productName: _productName ?? null,
-            productQuantity: _productQuantity ?? 1.toString(),
+            productPhotos: _images.isNotEmpty ? _images : null,
+            productName: _productName.trim() ?? null,
+            productQuantity: _productQuantity.trim() ?? 1.toString(),
             productDescription: _productDescription ?? '',
             productDiscount: _productDiscount ?? 0.toString(),
-            productPrice: _productPrice ?? null,
-            productType: _productType,
+            productPrice: _productPrice.trim() ?? null,
+            productType: _productType.trim(),
             productSize: _productSize ?? null,
-            gender: _gender,
-            collection: _collection);
+            gender: _gender.trim(),
+            collection: _collection.trim());
         dynamic product = await newProduct.newProduct();
-        switch (product) {
-          case "NULL_IN_REQUIRE_VALUES":
-            Scaffold.of(context).showSnackBar(
-                snackBar("Error, provide all required(*) fields"));
-            _loading = false;
-            notifyListeners();
-            break;
+        print(product);
+        if (product != true) {
+          switch (product) {
+            case "NULL_IN_REQUIRED_FIELD":
+              Scaffold.of(context).showSnackBar(
+                  snackBar("Error, provide all required(*) fields"));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "PRODUCT_ADD_FAILED":
-            Scaffold.of(context)
-                .showSnackBar(snackBar("Unexpected error occured, try again"));
-            _loading = false;
-            notifyListeners();
-            break;
-          default:
-            print(
-                "UNEXPECTED ERROR <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
-            Scaffold.of(context).showSnackBar(
-                snackBar("Something went wrong, please try again"));
-            _loading = false;
-            notifyListeners();
+            case "PRODUCT_ADD_FAILED":
+              Scaffold.of(context)
+                  .showSnackBar(snackBar("Unable to add product"));
+              _loading = false;
+              notifyListeners();
+              break;
+
+            case "NULL_OR_EMPTY_PRODUCT_PHOTO":
+              Scaffold.of(context)
+                  .showSnackBar(snackBar("Please select product photo(s)"));
+              _loading = false;
+              notifyListeners();
+              break;
+
+            case "PRODUCT_IMAGE_UPLOAD_FAIL":
+              Scaffold.of(context).showSnackBar(
+                  snackBar("Could not upload photos, please resubmit data"));
+              _loading = false;
+              notifyListeners();
+              break;
+
+            case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
+              Scaffold.of(context).showSnackBar(
+                  snackBar("Unexpected error after uploading photos"));
+              _loading = false;
+              notifyListeners();
+              break;
+            default:
+              print(
+                  "UNEXPECTED ERROR <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
+              Scaffold.of(context).showSnackBar(
+                  snackBar("An unknown error, please contact support"));
+              _loading = false;
+              notifyListeners();
+          }
         }
       }
     }
   }
 
-  Future<void> uploadProductPhotos() async {
-    List<Asset> resultList = List<Asset>();
-
+  Future<void> selectProductPhotos(BuildContext context) async {
     try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 3,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          // actionBarColor: "#abcdef",
-          actionBarTitle: "Choose photos",
-          allViewTitle: "All Photos",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-    } on Exception catch (e) {}
-    _images = resultList;
+      _images = await FilePicker.getMultiFile(
+        type: FileType.image,
+      ).then((value) {
+        if (value.length > 4) {
+          Toast.show("Please select at most 4 photos", context,
+              duration: 3, gravity: Toast.BOTTOM);
+          value = value.sublist(0, 4);
+        }
+        print(value.length);
+        return value;
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
     notifyListeners();
   }
 }

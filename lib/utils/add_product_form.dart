@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
-
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/validation_product.dart';
 import 'package:gh_styles/models/users.dart';
@@ -23,6 +20,8 @@ class _NewProductFormState extends State<NewProductForm> {
   User _user;
   DocumentReference shopRef;
   String shopName = '';
+  String _nextStepperToggleText = 'Next';
+  Color _nextStepperToggleColor = Color.fromRGBO(32, 125, 255, 1);
 
   @override
   void initState() {
@@ -41,95 +40,178 @@ class _NewProductFormState extends State<NewProductForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _addProduct.formKey,
-      autovalidate: _addProduct.autovalidate,
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+        child: Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              alignment: Alignment.topCenter,
+              margin: EdgeInsets.only(top: 30),
+              child: FutureBuilder<dynamic>(
+                  future: _addProduct.getShopData(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Text("...");
+                    }
+                    return CircleAvatar(
+                        radius: 30,
+                        backgroundImage:
+                            NetworkImage(snapshot.data['shop_logo']));
+                  }),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(
-        children: <Widget>[
-          Row(
             children: <Widget>[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                alignment: Alignment.topCenter,
-                margin: EdgeInsets.only(top: 30),
-                child: FutureBuilder<dynamic>(
-                    future: _addProduct.getShopData(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Text("...");
-                      }
-                      return CircleAvatar(
-                          radius: 30,
-                          backgroundImage:
-                              NetworkImage(snapshot.data['shop_logo']));
-                    }),
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  FutureBuilder<dynamic>(
+                      future: _addProduct.getShopData(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Text("");
+                        }
+                        shopName = snapshot.data['shop_name'];
+                        return Text(
+                          shopName.toUpperCase(),
+                          style: GoogleFonts.ptSans(
+                              textStyle: TextStyle(
+                                  color: Color.fromRGBO(181, 7, 107, 1),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15)),
+                        );
+                      })
+                ],
               ),
+              SizedBox(height: 30),
             ],
           ),
-          SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    FutureBuilder<dynamic>(
-                        future: _addProduct.getShopData(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Text("");
-                          }
-                          shopName = snapshot.data['shop_name'];
-                          return Text(
-                            shopName.toUpperCase(),
-                            style: GoogleFonts.ptSans(
-                                textStyle: TextStyle(
-                                    color: Color.fromRGBO(181, 7, 107, 1),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15)),
-                          );
-                        })
-                  ],
-                ),
-                SizedBox(height: 30),
-              ],
-            ),
-          ),
-          Stepper(
+        ),
+        Form(
+          key: _addProduct.formKey,
+          child: Stepper(
+              physics: ClampingScrollPhysics(),
               currentStep: _currentStep,
               onStepContinue: () {
                 if (_currentStep >= 1) return;
-                setState(() {
-                  _currentStep += 1;
-                });
+                if (_addProduct.formKeyStepperOne.currentState.validate()) {
+                  _addProduct.formKeyStepperOne.currentState.save();
+                  setState(() {
+                    _currentStep += 1;
+                    _nextStepperToggleText = 'Add';
+                    _nextStepperToggleColor = Color.fromRGBO(181, 7, 107, 1);
+                  });
+                }
               },
               onStepCancel: () {
                 if (_currentStep <= 0) return;
                 setState(() {
                   _currentStep -= 1;
+                  _nextStepperToggleText = 'Next';
+                  _nextStepperToggleColor = Color.fromRGBO(32, 125, 255, 1);
                 });
+              },
+              controlsBuilder: (BuildContext context,
+                  {onStepCancel, onStepContinue}) {
+                return Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Row(
+                    children: <Widget>[
+                      FlatButton(
+                        color: _nextStepperToggleColor,
+                        child: Text(
+                          _nextStepperToggleText,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: _currentStep != 1
+                            ? onStepContinue
+                            : () => _addProduct.processAndSave(context),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      FlatButton(
+                          // color: Colors.red,
+                          child: Text("Previous"),
+                          onPressed: onStepCancel),
+                    ],
+                  ),
+                );
               },
               steps: <Step>[
                 Step(
                     title: Text('Step 1'),
-                    content: Column(
-                      children: <Widget>[
-                        _productName(),
-                        _productDescription(),
-                        _productQuantity(),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            _uploadProductPhoto(),
-                            Expanded(child: Text("Choose photo(s)"))
-                          ],
-                        )
-                      ],
+                    content: Form(
+                      key: _addProduct.formKeyStepperOne,
+                      child: Column(
+                        children: <Widget>[
+                          _productName(),
+                          _productDescription(),
+                          _productQuantity(),
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              _uploadProductPhoto(),
+                              Expanded(child: Text("Choose photo(s)"))
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Consumer<AddProductProvider>(builder: (_, data, __) {
+                            return Visibility(
+                              visible: data.images.isNotEmpty,
+                              child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: 80.0,
+                                  ),
+                                  child: GridView.count(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    primary: false,
+                                    crossAxisCount: 4,
+                                    crossAxisSpacing: 10,
+                                    children: List.generate(data.images.length,
+                                        (index) {
+                                      return Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          Image.file(
+                                            data.images[index],
+                                            fit: BoxFit.cover,
+                                          ),
+                                          Positioned(
+                                            top: 0,
+                                            right: 0,
+                                            child: GestureDetector(
+                                              behavior:
+                                                  HitTestBehavior.translucent,
+                                              onTap: () {
+                                                data.imageToRemoveIndex = index;
+                                              },
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    }),
+                                  )),
+                            );
+                          }),
+                        ],
+                      ),
                     )),
                 Step(
                     title: Text('Step 2'),
@@ -160,9 +242,9 @@ class _NewProductFormState extends State<NewProductForm> {
                       ],
                     )),
               ]),
-        ],
-      )),
-    );
+        ),
+      ],
+    ));
   }
 
   Widget _productName() {
@@ -221,49 +303,55 @@ class _NewProductFormState extends State<NewProductForm> {
   }
 
   Widget _productCategory() {
-    return DropdownButton<String>(
-      value: _addProduct.productType,
-      onChanged: (String newValue) => _addProduct.setproductType = newValue,
-      items: <String>[
-        'Foot Wears',
-        'Shoes',
-        'Bags',
-        'Clothings',
-        'Shirts',
-        'Shorts'
-      ].map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+    return Consumer<AddProductProvider>(builder: (_, data, __) {
+      return DropdownButton<String>(
+        value: data.productType,
+        onChanged: (String value) => data.setproductType = value,
+        items: <String>[
+          'Footwears',
+          'Shoes',
+          'Bags',
+          'Clothings',
+          'Shirts',
+          'Shorts'
+        ].map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      );
+    });
   }
 
   Widget _gender() {
-    return DropdownButton<String>(
-      value: _addProduct.gender,
-      onChanged: (String newValue) => _addProduct.setgender = newValue,
-      items: <String>['Male', "Female"]
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+    return Consumer<AddProductProvider>(builder: (_, data, __) {
+      return DropdownButton<String>(
+        value: data.gender,
+        onChanged: (String newValue) => data.setgender = newValue,
+        items: <String>['Male', "Female"]
+            .map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      );
+    });
   }
 
   Widget _collection() {
-    return RadioButtonGroup(
-        picked: _addProduct.collection,
-        orientation: GroupedButtonsOrientation.HORIZONTAL,
-        padding: EdgeInsets.all(0),
-        labels: <String>[
-          "Kids",
-          "Adults",
-        ],
-        onSelected: (String selected) => _addProduct.setcollection = selected);
+    return Consumer<AddProductProvider>(builder: (_, data, __) {
+      return RadioButtonGroup(
+          picked: data.collection,
+          orientation: GroupedButtonsOrientation.HORIZONTAL,
+          padding: EdgeInsets.all(0),
+          labels: <String>[
+            "Kids",
+            "Adults",
+          ],
+          onSelected: (String selected) => data.setcollection = selected);
+    });
   }
 
   Widget _uploadProductPhoto() {
@@ -273,7 +361,7 @@ class _NewProductFormState extends State<NewProductForm> {
         size: 35,
         // color: Color.fromRGBO(184, 59, 94, 1),
       ),
-      onPressed: () => _addProduct.uploadProductPhotos(),
+      onPressed: () => _addProduct.selectProductPhotos(context),
     );
   }
 
@@ -303,64 +391,3 @@ class _NewProductFormState extends State<NewProductForm> {
     );
   }
 }
-/*
-Product Name
-Product Price
-Product Discount(in %)
-Product Photos
-
-===============================================
-Type         gender      Collection
-
-Shoes        Male         Kids
-Bags         Female       Adults
-Clothings
-Shirts
-Shorts
-
-
-
-
- */
-// Container(
-//   child: GridView.count(
-//     crossAxisCount: 3,
-//     children: List.generate(_addProduct.images.length, (index) {
-//       Asset asset = _addProduct.images[index];
-//       return AssetThumb(
-//         asset: asset,
-//         width: 60,
-//         height: 60,
-//       );
-//     }),
-//   ),
-// ),
-// Row(
-//   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//   children: <Widget>[
-//     Container(
-//       height: 60,
-//       width: 60,
-//       color: Colors.grey,
-//       child: Center(child: Text("ONE")),
-//     ),
-//     Container(
-//       height: 60,
-//       width: 60,
-//       color: Colors.grey,
-//       child: Center(child: Text("TWO")),
-//     ),
-//     Container(
-//       height: 60,
-//       width: 60,
-//       color: Colors.grey,
-//       child: Center(child: Text("THREE")),
-//     ),
-//     Container(
-//       height: 60,
-//       width: 60,
-//       color: Colors.grey,
-//       child: Center(child: Text("FOUR")),
-//     )
-//   ],
-// ),
