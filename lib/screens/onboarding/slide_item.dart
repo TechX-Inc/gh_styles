@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:gh_styles/constants/constants.dart';
+import 'package:gh_styles/utils/constants.dart';
 import 'package:gh_styles/screens/onboarding/slider.dart';
 
-class SlideItem extends StatelessWidget {
+class OnboardingSliderItem extends StatelessWidget {
   final int index;
-  SlideItem(this.index);
+  OnboardingSliderItem(this.index);
 
   @override
   Widget build(BuildContext context) {

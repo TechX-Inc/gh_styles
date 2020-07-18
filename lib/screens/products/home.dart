@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/products/widgets/categorycontainer.dart';
 import 'package:gh_styles/screens/products/widgets/productcontainer.dart';
 import '../../test_data.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -37,15 +36,7 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          StickyHeader(
-            header: Container(
-              height: 30,
-              child: CategoryContainer(),
-            ),
-            content: Container(
-              // child: Text("SOME TEST DATA"),
-            ),
-          ),
+
           SizedBox(
             height: 15,
           ),

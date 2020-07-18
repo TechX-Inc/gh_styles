@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:gh_styles/constants/constants.dart';
+import 'package:gh_styles/utils/constants.dart';
 
 class Slider {
   final String sliderImageUrl;

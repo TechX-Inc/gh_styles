@@ -17,9 +17,9 @@ class AddProductProvider with ChangeNotifier {
   List<File> _images = List();
   bool _loading = false;
 
-  Widget snackBar(error) => SnackBar(
+  Widget snackBar(error, [color = Colors.red]) => SnackBar(
         content: Text(error),
-        backgroundColor: Colors.red,
+        backgroundColor: color,
       );
 
   CollectionReference user = Firestore.instance.collection("Users");
@@ -126,91 +126,99 @@ class AddProductProvider with ChangeNotifier {
 
   Future<void> processAndSave(BuildContext context) async {
     if (!_formKey.currentState.validate()) {
-      _formKey.currentState.build(context);
-      notifyListeners();
       return;
     } else {
-      _formKey.currentState.save();
-      _loading = true;
-      notifyListeners();
-
-      dynamic shopRef = await findShop();
-      if (shopRef.runtimeType != DocumentReference) {
-        print(shopRef);
-        Scaffold.of(context)
-            .showSnackBar(snackBar("An unexpected error occured"));
-        _loading = false;
+      if (_images.isNotEmpty) {
+        _formKey.currentState.save();
+        _loading = true;
         notifyListeners();
-      } else {
-        // print("NAME $_productName");
-        // print("QUANTITY $_productQuantity");
-        // print("DESCRIPTION $_productDescription");
-        // print("DISCOUNT $_productDiscount");
-        // print("PRICE $_productPrice");
-        // print("TYPE $_productType");
-        // print("SIZE $_productSize");
-        // print("GENDER $_gender");
-        // print("COLLECTION $_collection");
 
-        ProductService newProduct = new ProductService(
-            shopRef: shopRef,
-            productPhotos: _images.isNotEmpty ? _images : null,
-            productName: _productName.trim() ?? null,
-            productQuantity: _productQuantity.trim() ?? 1.toString(),
-            productDescription: _productDescription ?? '',
-            productDiscount: _productDiscount ?? 0.toString(),
-            productPrice: _productPrice.trim() ?? null,
-            productType: _productType.trim(),
-            productSize: _productSize ?? null,
-            gender: _gender.trim(),
-            collection: _collection.trim());
-        dynamic product = await newProduct.newProduct();
-        print(product);
-        if (product != true) {
-          switch (product) {
-            case "NULL_IN_REQUIRED_FIELD":
-              Scaffold.of(context).showSnackBar(
-                  snackBar("Error, provide all required(*) fields"));
-              _loading = false;
-              notifyListeners();
-              break;
+        dynamic shopRef = await findShop();
+        if (shopRef.runtimeType != DocumentReference) {
+          print(shopRef);
+          Scaffold.of(context)
+              .showSnackBar(snackBar("An unexpected error occured"));
+          _loading = false;
+          notifyListeners();
+        } else {
+          // print("NAME $_productName");
+          // print("QUANTITY $_productQuantity");
+          // print("DESCRIPTION $_productDescription");
+          // print("DISCOUNT $_productDiscount");
+          // print("PRICE $_productPrice");
+          // print("TYPE $_productType");
+          // print("SIZE $_productSize");
+          // print("GENDER $_gender");
+          // print("COLLECTION $_collection");
 
-            case "PRODUCT_ADD_FAILED":
-              Scaffold.of(context)
-                  .showSnackBar(snackBar("Unable to add product"));
-              _loading = false;
-              notifyListeners();
-              break;
+          ProductService newProduct = new ProductService(
+              shopRef: shopRef,
+              productPhotos: _images.isNotEmpty ? _images : null,
+              productName: _productName.trim() ?? null,
+              productQuantity: _productQuantity.trim() ?? 1.toString(),
+              productDescription: _productDescription ?? '',
+              productDiscount: _productDiscount ?? 0.toString(),
+              productPrice: _productPrice.trim() ?? null,
+              productType: _productType.trim(),
+              productSize: _productSize ?? null,
+              gender: _gender.trim(),
+              collection: _collection.trim());
+          dynamic product = await newProduct.newProduct();
+          print(product);
+          if (product != true) {
+            switch (product) {
+              case "NULL_IN_REQUIRED_FIELD":
+                Scaffold.of(context).showSnackBar(
+                    snackBar("Error, provide all required(*) fields"));
+                _loading = false;
+                notifyListeners();
+                break;
 
-            case "NULL_OR_EMPTY_PRODUCT_PHOTO":
-              Scaffold.of(context)
-                  .showSnackBar(snackBar("Please select product photo(s)"));
-              _loading = false;
-              notifyListeners();
-              break;
+              case "PRODUCT_ADD_FAILED":
+                Scaffold.of(context)
+                    .showSnackBar(snackBar("Unable to add product"));
+                _loading = false;
+                notifyListeners();
+                break;
 
-            case "PRODUCT_IMAGE_UPLOAD_FAIL":
-              Scaffold.of(context).showSnackBar(
-                  snackBar("Could not upload photos, please resubmit data"));
-              _loading = false;
-              notifyListeners();
-              break;
+              case "NULL_OR_EMPTY_PRODUCT_PHOTO":
+                Scaffold.of(context)
+                    .showSnackBar(snackBar("Please select product photo(s)"));
+                _loading = false;
+                notifyListeners();
+                break;
 
-            case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
-              Scaffold.of(context).showSnackBar(
-                  snackBar("Unexpected error after uploading photos"));
-              _loading = false;
-              notifyListeners();
-              break;
-            default:
-              print(
-                  "UNEXPECTED ERROR <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
-              Scaffold.of(context).showSnackBar(
-                  snackBar("An unknown error, please contact support"));
-              _loading = false;
-              notifyListeners();
+              case "PRODUCT_IMAGE_UPLOAD_FAIL":
+                Scaffold.of(context).showSnackBar(
+                    snackBar("Could not upload photos, please resubmit data"));
+                _loading = false;
+                notifyListeners();
+                break;
+
+              case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
+                Scaffold.of(context).showSnackBar(
+                    snackBar("Unexpected error after uploading photos"));
+                _loading = false;
+                notifyListeners();
+                break;
+              default:
+                print(
+                    "UNEXPECTED ERROR <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
+                Scaffold.of(context).showSnackBar(
+                    snackBar("An unknown error, please contact support"));
+                _loading = false;
+                notifyListeners();
+            }
+          } else {
+            Scaffold.of(context).showSnackBar(snackBar(
+                "product added successfully", Color.fromRGBO(67, 216, 201, 1)));
+            _loading = false;
+            notifyListeners();
           }
         }
+      } else {
+        Scaffold.of(context)
+            .showSnackBar(snackBar("Please select photo(s) for your products"));
       }
     }
   }

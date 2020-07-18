@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../test_data.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class CategoryContainer extends StatefulWidget {
   const CategoryContainer({

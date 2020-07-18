@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/auth_and_validation/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/products/favorites.dart';
@@ -9,12 +8,12 @@ import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/search_service.dart';
 import 'package:provider/provider.dart';
 
-class ProductWrap extends StatefulWidget {
+class MainScreenWrapper extends StatefulWidget {
   @override
-  _ProductWrapState createState() => _ProductWrapState();
+  _MainScreenWrapperState createState() => _MainScreenWrapperState();
 }
 
-class _ProductWrapState extends State<ProductWrap> {
+class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
   bool _showAppBar = true;
   // final AuthService _auth = new AuthService();
