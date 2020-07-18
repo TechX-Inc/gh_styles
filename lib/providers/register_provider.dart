@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/authentication/auth_service.dart';
+import 'package:gh_styles/auth_and_validation/auth_service.dart';
 import 'package:gh_styles/models/users.dart';
 
 class RegisterProvider with ChangeNotifier {
@@ -57,7 +57,6 @@ class RegisterProvider with ChangeNotifier {
 
       dynamic result =
           await _auth.register(_username.trim(), _email.trim(), _password);
-
       if (result != FirebaseUser) {
         print(
             "<<<<<<<<<<<<==================== INVALID REGISTER VALUES ==================>>>>>>>>>>>");
@@ -68,7 +67,6 @@ class RegisterProvider with ChangeNotifier {
             _loading = false;
             notifyListeners();
             break;
-
           default:
             print(
                 "UNEXPECTED ERROR <<<<<<<<<<<<==================== $result ==================>>>>>>>>>>>");
@@ -79,7 +77,7 @@ class RegisterProvider with ChangeNotifier {
         }
       } else {
         print(
-            "<<<<<<<<<<<<==================== VALID LOGIN VALUES ==================>>>>>>>>>>>");
+            "<<<<<<<<<<<<==================== VALID REGISTER VALUES ==================>>>>>>>>>>>");
         print(result.runtimeType);
         _loading = false;
         notifyListeners();

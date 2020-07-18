@@ -37,7 +37,10 @@ dependencies:
   get: ^3.1.0
   flutter_spinkit: "^4.1.2"
   firebase_storage: ^3.1.6
-
+  grouped_buttons: ^1.0.4
+  multi_image_picker: ^4.6.7
+  file_picker: ^1.12.0
+  toast: ^0.1.5
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

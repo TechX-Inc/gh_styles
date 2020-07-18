@@ -44,7 +44,7 @@ class Shop {
           'shop_contact': shopContact,
           'shop_email': shopEmail,
           'shop_location': shopLocation,
-          'shop"_logo': downloadPath != null ? downloadPath : "None",
+          'shop_logo': downloadPath != null ? downloadPath : "None",
           'shop_website': shopWebsite,
           'date_register': FieldValue.serverTimestamp()
         }).then((value) async {

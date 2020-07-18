@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/models/shops.dart';
+import 'package:gh_styles/services/shops_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddShopProvider with ChangeNotifier {

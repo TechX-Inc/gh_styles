@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:provider/provider.dart';
 
-import 'authentication/auth_service.dart';
+import 'auth_and_validation/auth_service.dart';
 
 void main() {
   runApp(MyApp());
