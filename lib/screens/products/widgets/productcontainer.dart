@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../test_data.dart';
-import 'package:gh_styles/screens/products/details.dart';
+import 'package:gh_styles/screens/product_details.dart';
 
 class ProductContainer extends StatelessWidget {
   final int id;

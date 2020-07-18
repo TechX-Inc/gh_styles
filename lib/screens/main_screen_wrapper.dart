@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/users.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
-import 'package:gh_styles/screens/products/favorites.dart';
-import 'package:gh_styles/screens/products/home.dart';
+import 'package:gh_styles/screens/product_favorites.dart';
+import 'package:gh_styles/screens/home_screen.dart';
 import 'package:gh_styles/screens/add_shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/search_service.dart';
@@ -16,20 +16,16 @@ class MainScreenWrapper extends StatefulWidget {
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
   bool _showAppBar = true;
-  // final AuthService _auth = new AuthService();
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    // print(user);
     List<Widget> bottomNavPages = [
       HomeScreen(),
       user == null ? ToggleLoginSignUp() : AddShop(),
       Favorites(),
       user == null ? ToggleLoginSignUp() : UserProfile(),
     ];
-
-    // print(user);
 
     return SafeArea(
         child: Scaffold(
@@ -90,6 +86,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 1:
+        case 2:
         case 3:
           setState(() {
             _showAppBar = false;

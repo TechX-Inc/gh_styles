@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../test_data.dart';
 import 'package:gh_styles/screens/products/widgets/counter.dart';
+
+import '../test_data.dart';
 
 class DetailsScreen extends StatelessWidget {
   final int id;

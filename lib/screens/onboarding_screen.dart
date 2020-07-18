@@ -6,12 +6,12 @@ import 'package:gh_styles/utils/constants.dart';
 import 'package:gh_styles/screens/onboarding/slider.dart';
 import 'package:gh_styles/screens/onboarding/slide_item.dart';
 
-class SliderLayoutView extends StatefulWidget {
+class OnboardingScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _SliderLayoutViewState();
+  State<StatefulWidget> createState() => _OnboardingScreenState();
 }
 
-class _SliderLayoutViewState extends State<SliderLayoutView> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
 

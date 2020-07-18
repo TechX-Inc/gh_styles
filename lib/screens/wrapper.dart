@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/main_screen_wrapper.dart';
-import 'package:gh_styles/screens/slider_layout_view.dart';
+import 'package:gh_styles/screens/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Wrapper extends StatefulWidget {
@@ -36,9 +36,9 @@ class _WrapperState extends State<Wrapper> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body:
-              // firstStartup == true ? SliderLayoutView() : MainScreenWrapper()
-              firstStartup == true ? MainScreenWrapper() : SliderLayoutView()),
+          body: firstStartup == true ? OnboardingScreen() : MainScreenWrapper()
+          // firstStartup == true ? MainScreenWrapper() : OnboardingScreen()
+          ),
     );
   }
 }

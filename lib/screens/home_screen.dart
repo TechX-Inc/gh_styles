@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/screens/products/widgets/categorycontainer.dart';
 import 'package:gh_styles/screens/products/widgets/productcontainer.dart';
-import '../../test_data.dart';
+import '../test_data.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
