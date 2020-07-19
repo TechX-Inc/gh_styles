@@ -29,11 +29,12 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
 
     return SafeArea(
         child: Scaffold(
-      backgroundColor: _selectedIndex == 1 ? Colors.white : Color(0xfff9f9f9),
+      backgroundColor: Colors.white,
+      // backgroundColor: _selectedIndex == 1 ? Colors.white : Color(0xfff9f9f9),
       appBar: _showAppBar
           ? AppBar(
               iconTheme: IconThemeData(color: Colors.black54),
-              backgroundColor: Color(0xfff9f9f9),
+              backgroundColor: Colors.white,
               elevation: 0.0,
               leading: IconButton(
                 icon: Icon(
@@ -53,7 +54,6 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
             )
           : null,
       body: bottomNavPages.elementAt(_selectedIndex),
-      // body: HomeScreen(),
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.grey,
         selectedItemColor: Colors.blueAccent,

@@ -284,7 +284,7 @@ class _NewProductFormState extends State<NewProductForm> {
     return TextFormField(
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Discount(%)"),
-      onSaved: (discount) => _addProduct.setproductDescription = discount,
+      onSaved: (discount) => _addProduct.setproductDiscount = discount,
     );
   }
 

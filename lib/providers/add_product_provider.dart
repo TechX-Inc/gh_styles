@@ -63,6 +63,10 @@ class AddProductProvider with ChangeNotifier {
     _productPrice = productPrice;
   }
 
+  set setproductDiscount(String productDiscount) {
+    _productDiscount = productDiscount;
+  }
+
   set setproductDescription(String productDescription) {
     _productDescription = productDescription;
   }

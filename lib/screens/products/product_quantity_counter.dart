@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class Counter extends StatefulWidget {
+class ProductQuantityCounter extends StatefulWidget {
   @override
-  _CounterState createState() => _CounterState();
+  _ProductQuantityCounterState createState() => _ProductQuantityCounterState();
 }
 
-class _CounterState extends State<Counter> {
+class _ProductQuantityCounterState extends State<ProductQuantityCounter> {
   int _count = 1;
   @override
   Widget build(BuildContext context) {

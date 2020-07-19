@@ -28,10 +28,4 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-
-  void _googleAuth() async {
-    if (await _auth.registerWithGoogle() == User) {
-      Navigator.pushReplacementNamed(context, '/main_screen_wrapper');
-    }
-  }
 }

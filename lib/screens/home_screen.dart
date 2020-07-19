@@ -1,69 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/screens/products/widgets/productcontainer.dart';
+import 'package:gh_styles/widgets/product_grid_container.dart';
+import 'package:gh_styles/screens/products/products_overview.dart';
+import 'package:gh_styles/widgets/page_banner.dart';
+import 'package:gh_styles/widgets/sticky_header.dart';
 import '../test_data.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+  List<String> _categories = [
+    'Overview',
+    'Footwears',
+    'Bags',
+    'Clothings',
+    'Shirts',
+    'Shorts'
+  ];
+
+  List<Widget> _pages = [
+    ProductsOverView(),
+    ProductGridContainer(productsList),
+    ProductGridContainer(productsList),
+    ProductGridContainer(productsList),
+    ProductGridContainer(productsList),
+    ProductsOverView(),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            "Our",
-            style: Theme.of(context).textTheme.headline4.apply(
-                  fontWeightDelta: 2,
-                  color: Colors.black,
-                ),
+    return Column(
+      children: [
+        SizedBox(
+          height: 20,
+        ),
+        SizedBox(
+          height: 25,
+          child: Container(
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _categories.length,
+                itemBuilder: (context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    child: Container(
+                      child:
+                          CategoriesHeader(index, _selectedIndex, _categories),
+                    ),
+                  );
+                }),
           ),
-          Text("Products",
-              style:
-                  Theme.of(context).textTheme.headline4.copyWith(height: .9)),
-          SizedBox(
-            height: 15,
-          ),
-          // TextField(
-          //   decoration: InputDecoration(
-          //     fillColor: Colors.white,
-          //     filled: true,
-          //     border: InputBorder.none,
-          //     prefixIcon: Icon(Icons.search),
-          //     hintText: "Search",
-          //   ),
-          // ),
-          SizedBox(
-            height: 15,
-          ),
+        ),
 
-          SizedBox(
-            height: 15,
-          ),
-          Text(
-            "New Products",
-            style: Theme.of(context).textTheme.headline6.apply(
-                  fontWeightDelta: 2,
+        //
+        SizedBox(
+          height: 20,
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                PageBanner(),
+                SizedBox(
+                  height: 10,
                 ),
+                // ProductGridContainer()
+                // ProductsOverView(),
+                _pages[_selectedIndex]
+              ],
+            ),
           ),
-          SizedBox(
-            height: 11,
-          ),
-          GridView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: .7),
-            itemCount: productsList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ProductContainer(id: index);
-            },
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
+
+//////////////// MIGHT NEED LATER, DO NOT DELETE ///////////////////////
+/////////////////SEARCH BAR/////////////////
+
+// TextField(
+//   decoration: InputDecoration(
+//     fillColor: Colors.white,
+//     filled: true,
+//     border: InputBorder.none,
+//     prefixIcon: Icon(Icons.search),
+//     hintText: "Search",
+//   ),
+// ),
