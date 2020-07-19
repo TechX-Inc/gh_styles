@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gh_styles/services/shops_services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AddShopProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -18,6 +20,11 @@ class AddShopProvider with ChangeNotifier {
   String _shopLocation;
   String _shopWebsite;
   String _uid;
+
+  snackBar(message, [color = Colors.red]) => SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      );
 
 //GETTERS
   GlobalKey<FormState> get formKey => _formKey;
@@ -62,14 +69,20 @@ class AddShopProvider with ChangeNotifier {
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     _shopAvatar = File(pickedFile.path);
-    // print("<<<<<<<================ $_shopAvatar ===============>>>>>>>");
     notifyListeners();
   }
 
-  final snackBar = SnackBar(
-    content: Text('Operation failed. please try again'),
-    backgroundColor: Colors.red,
-  );
+  // ignore: missing_return
+  Future<File> getImageFileFromAssets() async {
+    final byteData = await rootBundle.load('assets/images/logo_default.jpg');
+    final file =
+        File('${(await getTemporaryDirectory()).path}/logo_default.jpg');
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    if (await file.exists()) {
+      return file;
+    }
+  }
 
   Future<void> processAndSave(BuildContext context) async {
     if (!_formKey.currentState.validate()) {
@@ -82,26 +95,80 @@ class AddShopProvider with ChangeNotifier {
       _loading = true;
       notifyListeners();
 
+      dynamic defaultLogo = await getImageFileFromAssets()
+          .catchError((error) => print(error.message));
+
       Shop shop = new Shop(
-        uid: _uid != null ? _uid : null,
-        shopName: _shopName != null ? _shopName : null,
-        shopOwnerLegalName:
-            _shopOwnerLegalName != null ? _shopOwnerLegalName : null,
-        shopContact: _shopPhoneContact != null ? _shopPhoneContact : null,
-        shopEmail: _shopEmail != null ? _shopEmail : null,
-        shopLocation: _shopLocation != null ? _shopLocation : null,
-        shopWebsite: _shopWebsite != "" ? _shopWebsite : "None",
-        shopLogo: _shopAvatar,
+        uid: _uid ?? null,
+        shopName: _shopName.trim() ?? null,
+        shopOwnerLegalName: _shopOwnerLegalName.trim() ?? null,
+        shopContact: _shopPhoneContact.trim() ?? null,
+        shopEmail: _shopEmail ?? null,
+        shopLocation: _shopLocation ?? null,
+        shopWebsite: _shopWebsite ?? "None",
+        shopLogo: _shopAvatar ?? defaultLogo,
       );
       dynamic createShop = await shop.createShop();
 
-      if (createShop == null) {
-        _loading = false;
-        notifyListeners();
-        Scaffold.of(context).showSnackBar(snackBar);
+      if (createShop != true) {
+        switch (createShop.code) {
+          case "FAILED_TO_CREATE_SHOP":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "NULL_REQUIRED_FIELD":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "UPDATE_SHOP_DOCUMENT_LOGO_FAIL":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "SET_SHOP_OWNER_FALSE_FAILED":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "SHOP_LOGO_UPLOAD_FAIL":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "SET_SHOP_OWNER_FALSE_FAILED":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+
+          case "NULL_IMAGE_FILE":
+            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+            _loading = false;
+            notifyListeners();
+            break;
+          default:
+            print(
+                "UNEXPECTED ERROR <<<<<<<<<<<<==================== $createShop ==================>>>>>>>>>>>");
+            Scaffold.of(context).showSnackBar(
+                snackBar("An unknown error, please contact support"));
+            _loading = false;
+            notifyListeners();
+        }
+
         print(
             "ERROR <<<<<<<<<<============== $createShop ===============>>>>>>>>>>");
       } else {
+        Scaffold.of(context).showSnackBar(snackBar(
+            "New shop successfully registered as $_shopName",
+            Color.fromRGBO(67, 216, 201, 1)));
+
         _loading = false;
         notifyListeners();
       }

@@ -5,8 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-// import 'dart:math';
-// import 'package:gh_styles/test_data.dart';
 
 class ProductService {
   final CollectionReference products =
@@ -51,7 +49,7 @@ class ProductService {
         print("Sending data...");
         // dynamic downloadPath = await uploadProductPhotos(shopLogo);
         return await _productRef.setData({
-          'shop': shopRef,
+          'shop_ref': shopRef,
           'product_name': productName,
           'product_quantity': productQuantity ?? 1,
           'product_price': productPrice,
@@ -64,7 +62,7 @@ class ProductService {
             'size': productSize,
             'collection': collection
           },
-          'productPhotos': null
+          'product_photos': null
         }).then((value) async {
           print("PRODUCTS ADDED, sending image data....");
           dynamic storePhoto =
@@ -101,7 +99,7 @@ class ProductService {
               .then((value) async {
             productPhotoDownloadPaths.add(value);
             return await productRef
-                .updateData({'productPhotos': productPhotoDownloadPaths})
+                .updateData({'product_photos': productPhotoDownloadPaths})
                 .then((value) => true)
                 .catchError((error) => throw new PlatformException(
                     code: "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL",
