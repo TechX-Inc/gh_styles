@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          visualDensity: VisualDensity.adaptivePlatformDensity,
           primarySwatch: Colors.blue,
           platform: TargetPlatform.android,
         ),

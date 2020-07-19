@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/constants/constants.dart';
+import 'package:gh_styles/utils/constants.dart';
 import 'package:gh_styles/screens/onboarding/slider.dart';
-import 'package:gh_styles/screens/widgets/slide_dots.dart';
-import 'package:gh_styles/screens/widgets/slide_items/slide_item.dart';
+import 'package:gh_styles/screens/onboarding/slide_item.dart';
 
-class SliderLayoutView extends StatefulWidget {
+class OnboardingScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _SliderLayoutViewState();
+  State<StatefulWidget> createState() => _OnboardingScreenState();
 }
 
-class _SliderLayoutViewState extends State<SliderLayoutView> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -54,7 +53,7 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
                   controller: _pageController,
                   onPageChanged: _onPageChanged,
                   itemCount: sliderArrayList.length,
-                  itemBuilder: (ctx, i) => SlideItem(i),
+                  itemBuilder: (context, i) => OnboardingSliderItem(i),
                 ),
                 Stack(
                   alignment: AlignmentDirectional.topStart,
@@ -80,7 +79,7 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
                           child: FlatButton(
                             onPressed: () {
                               Navigator.of(context)
-                                  .pushReplacementNamed('/products_wrapper');
+                                  .pushReplacementNamed('/main_screen_wrapper');
                             },
                             child: Text(
                               Constants.SKIP,
@@ -111,4 +110,32 @@ class _SliderLayoutViewState extends State<SliderLayoutView> {
               ],
             )),
       );
+}
+
+class SlideDots extends StatelessWidget {
+  bool isActive;
+  SlideDots(this.isActive);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 150),
+      margin: const EdgeInsets.symmetric(horizontal: 3.3),
+      height: isActive ? 10 : 6,
+      width: isActive ? 10 : 6,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.white : Colors.grey,
+        border: isActive
+            ? Border.all(
+                color: Color(0xff927DFF),
+                width: 2.0,
+              )
+            : Border.all(
+                color: Colors.transparent,
+                width: 1,
+              ),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
+    );
+  }
 }

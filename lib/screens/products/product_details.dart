@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/screens/products/product_quantity_counter.dart';
+
 import '../../test_data.dart';
-import 'package:gh_styles/screens/products/widgets/counter.dart';
 
 class DetailsScreen extends StatelessWidget {
   final int id;
@@ -94,7 +95,7 @@ class DetailsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Counter(),
+                        ProductQuantityCounter(),
                         Text(
                           "${productsList[id].price}",
                           style: Theme.of(context).textTheme.headline6,

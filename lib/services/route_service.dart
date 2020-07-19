@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/register.dart';
-import 'package:gh_styles/screens/item_profile.dart';
 import 'package:gh_styles/screens/new_product.dart';
-import 'package:gh_styles/screens/product_listing.dart';
-import 'package:gh_styles/screens/product_wrapper.dart';
+import 'package:gh_styles/screens/main_screen_wrapper.dart';
 import 'package:gh_styles/screens/wrapper.dart';
-import 'package:gh_styles/screens/splash.dart';
+import 'package:gh_styles/screens/splashscreen.dart';
 import '../main.dart';
 
 class RouteGenerator {
@@ -24,8 +22,8 @@ class RouteGenerator {
       //  case '/products':
       //   return MaterialPageRoute(builder: (_) => Products());
 
-      case '/products_wrapper':
-        return MaterialPageRoute(builder: (_) => ProductWrap());
+      case '/main_screen_wrapper':
+        return MaterialPageRoute(builder: (_) => MainScreenWrapper());
 
       case '/add_product':
         return MaterialPageRoute(builder: (_) => NewProduct());
@@ -39,8 +37,8 @@ class RouteGenerator {
       case '/forgot_password':
         return MaterialPageRoute(builder: (_) => ForgotPassword());
 
-      case '/item_profile':
-        return MaterialPageRoute(builder: (_) => ItemProfile());
+        // case '/item_profile':
+        //   return MaterialPageRoute(builder: (_) => ItemProfile());
         // if (args is String) {
         //   return MaterialPageRoute(builder: (_) => ItemProfile(data: args));
         // }
