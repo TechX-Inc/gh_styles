@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/shop_validator.dart';
-import 'package:gh_styles/models/users.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/add_shop_provider.dart';
 import 'package:provider/provider.dart';
 

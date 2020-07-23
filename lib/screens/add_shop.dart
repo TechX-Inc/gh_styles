@@ -12,8 +12,6 @@ class AddShop extends StatefulWidget {
 class _AddShopState extends State<AddShop> {
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-
     return Container(
       color: Color.fromRGBO(109, 0, 39, 1),
       // color: Colors.white,

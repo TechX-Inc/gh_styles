@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
@@ -44,16 +45,15 @@ class ProductService {
           productName != null &&
           productQuantity != null &&
           productDescription != null &&
-          productPrice != null &&
-          productPhotos != null) {
-        print("Sending data...");
-        // dynamic downloadPath = await uploadProductPhotos(shopLogo);
+          productPrice != null) {
         return await _productRef.setData({
           'shop_ref': shopRef,
           'product_name': productName,
           'product_quantity': productQuantity ?? 1,
           'product_price': productPrice,
-          'product_discount': productDiscount ?? 0,
+          'product_discount': (productDiscount == "" || productDiscount == null)
+              ? "0"
+              : productDiscount,
           'product_description': productDescription,
           'date_posted': FieldValue.serverTimestamp(),
           'categories': {
@@ -65,23 +65,29 @@ class ProductService {
           'product_photos': null
         }).then((value) async {
           print("PRODUCTS ADDED, sending image data....");
-          dynamic storePhoto =
-              await uploadProductPhotos(productPhotos, _productRef);
-          return storePhoto;
+          return await uploadProductPhotos(productPhotos, _productRef)
+              .then((value) {
+            if (value.runtimeType == PlatformException) {
+              return value;
+            } else {
+              return true;
+            }
+          });
         }).catchError((onError) => throw new PlatformException(
-            code: "PRODUCT_ADD_FAILED", message: "Product was not added"));
+            code: "PRODUCT_ADD_FAILED", message: "Failed to add product"));
       } else {
         throw new PlatformException(
             code: "NULL_IN_REQUIRED_FIELD",
-            message: "Some required fields are null");
+            message: "Error, fill in all required(*) fields");
       }
     } on PlatformException catch (e) {
-      print(
-          "ADD SHOP PLATFORM EXCEPTION   <<<<<<<<=========${e.code}=========>>>>>>>> ");
-      return e.code;
+      // print(
+      //     "ADD SHOP PLATFORM EXCEPTION   <<<<<<<<=========${e.code}=========>>>>>>>> ");
+      return e;
     }
   }
 
+/////////////////////UPLOAD PRODUCT PHOTOS/////////////////////////////////
   Future<dynamic> uploadProductPhotos(
       List<File> productPhoto, DocumentReference productRef) async {
     try {
@@ -92,36 +98,63 @@ class ProductService {
               .ref()
               .child(
                   "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}");
+
+          // try {
           StorageUploadTask task = firebaseStorageRef.putFile(imageFile);
-          return await (await task.onComplete)
+          String downloadUrl = await (await task.onComplete)
               .ref
               .getDownloadURL()
-              .then((value) async {
-            productPhotoDownloadPaths.add(value);
-            return await productRef
-                .updateData({'product_photos': productPhotoDownloadPaths})
-                .then((value) => true)
-                .catchError((error) => throw new PlatformException(
+              .catchError((error) {
+            //DELETE PRODUCT IF GET DOWNLOAD URL FAILS
+            productRef.delete();
+            firebaseStorageRef
+                .child(
+                    "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}")
+                .delete();
+            throw new PlatformException(
+                code: "GET_DOWNLOAD_URL_FAILED",
+                message: "failed to retrieve images URLs");
+          });
+          productPhotoDownloadPaths.add(downloadUrl);
+          return await productRef
+              .updateData({'product_photos': productPhotoDownloadPaths})
+              .then((value) => true)
+              .catchError((error) {
+                deleteProductPhoto(photoUrl: downloadUrl);
+                productRef.delete();
+                throw new PlatformException(
                     code: "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL",
-                    message: "unable to update document with download paths"));
-          }).catchError((error) => {
-                    throw new PlatformException(
-                        code: "PRODUCT_IMAGE_UPLOAD_FAIL",
-                        message: "failed to upload product photos"),
-                    //DELETE PRODUCT IF PHOTO UPLOAD FAILS
-                    productRef.delete()
-                  });
+                    message:
+                        "Something went wrong while sending data, please try again");
+              });
         });
-        return true;
       } else {
-        // print("ERROR UPLOADING FILE");
+        productRef.delete();
         throw new PlatformException(
-            code: "NULL_OR_EMPTY_PRODUCT_PHOTO",
-            message: "no image data found");
+            code: "NO_IMAGE_FILE_FOUND",
+            message: "missing product image(s), please try again");
       }
     } on PlatformException catch (e) {
       print(e.message);
-      return e.code;
+      return e;
+    }
+  }
+
+  Future deleteProductPhoto({String photoUrl}) async {
+    if (photoUrl != null) {
+      StorageReference photoRef = await FirebaseStorage.instance
+          .ref()
+          .getStorage()
+          .getReferenceFromUrl(photoUrl);
+
+      try {
+        await photoRef.delete().catchError((error) =>
+            throw new PlatformException(
+                code: "UNABLE_TO_DELETE_PHOTO",
+                message: "Failed to delete product photo"));
+      } on PlatformException catch (e) {
+        return e;
+      }
     }
   }
 }

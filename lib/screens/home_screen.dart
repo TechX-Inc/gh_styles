@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/screens/products/bags.dart';
+import 'package:gh_styles/screens/products/clothings.dart';
+import 'package:gh_styles/screens/products/footwears.dart';
+import 'package:gh_styles/screens/products/shirts.dart';
+import 'package:gh_styles/screens/products/shorts.dart';
 import 'package:gh_styles/widgets/product_grid_container.dart';
 import 'package:gh_styles/screens/products/products_overview.dart';
-import 'package:gh_styles/widgets/page_banner.dart';
+import 'package:gh_styles/widgets/page_header_banner.dart';
 import 'package:gh_styles/widgets/sticky_header.dart';
+import 'package:provider/provider.dart';
 import '../test_data.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  HomeScreenStickyHeaderProvider homeProvider;
   int _selectedIndex = 0;
   List<String> _categories = [
     'Overview',
@@ -23,12 +31,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _pages = [
     ProductsOverView(),
-    ProductGridContainer(productsList),
-    ProductGridContainer(productsList),
-    ProductGridContainer(productsList),
-    ProductGridContainer(productsList),
-    ProductsOverView(),
+    Footwears(),
+    Bags(),
+    Clothings(),
+    Shirts(),
+    Shorts(),
   ];
+
+  @override
+  void initState() {
+    homeProvider =
+        Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 20,
         ),
         SizedBox(
-          height: 25,
+          height: 30,
           child: Container(
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -63,23 +78,19 @@ class _HomeScreenState extends State<HomeScreen> {
         SizedBox(
           height: 20,
         ),
-        Expanded(
-          child: SingleChildScrollView(
+        Expanded(child:
+            Consumer<HomeScreenStickyHeaderProvider>(builder: (_, data, __) {
+          return SingleChildScrollView(
+            physics: data.scrollEnabled
+                ? BouncingScrollPhysics() //ScrollPhysics()
+                : NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                PageBanner(),
-                SizedBox(
-                  height: 10,
-                ),
-                // ProductGridContainer()
-                // ProductsOverView(),
-                _pages[_selectedIndex]
-              ],
+              children: <Widget>[_pages[_selectedIndex]],
             ),
-          ),
-        ),
+          );
+        })),
       ],
     );
   }

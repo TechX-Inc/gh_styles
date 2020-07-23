@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/models/users.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/product_favorites.dart';
 import 'package:gh_styles/screens/home_screen.dart';
 import 'package:gh_styles/screens/add_shop.dart';
+import 'package:gh_styles/screens/shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/search_service.dart';
+import 'package:gh_styles/services/user_service.dart';
 import 'package:provider/provider.dart';
 
 class MainScreenWrapper extends StatefulWidget {
@@ -16,21 +19,30 @@ class MainScreenWrapper extends StatefulWidget {
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
   bool _showAppBar = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
+
     List<Widget> bottomNavPages = [
-      HomeScreen(),
-      user == null ? ToggleLoginSignUp() : AddShop(),
+      ChangeNotifierProvider<HomeScreenStickyHeaderProvider>(
+          create: (context) => new HomeScreenStickyHeaderProvider(),
+          builder: (context, snapshot) {
+            return HomeScreen();
+          }),
+      user == null ? ToggleLoginSignUp() : Shop(),
       Favorites(),
       user == null ? ToggleLoginSignUp() : UserProfile(),
     ];
 
     return SafeArea(
         child: Scaffold(
-      backgroundColor: Colors.white,
-      // backgroundColor: _selectedIndex == 1 ? Colors.white : Color(0xfff9f9f9),
+      backgroundColor: Color.fromRGBO(250, 250, 250, 1),
       appBar: _showAppBar
           ? AppBar(
               iconTheme: IconThemeData(color: Colors.black54),
@@ -42,7 +54,8 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
                   size: 28,
                 ),
                 onPressed: () {
-                  showSearch(context: context, delegate: SearchServices());
+                  // showSearch(context: context, delegate: SearchServices());
+                  print("Searching...");
                 },
               ),
               actions: <Widget>[

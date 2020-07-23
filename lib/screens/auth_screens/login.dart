@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/auth_and_validation/auth_service.dart';
-import 'package:gh_styles/models/users.dart';
+
 import 'package:gh_styles/widgets/login_form.dart';
 import 'package:provider/provider.dart';
 import 'package:gh_styles/providers/login_provider.dart';

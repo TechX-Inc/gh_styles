@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/screens/products/product_quantity_counter.dart';
 
-import '../../test_data.dart';
-
 class DetailsScreen extends StatelessWidget {
-  final int id;
+  final ProductModel productModel;
+  final String heroID;
 
-  const DetailsScreen({Key key, this.id}) : super(key: key);
+  const DetailsScreen({Key key, this.productModel, this.heroID})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,9 +45,10 @@ class DetailsScreen extends StatelessWidget {
                       width: double.infinity,
                       alignment: Alignment.center,
                       child: Hero(
-                        tag: '$id',
-                        child: Image.asset(
-                          "${productsList[id].img}",
+                        tag: '$heroID',
+                        child: Image.network(
+                          "${productModel.productPhotos[0]}",
+                          fit: BoxFit.fill,
                           width: MediaQuery.of(context).size.width * .7,
                         ),
                       ),
@@ -72,9 +74,11 @@ class DetailsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(
-                          "${productsList[id].title}",
-                          style: Theme.of(context).textTheme.headline4,
+                        Expanded(
+                          child: Text(
+                            "${productModel.productName}",
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
                         ),
                         IconButton(
                           icon: Icon(
@@ -90,14 +94,14 @@ class DetailsScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline6,
                     ),
                     Text(
-                      "${productsList[id].description}",
+                      "${productModel.productDescription}",
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         ProductQuantityCounter(),
                         Text(
-                          "${productsList[id].price}",
+                          "\₵${productModel.productPrice}",
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ],

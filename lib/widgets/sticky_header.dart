@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-// class CategoriesHeader extends StatefulWidget {
-//   @override
-//   _CategoriesHeaderState createState() => _CategoriesHeaderState();
-// }
-
 class CategoriesHeader extends StatelessWidget {
   final int index;
   final int selectedIndex;

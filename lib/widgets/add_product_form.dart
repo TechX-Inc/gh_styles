@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/validation_product.dart';
-import 'package:gh_styles/models/users.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/add_product_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
