@@ -4,6 +4,7 @@ import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:badges/badges.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ProductGridContainer extends StatefulWidget {
@@ -18,9 +19,9 @@ class ProductGridContainer extends StatefulWidget {
 
 class _ProductGridContainerState extends State<ProductGridContainer> {
   HomeScreenStickyHeaderProvider _homeHeaderProvider;
+  final f = new NumberFormat("###.0#", "en_US");
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _homeHeaderProvider =
         Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
@@ -181,6 +182,6 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
     } else {
       productPrice = (price - (discount / 100) * price).toString();
     }
-    return productPrice;
+    return f.format(double.parse(productPrice));
   }
 }

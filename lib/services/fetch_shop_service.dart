@@ -20,7 +20,5 @@ class FetchShopService {
         .map((shopSnapshot) => shopSnapshot.documents
             .map((e) => ShopsModel.fromSnapshot(e))
             .toList());
-
-    // print(shopSnapshot);
   }
 }

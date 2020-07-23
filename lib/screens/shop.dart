@@ -36,7 +36,7 @@ class _ShopState extends State<Shop> {
                     snapshot.data.contains(null) ||
                     snapshot.data.isEmpty)
                 ? AddShop()
-                : ShopProfile();
+                : ShopProfile(shopModel: snapshot.data);
         });
   }
 }

@@ -27,6 +27,17 @@ class FetchProductService {
           .toList();
     });
   }
+
+  Stream<List<ProductModel>> get allProductsStream {
+    return products
+        .orderBy("date_posted", descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.documents
+          .map<ProductModel>((product) => ProductModel.fromSnapshot(product))
+          .toList();
+    });
+  }
 }
 
 // Parse product isolate

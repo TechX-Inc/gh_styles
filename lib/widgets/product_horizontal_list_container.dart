@@ -4,6 +4,7 @@ import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ProductHorizontalListContainer extends StatefulWidget {
@@ -25,6 +26,7 @@ class ProductHorizontalListContainer extends StatefulWidget {
 class _ProductHorizontalListContainerState
     extends State<ProductHorizontalListContainer> {
   HomeScreenStickyHeaderProvider _homeHeaderProvider;
+  final f = new NumberFormat("###.0#", "en_US");
   @override
   void initState() {
     // TODO: implement initState
@@ -234,6 +236,6 @@ class _ProductHorizontalListContainerState
     } else {
       productPrice = (price - (discount / 100) * price).toString();
     }
-    return productPrice;
+    return f.format(double.parse(productPrice));
   }
 }
