@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/providers/product_details_provider.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';
@@ -97,12 +98,20 @@ class _ProductHorizontalListContainerState
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      DetailsScreen(
-                                                    productModel:
-                                                        products[index],
-                                                    heroID:
-                                                        '$index${widget.heroID}',
-                                                  ),
+                                                      ChangeNotifierProvider<
+                                                              ProductDetailsProvider>(
+                                                          create: (context) =>
+                                                              ProductDetailsProvider(),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            return DetailsScreen(
+                                                              productModel:
+                                                                  products[
+                                                                      index],
+                                                              heroID:
+                                                                  '$index${widget.heroID}',
+                                                            );
+                                                          }),
                                                 )),
                                             child: ConstrainedBox(
                                               constraints: BoxConstraints(

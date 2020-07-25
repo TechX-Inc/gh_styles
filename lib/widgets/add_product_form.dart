@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/validation_product.dart';
+import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/add_product_provider.dart';
+import 'package:gh_styles/services/fetch_shop_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -17,6 +19,8 @@ class NewProductForm extends StatefulWidget {
 
 class _NewProductFormState extends State<NewProductForm> {
   AddProductProvider _addProduct;
+  FetchShopService fetchShopService = new FetchShopService();
+
   int _currentStep = 0;
   User _user;
   DocumentReference shopRef;
@@ -30,6 +34,7 @@ class _NewProductFormState extends State<NewProductForm> {
     _user = Provider.of<User>(context, listen: false);
     _addProduct = Provider.of<AddProductProvider>(context, listen: false);
     _addProduct.setUID = _user.uid;
+    fetchShopService.setUid = _user.uid;
   }
 
   @override
@@ -47,22 +52,41 @@ class _NewProductFormState extends State<NewProductForm> {
           children: <Widget>[
             Row(
               children: <Widget>[
+                //           return StreamBuilder<List<ShopsModel>>(
+                // stream: fetchShopService.shopsStream,
+                // builder: (context, snapshot) {
+                //   if (!snapshot.hasData) {
+                //     print(snapshot.error);
+                //     return Text("Loading");
+                //   } else
+                //     return (snapshot.data == null ||
+                //             snapshot.data.contains(null) ||
+                //             snapshot.data.isEmpty)
+                //         ? AddShop()
+                //         : ShopProfile(shopModel: snapshot.data);
+                // });
+
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   alignment: Alignment.topCenter,
                   margin: EdgeInsets.only(top: 30),
-                  child: FutureBuilder<dynamic>(
-                      future: _addProduct.getShopData(),
+                  child: StreamBuilder<List<ShopsModel>>(
+                      stream: fetchShopService.shopsStream,
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
+                          print(snapshot.error);
                           return Text("...");
                         }
-                        return CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                NetworkImage(snapshot.data['shop_logo']));
+                        return (snapshot.data == null ||
+                                snapshot.data.contains(null) ||
+                                snapshot.data.isEmpty)
+                            ? Container()
+                            : CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                    snapshot.data[0].shopLogoPath));
                       }),
-                ),
+                )
               ],
             ),
             SizedBox(
@@ -75,21 +99,25 @@ class _NewProductFormState extends State<NewProductForm> {
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      FutureBuilder<dynamic>(
-                          future: _addProduct.getShopData(),
+                      StreamBuilder<List<ShopsModel>>(
+                          stream: fetchShopService.shopsStream,
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
                               return Text("");
                             }
-                            shopName = snapshot.data['shop_name'];
-                            return Text(
-                              shopName.toUpperCase(),
-                              style: GoogleFonts.ptSans(
-                                  textStyle: TextStyle(
-                                      color: Color.fromRGBO(181, 7, 107, 1),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15)),
-                            );
+                            return (snapshot.data == null ||
+                                    snapshot.data.contains(null) ||
+                                    snapshot.data.isEmpty)
+                                ? Container()
+                                : Text(
+                                    snapshot.data[0].shopName.toUpperCase(),
+                                    style: GoogleFonts.ptSans(
+                                        textStyle: TextStyle(
+                                            color:
+                                                Color.fromRGBO(181, 7, 107, 1),
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 15)),
+                                  );
                           })
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
+import 'package:gh_styles/screens/create_shop_bg.dart';
 import 'package:gh_styles/screens/product_favorites.dart';
 import 'package:gh_styles/screens/home_screen.dart';
 import 'package:gh_styles/screens/add_shop.dart';
@@ -21,7 +22,6 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   bool _showAppBar = true;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -54,7 +54,6 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
                   size: 28,
                 ),
                 onPressed: () {
-                  // showSearch(context: context, delegate: SearchServices());
                   print("Searching...");
                 },
               ),
@@ -79,15 +78,15 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.business),
-            title: Text("New Shop"),
+            title: Text("Business"),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite_border),
-            title: Text("Favorite"),
+            title: Text("Favorites"),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            title: Text("Sign In"),
+            title: Text("My Account"),
           ),
         ],
       ),

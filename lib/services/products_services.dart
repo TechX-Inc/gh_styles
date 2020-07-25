@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
@@ -10,9 +8,12 @@ import 'package:path/path.dart';
 class ProductService {
   final CollectionReference products =
       Firestore.instance.collection('Products');
-  final CollectionReference shopOwner = Firestore.instance.collection("Users");
+  final CollectionReference _userCollection =
+      Firestore.instance.collection("Users");
   final DocumentReference _productRef =
       Firestore.instance.collection("Products").document();
+  final CollectionReference _favourites =
+      Firestore.instance.collection("Favourites");
 
   DocumentReference shopRef;
   List<File> productPhotos;
@@ -155,6 +156,44 @@ class ProductService {
       } on PlatformException catch (e) {
         return e;
       }
+    }
+  }
+
+  Future<QuerySnapshot> checkFavExist(
+      String uid, DocumentReference favItemRef) async {
+    return _favourites
+        .where('user_ref', isEqualTo: _userCollection.document(uid))
+        .where('product_ref', isEqualTo: favItemRef)
+        .getDocuments();
+  }
+
+  Future<void> favoriteProductHandler(
+      String uid, DocumentReference favItemRef) async {
+    try {
+      QuerySnapshot favStatus = await checkFavExist(uid, favItemRef);
+
+      if (favStatus.documents.isEmpty || favStatus.documents.length <= 0) {
+        _favourites
+            .add({
+              'user_ref': _userCollection.document(uid),
+              'product_ref': favItemRef,
+              'save_date': FieldValue.serverTimestamp(),
+            })
+            .then((value) => print("Item added to favourites"))
+            .catchError((onError) => throw new PlatformException(
+                code: onError.code, message: onError.message));
+      } else {
+        QuerySnapshot favouriteProduct = await _favourites
+            .where('user_ref', isEqualTo: _userCollection.document(uid))
+            .where('product_ref', isEqualTo: favItemRef)
+            .getDocuments();
+        favouriteProduct.documents[0].reference
+            .delete()
+            .then((value) => print("Porduct removed from favoourites..."));
+      }
+    } on PlatformException catch (e) {
+      print("Error unable to add favourite");
+      return e.message;
     }
   }
 }

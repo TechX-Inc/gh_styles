@@ -51,15 +51,14 @@ class LoginProvider with ChangeNotifier {
       notifyListeners();
 
       dynamic result = await _auth.login(_email.trim(), _password.trim());
-
+      print(result);
       if (result != FirebaseUser) {
-        print(
-            "<<<<<<<<<<<<==================== INVALID LOGIN VALUES ==================>>>>>>>>>>>");
         switch (result) {
           case "ERROR_USER_NOT_FOUND":
             Scaffold.of(context)
                 .showSnackBar(snackBar("Email or password is incorrect"));
             _loading = false;
+            print(result.code);
             notifyListeners();
             break;
 
@@ -67,6 +66,7 @@ class LoginProvider with ChangeNotifier {
             Scaffold.of(context)
                 .showSnackBar(snackBar("Email or password is incorrect"));
             _loading = false;
+            print(result.code);
             notifyListeners();
             break;
           default:

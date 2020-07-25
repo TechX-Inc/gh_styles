@@ -59,6 +59,7 @@ class AuthService {
           .catchError((onError) => throw new PlatformException(
               code: onError.code, message: onError.message));
     } on PlatformException catch (e) {
+      print(e);
       return e.code;
     }
   }

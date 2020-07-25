@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/providers/product_details_provider.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:badges/badges.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
@@ -59,10 +60,16 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DetailsScreen(
-                                    productModel: products[index],
-                                    heroID: '$index${widget.heroID}',
-                                  )),
+                              builder: (context) => ChangeNotifierProvider<
+                                      ProductDetailsProvider>(
+                                  create: (context) =>
+                                      new ProductDetailsProvider(),
+                                  builder: (context, snapshot) {
+                                    return DetailsScreen(
+                                      productModel: products[index],
+                                      heroID: '$index${widget.heroID}',
+                                    );
+                                  })),
                         ),
                         child: Container(
                           child: Column(
@@ -103,21 +110,30 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                                   fit: BoxFit.fill,
                                                 ),
                                               ),
-                                              Positioned(
-                                                top: 0,
-                                                right: 0,
-                                                child: Badge(
-                                                  badgeColor: Color.fromRGBO(
-                                                      148, 15, 55, 1),
-                                                  // badgeColor: Color.fromRGBO(231, 48, 91, 1),
-                                                  shape: BadgeShape.square,
-                                                  borderRadius: 20,
-                                                  toAnimate: false,
-                                                  badgeContent: Text('-20%',
-                                                      style: TextStyle(
-                                                          color: Colors.white)),
-                                                ),
-                                              )
+                                              products[index]
+                                                          .productDiscount
+                                                          .toString() !=
+                                                      "0"
+                                                  ? Positioned(
+                                                      top: 0,
+                                                      right: 0,
+                                                      child: Badge(
+                                                        badgeColor:
+                                                            Color.fromRGBO(
+                                                                148, 15, 55, 1),
+                                                        // badgeColor: Color.fromRGBO(231, 48, 91, 1),
+                                                        shape:
+                                                            BadgeShape.square,
+                                                        borderRadius: 20,
+                                                        toAnimate: false,
+                                                        badgeContent: Text(
+                                                            '-${products[index].productDiscount}%',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                      ),
+                                                    )
+                                                  : Container()
                                             ],
                                           ))),
                                 ),

@@ -132,7 +132,6 @@ class AddProductProvider with ChangeNotifier {
     if (!_formKey.currentState.validate()) {
       return;
     } else {
-      // if (_images.isNotEmpty) {
       _formKey.currentState.save();
       _loading = true;
       notifyListeners();
@@ -210,10 +209,6 @@ class AddProductProvider with ChangeNotifier {
           notifyListeners();
         }
       }
-      // } else {
-      //   Scaffold.of(context)
-      //       .showSnackBar(snackBar("Please select photo(s) for your products"));
-      // }
     }
   }
 
