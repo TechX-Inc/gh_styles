@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/providers/cart_provider.dart';
 import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/register.dart';
@@ -8,6 +9,7 @@ import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/screens/products/shopping_cart.dart';
 import 'package:gh_styles/screens/wrapper.dart';
 import 'package:gh_styles/screens/splashscreen.dart';
+import 'package:provider/provider.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {

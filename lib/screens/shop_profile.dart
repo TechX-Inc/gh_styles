@@ -110,7 +110,7 @@ class _ShopProfileState extends State<ShopProfile> {
         ),
         Expanded(
           child: StreamBuilder<List<ProductModel>>(
-              stream: FetchProductService().allProductsStream,
+              stream: new FetchProductService().allProductsStream(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: Text("Loading"));

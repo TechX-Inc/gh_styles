@@ -86,6 +86,8 @@ class _ProductHorizontalListContainerState
                                 physics: BouncingScrollPhysics(),
                                 itemCount: products.length,
                                 itemBuilder: (context, int index) {
+                                  // print(
+                                  //     products[index].productDiscount.toInt());
                                   return Row(
                                     children: [
                                       ClipRRect(
@@ -161,8 +163,8 @@ class _ProductHorizontalListContainerState
                                                             ),
                                                             products[index]
                                                                         .productDiscount
-                                                                        .toString() !=
-                                                                    "0"
+                                                                        .toInt() !=
+                                                                    0
                                                                 ? Positioned(
                                                                     top: 0,
                                                                     right: 0,
@@ -181,7 +183,7 @@ class _ProductHorizontalListContainerState
                                                                       toAnimate:
                                                                           false,
                                                                       badgeContent: Text(
-                                                                          '-${products[index].productDiscount.toString()}%',
+                                                                          '-${products[index].productDiscount.toInt()}%',
                                                                           style:
                                                                               TextStyle(color: Colors.white)),
                                                                     ),
@@ -236,9 +238,7 @@ class _ProductHorizontalListContainerState
         });
   }
 
-  String computePrice(String discountString, String priceString) {
-    double discount = double.parse(discountString);
-    double price = double.parse(priceString);
+  String computePrice(double discount, double price) {
     String productPrice;
     if (discount <= 0) {
       productPrice = price.toString();

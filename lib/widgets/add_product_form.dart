@@ -33,7 +33,7 @@ class _NewProductFormState extends State<NewProductForm> {
     super.initState();
     _user = Provider.of<User>(context, listen: false);
     _addProduct = Provider.of<AddProductProvider>(context, listen: false);
-    _addProduct.setUID = _user.uid;
+    // _addProduct.setUID = _user.uid;
     fetchShopService.setUid = _user.uid;
   }
 
@@ -304,7 +304,7 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Price*"),
       validator: (value) => ValidateProducts.validatePrice(value.trim()),
-      onSaved: (price) => _addProduct.setproductPrice = price,
+      onSaved: (price) => _addProduct.setproductPrice = double.parse(price),
     );
   }
 
@@ -312,7 +312,8 @@ class _NewProductFormState extends State<NewProductForm> {
     return TextFormField(
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Discount(%)"),
-      onSaved: (discount) => _addProduct.setproductDiscount = discount,
+      onSaved: (discount) =>
+          _addProduct.setproductDiscount = double.parse(discount),
     );
   }
 
@@ -321,7 +322,8 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Quantity*"),
       validator: (value) => ValidateProducts.validateQuantity(value.trim()),
-      onSaved: (quantity) => _addProduct.setproductQuantity = quantity,
+      onSaved: (quantity) =>
+          _addProduct.setproductQuantity = int.parse(quantity),
     );
   }
 

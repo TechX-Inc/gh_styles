@@ -18,10 +18,10 @@ class ProductService {
   DocumentReference shopRef;
   List<File> productPhotos;
   String productName;
-  String productQuantity;
+  int productQuantity;
   String productDescription;
-  String productPrice;
-  String productDiscount;
+  double productPrice;
+  double productDiscount;
   String productType;
   String gender;
   String productSize;
@@ -50,11 +50,9 @@ class ProductService {
         return await _productRef.setData({
           'shop_ref': shopRef,
           'product_name': productName,
-          'product_quantity': productQuantity ?? 1,
+          'product_quantity': (productQuantity == null) ? 1 : productQuantity,
           'product_price': productPrice,
-          'product_discount': (productDiscount == "" || productDiscount == null)
-              ? "0"
-              : productDiscount,
+          'product_discount': (productDiscount == null) ? 0 : productDiscount,
           'product_description': productDescription,
           'date_posted': FieldValue.serverTimestamp(),
           'categories': {

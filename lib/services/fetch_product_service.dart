@@ -32,7 +32,7 @@ class FetchProductService {
     });
   }
 
-  Stream<List<ProductModel>> get allProductsStream {
+  Stream<List<ProductModel>> allProductsStream() {
     return products
         .orderBy("date_posted", descending: true)
         .snapshots()

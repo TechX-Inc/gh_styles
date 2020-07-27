@@ -112,8 +112,8 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                               ),
                                               products[index]
                                                           .productDiscount
-                                                          .toString() !=
-                                                      "0"
+                                                          .toInt() !=
+                                                      0
                                                   ? Positioned(
                                                       top: 0,
                                                       right: 0,
@@ -127,7 +127,7 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                                         borderRadius: 20,
                                                         toAnimate: false,
                                                         badgeContent: Text(
-                                                            '-${products[index].productDiscount}%',
+                                                            '-${products[index].productDiscount.toInt()}%',
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .white)),
@@ -189,9 +189,9 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
     );
   }
 
-  String computePrice(String discountString, String priceString) {
-    double discount = double.parse(discountString);
-    double price = double.parse(priceString);
+  String computePrice(double discount, double price) {
+    // double discount = double.parse(discountString);
+    // double price = double.parse(priceString);
     String productPrice;
     if (discount <= 0) {
       productPrice = price.toString();

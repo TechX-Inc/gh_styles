@@ -3,9 +3,11 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/product_details_provider.dart';
+import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/services/products_services.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +27,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final ProductService _productService = new ProductService();
 
   final FetchProductService _fetchProductService = new FetchProductService();
-
+  final FetchCartService _cartService = new FetchCartService();
   NumberFormat f = new NumberFormat("###.0#", "en_US");
   ProductDetailsProvider detailsProvider;
   User user;
@@ -37,7 +39,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     detailsProvider =
         Provider.of<ProductDetailsProvider>(context, listen: false);
     detailsProvider.setProductStockQuantity =
-        int.parse(widget.productModel.productQuantity);
+        widget.productModel.productQuantity;
     detailsProvider.setProductRef = widget.productModel.productRef;
     detailsProvider.setUID = user.uid;
   }
@@ -59,12 +61,37 @@ class _DetailsScreenState extends State<DetailsScreen> {
             ),
             backgroundColor: Colors.white,
             actions: [
-              IconButton(
-                  tooltip: "My Cart",
-                  icon: Icon(
-                    Icons.shopping_cart,
-                  ),
-                  onPressed: () => Navigator.pushNamed(context, '/cart')),
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: StreamBuilder<List<CartModel>>(
+                    stream: _cartService.shoppingCartProductStream(user?.uid),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: Icon(Icons.shopping_cart));
+                      }
+
+                      List<CartModel> cartData = snapshot?.data;
+                      cartData.removeWhere((value) => value == null);
+
+                      return Center(
+                        child: Badge(
+                          position: BadgePosition.topRight(top: 0, right: 3),
+                          animationDuration: Duration(milliseconds: 300),
+                          animationType: BadgeAnimationType.slide,
+                          badgeContent: Text(
+                            "${cartData.length}"
+                            // "5"
+                            ,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: IconButton(
+                              icon: Icon(Icons.shopping_cart),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/cart')),
+                        ),
+                      );
+                    }),
+              )
             ],
           ),
           backgroundColor: Color(0xfff9f9f9),
@@ -205,13 +232,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             SizedBox(
                               height: 15,
                             ),
-                            widget.productModel.productDiscount.toString() !=
-                                    "0"
+                            widget.productModel.productDiscount.toInt() != 0
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0),
                                     child: Text(
-                                      "${f.format(double.parse(widget.productModel.productPrice))} GHS",
+                                      "${f.format(widget.productModel.productPrice)} GHS",
                                       style: TextStyle(
                                           fontSize: 20,
                                           decoration:
@@ -236,13 +262,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       elevation: 0,
                                       shape: BadgeShape.square,
                                       toAnimate: false,
-                                      badgeContent: Text(
-                                        "In Stock: ${widget.productModel.productQuantity}",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 1,
-                                            fontSize: 16),
-                                      )),
+                                      badgeContent:
+                                          Consumer<ProductDetailsProvider>(
+                                              builder: (_, data, __) {
+                                        return Text(
+                                          "In Stock: ${data.quantityInStock}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1,
+                                              fontSize: 16),
+                                        );
+                                      })),
                                 ],
                               ),
                             ),

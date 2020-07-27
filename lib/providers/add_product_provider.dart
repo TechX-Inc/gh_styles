@@ -25,13 +25,13 @@ class AddProductProvider with ChangeNotifier {
   CollectionReference user = Firestore.instance.collection("Users");
   CollectionReference shop = Firestore.instance.collection("Shops");
 
-  String _uid;
+  // String _uid;
 
   String _productName;
-  String _productQuantity;
+  int _productQuantity;
   String _productDescription;
-  String _productPrice;
-  String _productDiscount;
+  double _productPrice;
+  double _productDiscount;
   String _productType = 'Footwears';
   String _gender = 'Male';
   String _productSize;
@@ -55,15 +55,15 @@ class AddProductProvider with ChangeNotifier {
     _productName = productName;
   }
 
-  set setproductQuantity(String productQuantity) {
+  set setproductQuantity(int productQuantity) {
     _productQuantity = productQuantity;
   }
 
-  set setproductPrice(String productPrice) {
+  set setproductPrice(double productPrice) {
     _productPrice = productPrice;
   }
 
-  set setproductDiscount(String productDiscount) {
+  set setproductDiscount(double productDiscount) {
     _productDiscount = productDiscount;
   }
 
@@ -90,9 +90,9 @@ class AddProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  set setUID(String uid) {
-    _uid = uid;
-  }
+  // set setUID(String uid) {
+  //   _uid = uid;
+  // }
 
   set imageToRemoveIndex(int index) {
     _images.removeAt(index);
@@ -147,13 +147,16 @@ class AddProductProvider with ChangeNotifier {
         ProductService newProduct = new ProductService(
             shopRef: shopRef,
             productPhotos: _images.isNotEmpty ? _images : null,
-            productName: _productName.trim() ?? null,
-            productQuantity: _productQuantity.trim() ?? 1.toString(),
+            productName: (_productName == null || _productName == "")
+                ? null
+                : _productName.trim(),
+            productQuantity: _productQuantity == null ? 1 : _productQuantity,
             productDescription: _productDescription ?? '',
-            productDiscount: _productDiscount ?? null,
-            productPrice: _productPrice.trim() ?? null,
+            productDiscount:
+                (_productDiscount == null) ? null : _productDiscount,
+            productPrice: (_productPrice == null) ? null : _productPrice,
             productType: _productType.trim(),
-            productSize: _productSize ?? null,
+            productSize: (_productSize == null) ? null : _productSize,
             gender: _gender.trim(),
             collection: _collection.trim());
         dynamic product = await newProduct.newProduct();

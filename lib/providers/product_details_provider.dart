@@ -8,10 +8,11 @@ class ProductDetailsProvider with ChangeNotifier {
   final ShoppingCartService _cartService = new ShoppingCartService();
   int _quantityCounter = 1;
   int _quantityInStock;
-  double _itemUnitPrice;
+  double _totalSelectionPrice;
   String _uid;
   DocumentReference _productRef;
 
+  int get quantityInStock => _quantityInStock;
   int get quantityCounter => _quantityCounter;
 
   set setProductStockQuantity(int quantity) {
@@ -48,21 +49,27 @@ class ProductDetailsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String computePrice(String discountString, String priceString) {
-    double discount = double.parse(discountString);
-    double price = double.parse(priceString);
+  String computePrice(double discount, double price) {
     String productPrice;
     if (discount <= 0) {
       productPrice = price.toString();
     } else {
       productPrice = (price - (discount / 100) * price).toString();
     }
-    _itemUnitPrice = double.parse(productPrice) * _quantityCounter;
-    return f.format(_itemUnitPrice);
+    _totalSelectionPrice = double.parse(productPrice) * _quantityCounter;
+    return f.format(_totalSelectionPrice);
   }
 
   void addToCart(BuildContext contexts) {
-    _cartService.addToCart(
-        _uid, _productRef, _quantityCounter, _quantityInStock);
+    if (_quantityInStock != 0) {
+      _cartService
+          .addToCart(_uid, _productRef, _quantityCounter, _quantityInStock,
+              _totalSelectionPrice)
+          .then((value) =>
+              {_quantityInStock -= _quantityCounter, notifyListeners()});
+    } else {
+      print("item out of stock");
+      return null;
+    }
   }
 }
