@@ -174,4 +174,12 @@ class AddShopProvider with ChangeNotifier {
       }
     }
   }
+
+  Future<void> updateShop() {
+    print("updating...");
+  }
+
+  Future<void> removeLogo() {
+    print("removing logo...");
+  }
 }

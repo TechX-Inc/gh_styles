@@ -1,13 +1,15 @@
 import 'package:badges/badges.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/cart_provider.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 final CartProvider _cartProvider = new CartProvider();
+final f = new NumberFormat("###.0#", "en_US");
+
 double computeDimensions(double percentage, double constraintHeight) {
   return ((percentage / 100) * constraintHeight);
 }
@@ -20,7 +22,6 @@ class ShoppingCart extends StatefulWidget {
 class _ShoppingCartState extends State<ShoppingCart> {
   User user;
   final FetchCartService _cartService = new FetchCartService();
-
   @override
   void initState() {
     super.initState();
@@ -100,18 +101,15 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                                           cartModel:
                                                               cartData[index],
                                                           index: index,
-                                                          cartProductRef:
-                                                              cartData[index]
-                                                                  .productRef,
                                                           user: user,
                                                         ),
                                                         onDismissed: (direction) =>
-                                                            _cartProvider
-                                                                .removeCartItem(
-                                                                    user.uid,
-                                                                    cartData[
-                                                                            index]
-                                                                        .productRef));
+                                                            _cartProvider.removeCartItem(
+                                                                user.uid,
+                                                                cartData[index]
+                                                                    .productRef,
+                                                                cartData[index]
+                                                                    .orderQuantity));
                                                   }))),
                                       CartBottomSection(
                                         height: computeDimensions(
@@ -152,9 +150,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
 class CartListTile extends StatelessWidget {
   final CartModel cartModel;
   final int index;
-  final DocumentReference cartProductRef;
   final User user;
-  CartListTile({this.cartModel, this.index, this.cartProductRef, this.user});
+  CartListTile({this.cartModel, this.index, this.user});
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -194,7 +191,7 @@ class CartListTile extends StatelessWidget {
                         SizedBox(height: 10),
                         Container(
                           child: Text(
-                            "${cartModel.selectionPrice.toString()} GHS",
+                            "${f.format(cartModel.selectionPrice)} GHS",
                             style: TextStyle(
                                 color: Color.fromRGBO(50, 219, 198, 1)),
                           ),
@@ -224,8 +221,8 @@ class CartListTile extends StatelessWidget {
                           Icons.close,
                           color: Colors.redAccent,
                         ),
-                        onPressed: () => _cartProvider.removeCartItem(
-                            user.uid, cartProductRef),
+                        onPressed: () => _cartProvider.removeCartItem(user.uid,
+                            cartModel.productRef, cartModel.orderQuantity),
                       ),
                     ],
                   )
@@ -266,7 +263,7 @@ class _CartBottomSectionState extends State<CartBottomSection> {
               child: Consumer<CartProvider>(builder: (_, data, __) {
                 // print(data.totalItemsPrice.toString());
                 return Text(
-                  "${widget.totalItemsPrice} GHS",
+                  "${f.format(widget.totalItemsPrice)} GHS",
                   style: TextStyle(fontSize: 20),
                 );
               }),

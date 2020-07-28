@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CreateShopBg extends StatelessWidget {

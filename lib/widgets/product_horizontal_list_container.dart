@@ -96,25 +96,14 @@ class _ProductHorizontalListContainerState
                                         child: Container(
                                           color: Colors.white,
                                           child: GestureDetector(
-                                            onTap: () => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ChangeNotifierProvider<
-                                                              ProductDetailsProvider>(
-                                                          create: (context) =>
-                                                              ProductDetailsProvider(),
-                                                          builder: (context,
-                                                              snapshot) {
-                                                            return DetailsScreen(
-                                                              productModel:
-                                                                  products[
-                                                                      index],
-                                                              heroID:
-                                                                  '$index${widget.heroID}',
-                                                            );
-                                                          }),
-                                                )),
+                                            onTap: () => Navigator.of(context)
+                                                .pushNamed("/product_details",
+                                                    arguments: {
+                                                  "product_model":
+                                                      products[index],
+                                                  "hero_id":
+                                                      '$index${widget.heroID}'
+                                                }),
                                             child: ConstrainedBox(
                                               constraints: BoxConstraints(
                                                 minWidth: 160.0,

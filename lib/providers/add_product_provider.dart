@@ -233,4 +233,8 @@ class AddProductProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> updateProduct() {
+    print("updating product...");
+  }
 }

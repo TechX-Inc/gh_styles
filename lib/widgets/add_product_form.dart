@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/validation_product.dart';
+import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/add_product_provider.dart';
@@ -12,12 +13,14 @@ import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 
-class NewProductForm extends StatefulWidget {
+class AddProductForm extends StatefulWidget {
+  final ProductModel productModel;
+  AddProductForm({this.productModel});
   @override
-  _NewProductFormState createState() => _NewProductFormState();
+  _AddProductFormState createState() => _AddProductFormState();
 }
 
-class _NewProductFormState extends State<NewProductForm> {
+class _AddProductFormState extends State<AddProductForm> {
   AddProductProvider _addProduct;
   FetchShopService fetchShopService = new FetchShopService();
 
@@ -33,8 +36,8 @@ class _NewProductFormState extends State<NewProductForm> {
     super.initState();
     _user = Provider.of<User>(context, listen: false);
     _addProduct = Provider.of<AddProductProvider>(context, listen: false);
-    // _addProduct.setUID = _user.uid;
     fetchShopService.setUid = _user.uid;
+    print("================${widget.productModel}====================");
   }
 
   @override
@@ -52,20 +55,6 @@ class _NewProductFormState extends State<NewProductForm> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                //           return StreamBuilder<List<ShopsModel>>(
-                // stream: fetchShopService.shopsStream,
-                // builder: (context, snapshot) {
-                //   if (!snapshot.hasData) {
-                //     print(snapshot.error);
-                //     return Text("Loading");
-                //   } else
-                //     return (snapshot.data == null ||
-                //             snapshot.data.contains(null) ||
-                //             snapshot.data.isEmpty)
-                //         ? AddShop()
-                //         : ShopProfile(shopModel: snapshot.data);
-                // });
-
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   alignment: Alignment.topCenter,
@@ -157,22 +146,21 @@ class _NewProductFormState extends State<NewProductForm> {
                       child: Row(
                         children: <Widget>[
                           FlatButton(
-                            color: _nextStepperToggleColor,
-                            child: Text(
-                              _nextStepperToggleText,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: _currentStep != 1
-                                ? onStepContinue
-                                : () => _addProduct.processAndSave(context),
-                          ),
+                              color: _nextStepperToggleColor,
+                              child: Text(
+                                _nextStepperToggleText,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: _currentStep != 1
+                                  ? onStepContinue
+                                  : () => widget.productModel == null
+                                      ? _addProduct.processAndSave(context)
+                                      : _addProduct.updateProduct()),
                           SizedBox(
                             width: 20,
                           ),
                           FlatButton(
-                              // color: Colors.red,
-                              child: Text("Previous"),
-                              onPressed: onStepCancel),
+                              child: Text("Previous"), onPressed: onStepCancel),
                         ],
                       ),
                     );
@@ -288,6 +276,8 @@ class _NewProductFormState extends State<NewProductForm> {
       decoration: InputDecoration(hintText: "Product Name*"),
       validator: (value) => ValidateProducts.validateProductName(value.trim()),
       onSaved: (productName) => _addProduct.setproductName = productName,
+      initialValue:
+          widget.productModel != null ? widget.productModel.productName : null,
     );
   }
 
@@ -296,6 +286,8 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.text,
       decoration: InputDecoration(hintText: "Size"),
       onSaved: (size) => _addProduct.setproductSize = size,
+      initialValue:
+          widget.productModel != null ? widget.productModel.productSize : null,
     );
   }
 
@@ -305,6 +297,9 @@ class _NewProductFormState extends State<NewProductForm> {
       decoration: InputDecoration(hintText: "Price*"),
       validator: (value) => ValidateProducts.validatePrice(value.trim()),
       onSaved: (price) => _addProduct.setproductPrice = double.parse(price),
+      initialValue: widget.productModel != null
+          ? widget.productModel.productPrice.toString()
+          : null,
     );
   }
 
@@ -314,6 +309,9 @@ class _NewProductFormState extends State<NewProductForm> {
       decoration: InputDecoration(hintText: "Discount(%)"),
       onSaved: (discount) =>
           _addProduct.setproductDiscount = double.parse(discount),
+      initialValue: widget.productModel != null
+          ? widget.productModel.productDiscount.toString()
+          : null,
     );
   }
 
@@ -324,6 +322,9 @@ class _NewProductFormState extends State<NewProductForm> {
       validator: (value) => ValidateProducts.validateQuantity(value.trim()),
       onSaved: (quantity) =>
           _addProduct.setproductQuantity = int.parse(quantity),
+      initialValue: widget.productModel != null
+          ? widget.productModel.productQuantity.toString()
+          : null,
     );
   }
 
@@ -336,13 +337,18 @@ class _NewProductFormState extends State<NewProductForm> {
         LengthLimitingTextInputFormatter(150),
       ],
       onSaved: (productDesc) => _addProduct.setproductDescription = productDesc,
+      initialValue: widget.productModel != null
+          ? widget.productModel.productDescription
+          : null,
     );
   }
 
   Widget _productCategory() {
     return Consumer<AddProductProvider>(builder: (_, data, __) {
       return DropdownButton<String>(
-        value: data.productType,
+        value: widget.productModel == null
+            ? data.productType
+            : widget.productModel.productType,
         onChanged: (String value) => data.setproductType = value,
         items: <String>[
           'Footwears',
@@ -364,7 +370,9 @@ class _NewProductFormState extends State<NewProductForm> {
   Widget _gender() {
     return Consumer<AddProductProvider>(builder: (_, data, __) {
       return DropdownButton<String>(
-        value: data.gender,
+        value: widget.productModel == null
+            ? data.gender
+            : widget.productModel.gender,
         onChanged: (String newValue) => data.setgender = newValue,
         items: <String>['Male', "Female"]
             .map<DropdownMenuItem<String>>((String value) {
@@ -380,7 +388,9 @@ class _NewProductFormState extends State<NewProductForm> {
   Widget _collection() {
     return Consumer<AddProductProvider>(builder: (_, data, __) {
       return RadioButtonGroup(
-          picked: data.collection,
+          picked: widget.productModel == null
+              ? data.collection
+              : widget.productModel.collection,
           orientation: GroupedButtonsOrientation.HORIZONTAL,
           padding: EdgeInsets.all(0),
           labels: <String>[
@@ -402,29 +412,29 @@ class _NewProductFormState extends State<NewProductForm> {
     );
   }
 
-  Widget _signInBtn() {
-    return RaisedButton(
-      color: Color.fromRGBO(181, 7, 107, 1),
-      child: FractionallySizedBox(
-        widthFactor: 1,
-        child: Container(child: Consumer<AddProductProvider>(
-          builder: (context, data, _) {
-            return !data.loading
-                ? Text(
-                    "Add",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  )
-                : SpinKitThreeBounce(
-                    color: Colors.white,
-                    size: 25.0,
-                  );
-          },
-        )),
-      ),
-      shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(30.0)),
-      onPressed: () => _addProduct.processAndSave(context),
-    );
-  }
+  // Widget _signInBtn() {
+  //   return RaisedButton(
+  //     color: Color.fromRGBO(181, 7, 107, 1),
+  //     child: FractionallySizedBox(
+  //       widthFactor: 1,
+  //       child: Container(child: Consumer<AddProductProvider>(
+  //         builder: (context, data, _) {
+  //           return !data.loading
+  //               ? Text(
+  //                   "Add",
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(color: Colors.white),
+  //                 )
+  //               : SpinKitThreeBounce(
+  //                   color: Colors.white,
+  //                   size: 25.0,
+  //                 );
+  //         },
+  //       )),
+  //     ),
+  //     shape: new RoundedRectangleBorder(
+  //         borderRadius: new BorderRadius.circular(30.0)),
+  //     onPressed: () => _addProduct.processAndSave(context),
+  //   );
+  // }
 }

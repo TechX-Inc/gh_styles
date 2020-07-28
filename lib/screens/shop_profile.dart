@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
-import 'package:gh_styles/test_data.dart';
 
 class ShopProfile extends StatefulWidget {
   final List<ShopsModel> shopModel;
@@ -13,6 +12,12 @@ class ShopProfile extends StatefulWidget {
 }
 
 class _ShopProfileState extends State<ShopProfile> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +82,11 @@ class _ShopProfileState extends State<ShopProfile> {
                                 style: TextStyle(color: Colors.blueAccent),
                               ),
                               onPressed: () {
-                                print("Editing shop...");
+                                Navigator.of(context).pushNamed("/edit_shop",
+                                    arguments: {
+                                      "edit_mode": true,
+                                      "shop_model": widget.shopModel[0]
+                                    });
                               },
                               shape: new RoundedRectangleBorder(
                                   borderRadius:
@@ -132,7 +141,7 @@ class _ShopProfileState extends State<ShopProfile> {
                         itemBuilder: (context, int index) {
                           return GestureDetector(
                             onTap: () {
-                              _showBottomSheet();
+                              _showBottomSheet(products[index]);
                             },
                             child: Container(
                               child: Column(
@@ -207,7 +216,7 @@ class _ShopProfileState extends State<ShopProfile> {
     ));
   }
 
-  void _showBottomSheet() {
+  void _showBottomSheet(ProductModel productModel) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -226,7 +235,11 @@ class _ShopProfileState extends State<ShopProfile> {
                             style: TextStyle(color: Colors.blueAccent),
                           ),
                           onPressed: () {
-                            print("Editing...");
+                            Navigator.of(context).pushNamed("/edit_product",
+                                arguments: {
+                                  "edit_mode": true,
+                                  "product_model": productModel
+                                });
                           },
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(30.0))),

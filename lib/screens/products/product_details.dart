@@ -48,6 +48,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+          key: detailsProvider.scaffoldKey,
           appBar: AppBar(
             iconTheme: IconThemeData(
               color: Colors.black, //change your color here
@@ -113,7 +114,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             Container(
                               width: viewportConstraints.maxWidth,
                               height: computeDimensions(
-                                  46, viewportConstraints.maxHeight),
+                                  50, viewportConstraints.maxHeight),
                               child: Hero(
                                 tag: '${widget.heroID}',
                                 child:
@@ -265,13 +266,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       badgeContent:
                                           Consumer<ProductDetailsProvider>(
                                               builder: (_, data, __) {
-                                        return Text(
-                                          "In Stock: ${data.quantityInStock}",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 1,
-                                              fontSize: 16),
-                                        );
+                                        return data.quantityInStock > 0
+                                            ? Text(
+                                                "In Stock: ${data.quantityInStock}",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 1,
+                                                    fontSize: 16),
+                                              )
+                                            : Text(
+                                                "Out of Stock",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 1,
+                                                    color: Colors.redAccent,
+                                                    fontSize: 16),
+                                              );
                                       })),
                                 ],
                               ),
@@ -342,10 +352,8 @@ class ProductQuantityCounter extends StatefulWidget {
 
 class _ProductQuantityCounterState extends State<ProductQuantityCounter> {
   ProductDetailsProvider detailsProvider;
-  int _count = 1;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     detailsProvider =
         Provider.of<ProductDetailsProvider>(context, listen: false);
@@ -358,7 +366,8 @@ class _ProductQuantityCounterState extends State<ProductQuantityCounter> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           GestureDetector(
-            onTap: () => data.increaseQuantity(),
+            onTap: () =>
+                data.quantityInStock > 0 ? data.increaseQuantity() : null,
             child: Container(
               padding: const EdgeInsets.all(3.0),
               decoration: BoxDecoration(
@@ -369,10 +378,15 @@ class _ProductQuantityCounterState extends State<ProductQuantityCounter> {
             ),
           ),
           SizedBox(width: 15.0),
-          Text("${data.quantityCounter}"),
+          data.quantityInStock > 0
+              ? Text("${data.quantityCounter}")
+              : Text(
+                  "0",
+                ),
           SizedBox(width: 15.0),
           GestureDetector(
-            onTap: () => data.decreaseQuantity(),
+            onTap: () =>
+                data.quantityInStock > 0 ? data.decreaseQuantity() : null,
             child: Container(
               padding: const EdgeInsets.all(3.0),
               decoration: BoxDecoration(

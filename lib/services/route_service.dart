@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/providers/cart_provider.dart';
+import 'package:gh_styles/providers/product_details_provider.dart';
+import 'package:gh_styles/screens/add_shop.dart';
 import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/register.dart';
-import 'package:gh_styles/screens/new_product.dart';
+import 'package:gh_styles/screens/add_product.dart';
 import 'package:gh_styles/screens/main_screen_wrapper.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/screens/products/shopping_cart.dart';
@@ -22,14 +24,8 @@ class RouteGenerator {
       case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
-      case '/cart':
-        return MaterialPageRoute(builder: (_) => ShoppingCart());
-
       case '/main_screen_wrapper':
         return MaterialPageRoute(builder: (_) => MainScreenWrapper());
-
-      case '/add_product':
-        return MaterialPageRoute(builder: (_) => NewProduct());
 
       case '/signup':
         return MaterialPageRoute(builder: (_) => SignUp());
@@ -37,17 +33,46 @@ class RouteGenerator {
       case '/login':
         return MaterialPageRoute(builder: (_) => Login());
 
-      case '/forgot_password':
-        return MaterialPageRoute(builder: (_) => ForgotPassword());
+      case '/cart':
+        return MaterialPageRoute(builder: (_) => ShoppingCart());
 
-        // case '/item_details':
-        //   return MaterialPageRoute(builder: (_) => DetailsScreen();
-        // if (args is String) {
-        //   return MaterialPageRoute(builder: (_) => DetailsScreen());
-        // }
-        // return _errorRoute();
+      case '/add_product':
+        return MaterialPageRoute(builder: (_) => AddProduct());
 
-        break;
+      case '/edit_product':
+        if (args is Map) {
+          return MaterialPageRoute(
+              builder: (_) => AddProduct(
+                    editMode: args["edit_mode"],
+                    productModel: args["product_model"],
+                  ));
+        }
+        return _errorRoute();
+
+      case '/edit_shop':
+        if (args is Map) {
+          return MaterialPageRoute(
+              builder: (_) => AddShop(
+                    editMode: args["edit_mode"],
+                    shopsModel: args["shop_model"],
+                  ));
+        }
+        return _errorRoute();
+
+      case '/product_details':
+        if (args is Map) {
+          return MaterialPageRoute(
+              builder: (_) => ChangeNotifierProvider<ProductDetailsProvider>(
+                  create: (context) => ProductDetailsProvider(),
+                  builder: (context, data) {
+                    return DetailsScreen(
+                      productModel: args["product_model"],
+                      heroID: args["hero_id"],
+                    );
+                  }));
+        }
+        return _errorRoute();
+
       default:
         return _errorRoute();
     }
