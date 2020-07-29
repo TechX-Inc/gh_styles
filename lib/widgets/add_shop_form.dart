@@ -153,12 +153,15 @@ class _ShopFormsWidgetState extends State<ShopForms> {
           ? RaisedButton(
               color: Color.fromRGBO(109, 0, 39, 1),
               child: Text(
-                'Create Shop',
+                widget.shopsModel != null ? "Save Changes" : 'Create Shop',
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () => widget.shopsModel == null
                   ? _addShopFormHandler.processAndSave(context)
-                  : _addShopFormHandler.updateShop(),
+                  : _addShopFormHandler.updateShop(
+                      context,
+                      widget.shopsModel.shopRef,
+                      widget.shopsModel.shopLogoPath),
             )
           : SpinKitWave(
               color: Color.fromRGBO(109, 0, 39, 1),

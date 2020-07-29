@@ -10,19 +10,20 @@ class ShopLogo extends StatefulWidget {
 }
 
 class _ShopLogoState extends State<ShopLogo> {
-  AddShopProvider logoUploadHandler;
+  // AddShopProvider _addShopProvider;
   @override
   void initState() {
     super.initState();
+    // _addShopProvider = Provider.of<AddShopProvider>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    logoUploadHandler = Provider.of<AddShopProvider>(context, listen: false);
     return Container(
         margin: EdgeInsets.only(top: 20),
         decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
         child: Consumer<AddShopProvider>(builder: (context, data, _) {
+          // print("==========LOGO FILE : ${data.logoUrl} ===========");
           if (widget.logoUrl != null) {
             return AnimatedContainer(
                 duration: Duration(milliseconds: 650),

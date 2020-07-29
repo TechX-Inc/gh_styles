@@ -26,13 +26,13 @@ class ShopsModel {
     return ShopsModel(
       shopRef: shop.reference,
       shopOwnerRef: shop.data['shop_owner_ref'],
-      shopName: shop.data['shop_name'] ?? "",
-      shopOwnerLegalName: shop.data['shop_owner_legal_name'] ?? "",
-      shopContact: shop.data['shop_contact'] ?? "",
-      shopEmail: shop.data['shop_email'] ?? "",
-      shopLocation: shop.data['shop_location'] ?? "",
-      shopWebsite: shop.data['shop_website'] ?? "",
-      shopLogoPath: shop.data['shop_logo'] ?? "",
+      shopName: shop.data['shop_name'] ?? null,
+      shopOwnerLegalName: shop.data['shop_owner_legal_name'] ?? null,
+      shopContact: shop.data['shop_contact'] ?? null,
+      shopEmail: shop.data['shop_email'] ?? null,
+      shopLocation: shop.data['shop_location'] ?? null,
+      shopWebsite: shop.data['shop_website'] ?? null,
+      shopLogoPath: shop.data['shop_logo'] ?? null,
     );
   }
 }

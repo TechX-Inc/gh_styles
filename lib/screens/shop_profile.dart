@@ -42,10 +42,12 @@ class _ShopProfileState extends State<ShopProfile> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                              radius: 40,
-                              backgroundImage: NetworkImage(
-                                  widget.shopModel[0].shopLogoPath)),
+                          widget?.shopModel[0]?.shopLogoPath != null
+                              ? CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: NetworkImage(
+                                      widget.shopModel[0]?.shopLogoPath))
+                              : Container(),
                           SizedBox(
                             height: 10,
                           ),

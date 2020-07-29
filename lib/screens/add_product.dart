@@ -10,7 +10,6 @@ class AddProduct extends StatelessWidget {
   AddProduct({this.editMode = false, this.productModel});
   @override
   Widget build(BuildContext context) {
-    print(editMode);
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,

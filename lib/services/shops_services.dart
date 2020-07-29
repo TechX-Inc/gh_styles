@@ -29,6 +29,7 @@ class Shop {
       this.shopWebsite,
       this.shopLogo});
 
+//////////////////////////////
   Future createShop() async {
     try {
       if (uid != null &&
@@ -49,10 +50,9 @@ class Shop {
           'shop_website': shopWebsite,
           'date_register': FieldValue.serverTimestamp()
         }).then((value) async {
-          print(
-              "=========================>>>>>>>>>>>>> DATA INSERTED, SENDING LOGO DATA <<<<<<<<<<<<================");
-          dynamic logo = await uploadLogoImage(shopLogo);
-          print("===================$logo=================");
+          print("============= DATA INSERTED, SENDING LOGO DATA ============");
+          dynamic logo = await uploadLogoImage(shopRef);
+          // print("===================$logo=================");
           if (logo == true) {
             await updateHasShopStatus();
             return true;
@@ -70,30 +70,50 @@ class Shop {
     }
   }
 
-  // ignore: missing_return
-  Future updateHasShopStatus() {
+  Future<dynamic> editShop(
+      DocumentReference shopReference, String existingLogoPath) async {
     try {
-      Firestore.instance.runTransaction((transaction) async {
-        DocumentSnapshot freshSnapshot =
-            await transaction.get(shopOwner.document(uid));
-        await transaction.update(freshSnapshot.reference, {'has_shop': true});
-      }).catchError((onError) {
-        print(
-            "UNABLE TO UPDATE SHOP STATUS   <<<<<<<==================>>>>>>  ${onError.message}");
-        return null;
-      });
+      if (shopName != null &&
+          shopOwnerLegalName != null &&
+          shopContact != null &&
+          shopEmail != null &&
+          shopLogo != null &&
+          shopLocation != null) {
+        return await shopReference.updateData({
+          'shop_name': shopName,
+          'shop_contact': shopContact,
+          'shop_email': shopEmail,
+          'shop_location': shopLocation,
+          'shop_logo': existingLogoPath,
+          'shop_owner_legal_name': shopOwnerLegalName,
+          'shop_website': shopWebsite,
+        }).then((value) async {
+          print("============ DATA INSERTED, updating logo ==========");
+          dynamic logo = await uploadLogoImage(shopReference);
+          if (logo == true) {
+            return true;
+          }
+          return true;
+        }).catchError((onError) => throw new PlatformException(
+            code: "FAILED_TO_UPDATE_SHOP",
+            message: "Could not update data, please try again"));
+      } else {
+        throw new PlatformException(
+            code: "NULL_REQUIRED_FIELD",
+            message: "Please fill all required(*) fields");
+      }
     } on PlatformException catch (e) {
-      print(
-          "CANNOT UPDATE SHOP STATUS   <<<<<<==================>>>>>>  ${e.message}");
+      return e;
     }
   }
 
-  Future<dynamic> uploadLogoImage(File logoFile) async {
+//////////////////////////////////////////// UPLOAD SHOP LOGO TO FIREBASE STORAGE ////////////////////////
+  Future<dynamic> uploadLogoImage(DocumentReference shopRef) async {
     try {
-      if (logoFile != null) {
+      if (shopLogo != null) {
         StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(
-            "businessLogo/${shopRef.documentID.toString()}.${basename(logoFile.path)}");
-        StorageUploadTask task = firebaseStorageRef.putFile(logoFile);
+            "businessLogo/${shopRef.documentID.toString()}.${basename(shopLogo.path)}");
+        StorageUploadTask task = firebaseStorageRef.putFile(shopLogo);
 
         return await (await task.onComplete)
             .ref
@@ -141,6 +161,45 @@ class Shop {
             code: "NULL_IMAGE_FILE", message: "Image file was not found");
       }
     } on PlatformException catch (e) {
+      return e;
+    }
+  }
+
+//////////////////////////////////////////// DELETE PHOTO FROM FIREBASE STORAGE ///////////////////////////
+
+  Future<dynamic> deleteLogoImage({String photoUrl}) async {
+    if (photoUrl != null) {
+      try {
+        StorageReference photoRef = await FirebaseStorage.instance
+            .ref()
+            .getStorage()
+            .getReferenceFromUrl(photoUrl);
+        return await photoRef
+            .delete()
+            .catchError((error) => throw new PlatformException(
+                code: "UNABLE_TO_DELETE_PHOTO",
+                message: "Failed to remove photo"))
+            .then((value) => true);
+      } on PlatformException catch (e) {
+        return e;
+      }
+    }
+  }
+
+/////////////////////////////////// UPDATE USER DATA AND SET add_shop to true //////////////////////////////////////
+  Future updateHasShopStatus() async {
+    try {
+      Firestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot freshSnapshot =
+            await transaction.get(shopOwner.document(uid));
+        await transaction.update(freshSnapshot.reference, {'has_shop': true});
+      }).catchError((onError) {
+        print(
+            "<<<========= UNABLE TO UPDATE SHOP STATUS ========>>>  ${onError.message}");
+      });
+    } on PlatformException catch (e) {
+      print(
+          "CANNOT UPDATE SHOP STATUS   <<<<<<==================>>>>>>  ${e.message}");
       return e;
     }
   }
