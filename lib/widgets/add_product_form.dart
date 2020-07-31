@@ -5,7 +5,7 @@ import 'package:gh_styles/auth_and_validation/validation_product.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
-import 'package:gh_styles/providers/add_product_provider.dart';
+import 'package:gh_styles/providers/product_management_provider.dart';
 import 'package:gh_styles/services/fetch_shop_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
@@ -50,8 +50,7 @@ class _AddProductFormState extends State<AddProductForm> {
             _addProduct.setcollection = widget.productModel.collection,
             _addProduct.setproductType = widget.productModel.productType,
             _addProduct.setgender = widget.productModel.gender,
-            _addProduct.setExistingImageLength =
-                widget.productModel.productPhotos.length
+            _addProduct.setExistingImage = widget.productModel.productPhotos
           });
     }
 
@@ -214,48 +213,181 @@ class _AddProductFormState extends State<AddProductForm> {
                                 ),
                                 Consumer<AddProductProvider>(
                                     builder: (_, data, __) {
-                                  return Visibility(
-                                    visible: data.images.isNotEmpty,
-                                    child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxHeight: 80.0,
-                                        ),
-                                        child: GridView.count(
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          primary: false,
-                                          crossAxisCount: 4,
-                                          crossAxisSpacing: 10,
-                                          children: List.generate(
-                                              data.images.length, (index) {
-                                            return Stack(
-                                              fit: StackFit.expand,
-                                              children: [
-                                                Image.file(
-                                                  data.images[index],
-                                                  fit: BoxFit.cover,
-                                                ),
-                                                Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: GestureDetector(
-                                                    behavior: HitTestBehavior
-                                                        .translucent,
-                                                    onTap: () {
-                                                      data.imageToRemoveIndex =
-                                                          index;
-                                                    },
-                                                    child: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
+                                  return (data.existingImages.isNotEmpty &&
+                                          data.existingImages != null)
+                                      ? ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight: 80.0,
+                                          ),
+                                          child: LayoutBuilder(
+                                            builder: (context,
+                                                BoxConstraints constraint) {
+                                              return Container(
+                                                color: Color.fromRGBO(
+                                                    240, 240, 240, 1),
+                                                child: Row(
+                                                  children: [
+///////////////////////////////////////////////////
+                                                    Expanded(
+                                                      child: GridView.count(
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        primary: false,
+                                                        crossAxisCount: data
+                                                            .computeExistingImageWidth(),
+                                                        crossAxisSpacing: 10,
+                                                        children: List.generate(
+                                                            (data.existingImages
+                                                                .length),
+                                                            (index) {
+                                                          return Stack(
+                                                            fit:
+                                                                StackFit.expand,
+                                                            children: [
+                                                              Image.network(
+                                                                data.existingImages[
+                                                                    index],
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              ),
+                                                              Positioned(
+                                                                top: 0,
+                                                                right: 0,
+                                                                child:
+                                                                    GestureDetector(
+                                                                  behavior:
+                                                                      HitTestBehavior
+                                                                          .translucent,
+                                                                  onTap: () => data.removeProductPhoto(
+                                                                      data.existingImages[
+                                                                          index],
+                                                                      widget
+                                                                          .productModel
+                                                                          .productRef,
+                                                                      index),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .red,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          );
+                                                        }),
+                                                      ),
                                                     ),
-                                                  ),
-                                                )
-                                              ],
-                                            );
-                                          }),
-                                        )),
-                                  );
+
+///////////////////////////////////////////////////////////
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Visibility(
+                                                      visible: data
+                                                          .images.isNotEmpty,
+                                                      child: Expanded(
+                                                        child: GridView.count(
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
+                                                          primary: false,
+                                                          crossAxisCount: (data
+                                                                      .images
+                                                                      .length <=
+                                                                  1)
+                                                              ? 1
+                                                              : data.images
+                                                                  .length,
+                                                          crossAxisSpacing: 10,
+                                                          children:
+                                                              List.generate(
+                                                                  data.images
+                                                                      .length,
+                                                                  (index) {
+                                                            return Stack(
+                                                              fit: StackFit
+                                                                  .expand,
+                                                              children: [
+                                                                Image.file(
+                                                                  data.images[
+                                                                      index],
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                                Positioned(
+                                                                  top: 0,
+                                                                  right: 0,
+                                                                  child:
+                                                                      GestureDetector(
+                                                                    behavior:
+                                                                        HitTestBehavior
+                                                                            .translucent,
+                                                                    onTap: () =>
+                                                                        data.imageToRemoveIndex =
+                                                                            index,
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .delete,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            );
+                                                          }),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ))
+                                      : Visibility(
+                                          visible: data.images.isNotEmpty,
+                                          child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxHeight: 80.0,
+                                              ),
+                                              child: GridView.count(
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                primary: false,
+                                                crossAxisCount: 4,
+                                                crossAxisSpacing: 10,
+                                                children: List.generate(
+                                                    data.images.length,
+                                                    (index) {
+                                                  return Stack(
+                                                    fit: StackFit.expand,
+                                                    children: [
+                                                      Image.file(
+                                                        data.images[index],
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                      Positioned(
+                                                        top: 0,
+                                                        right: 0,
+                                                        child: GestureDetector(
+                                                          behavior:
+                                                              HitTestBehavior
+                                                                  .translucent,
+                                                          onTap: () {
+                                                            data.imageToRemoveIndex =
+                                                                index;
+                                                          },
+                                                          child: Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  );
+                                                }),
+                                              )),
+                                        );
                                 }),
                               ],
                             ),
@@ -334,11 +466,13 @@ class _AddProductFormState extends State<AddProductForm> {
     return TextFormField(
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Discount(%)"),
-      onSaved: (discount) =>
-          _addProduct.setproductDiscount = double.parse(discount),
+      onSaved: (discount) => {
+        _addProduct.setproductDiscount =
+            discount.isEmpty ? 0.toDouble() : double.parse(discount)
+      },
       initialValue: widget.productModel != null
           ? widget.productModel.productDiscount.toString()
-          : null,
+          : '',
     );
   }
 

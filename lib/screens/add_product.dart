@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
-import 'package:gh_styles/providers/add_product_provider.dart';
+import 'package:gh_styles/providers/product_management_provider.dart';
 import 'package:gh_styles/widgets/add_product_form.dart';
 import 'package:provider/provider.dart';
 

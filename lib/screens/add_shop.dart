@@ -1,10 +1,11 @@
 import 'package:gh_styles/models/shops_model.dart';
-import 'package:gh_styles/providers/add_shop_provider.dart';
+import 'package:gh_styles/providers/shop_management_provider.dart';
 import 'package:gh_styles/widgets/add_shop_form.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/widgets/business_logo_picker.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class AddShop extends StatefulWidget {
   bool editMode;
   final ShopsModel shopsModel;
@@ -53,8 +54,11 @@ class FormWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _addShopProvider = Provider.of<AddShopProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _addShopProvider.setLogoUrl = shopsModel.shopLogoPath);
+    if (shopsModel != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _addShopProvider.setLogoUrl = shopsModel.shopLogoPath);
+    }
+
     return Scaffold(
       key: _addShopProvider.scaffoldKey,
       backgroundColor: Color.fromRGBO(109, 0, 39, 1),
@@ -74,17 +78,14 @@ class FormWrapper extends StatelessWidget {
                 ),
                 Consumer<AddShopProvider>(
                   builder: (context, data, _) {
-                    if (shopsModel?.shopLogoPath != null) {
+                    if (data?.logoUrl != null) {
                       // print("==========|| ${data.logoUrl} ||===========");
                       return FlatButton(
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         child: Icon(Icons.cancel, color: Colors.white),
                         onPressed: () {
-                          data
-                              .removeLogo(
-                                  shopsModel.shopLogoPath, shopsModel.shopRef)
-                              .then((value) => print(
-                                  "======= ${shopsModel.shopLogoPath} ======"));
+                          data.removeLogo(
+                              shopsModel.shopLogoPath, shopsModel.shopRef);
                         },
                       );
                     } else {

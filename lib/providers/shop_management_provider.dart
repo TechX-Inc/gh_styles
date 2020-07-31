@@ -111,7 +111,7 @@ class AddShopProvider with ChangeNotifier {
       dynamic defaultLogo = await getImageFileFromAssets()
           .catchError((error) => print(error.message));
 
-      Shop shop = new Shop(
+      ShopService shop = new ShopService(
         uid: _uid ?? null,
         shopName: _shopName.trim() ?? null,
         shopOwnerLegalName: _shopOwnerLegalName.trim() ?? null,
@@ -168,20 +168,16 @@ class AddShopProvider with ChangeNotifier {
             break;
           default:
             print(
-                "UNEXPECTED ERROR <<<<<<<<<<<<==================== $createShop ==================>>>>>>>>>>>");
+                "DEFAULT ==================== $createShop ==================");
             Scaffold.of(context).showSnackBar(
                 snackBar("An unknown error, please contact support"));
             _loading = false;
             notifyListeners();
         }
-
-        print(
-            "ERROR <<<<<<<<<<============== $createShop ===============>>>>>>>>>>");
       } else {
         Scaffold.of(context).showSnackBar(snackBar(
             "New shop successfully registered as $_shopName",
             Color.fromRGBO(67, 216, 201, 1)));
-
         _loading = false;
         notifyListeners();
       }
@@ -193,83 +189,76 @@ class AddShopProvider with ChangeNotifier {
     if (!_formKey.currentState.validate()) {
       return;
     } else {
-      _formKey.currentState.save();
-      _loading = true;
-      notifyListeners();
-
-      dynamic defaultLogo = await getImageFileFromAssets()
-          .catchError((error) => print(error.message));
-
-      Shop shop = new Shop(
-        shopName: _shopName.trim() ?? null,
-        shopOwnerLegalName: _shopOwnerLegalName.trim() ?? null,
-        shopContact: _shopPhoneContact.trim() ?? null,
-        shopEmail: _shopEmail ?? null,
-        shopLocation: _shopLocation ?? null,
-        shopWebsite: _shopWebsite ?? "None",
-        shopLogo: _shopAvatar ?? defaultLogo,
-      );
-      dynamic createShop = await shop.editShop(shopRef, existingLogoPath);
-
-      if (createShop != true) {
-        switch (createShop.code) {
-          case "FAILED_TO_UPDATE_SHOP":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
-
-          case "NULL_REQUIRED_FIELD":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
-
-          // case "UPDATE_SHOP_DOCUMENT_LOGO_FAIL":
-          //   Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-          //   _loading = false;
-          //   notifyListeners();
-          //   break;
-
-          // case "SET_SHOP_OWNER_FALSE_FAILED":
-          //   Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-          //   _loading = false;
-          //   notifyListeners();
-          //   break;
-
-          // case "SHOP_LOGO_UPLOAD_FAIL":
-          //   Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-          //   _loading = false;
-          //   notifyListeners();
-          //   break;
-
-          // case "SET_SHOP_OWNER_FALSE_FAILED":
-          //   Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-          //   _loading = false;
-          //   notifyListeners();
-          //   break;
-
-          // case "NULL_IMAGE_FILE":
-          //   Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-          //   _loading = false;
-          //   notifyListeners();
-          //   break;
-          default:
-            print(
-                "UNEXPECTED ERROR <<<<<<<<<<<<==================== $createShop ==================>>>>>>>>>>>");
-            Scaffold.of(context).showSnackBar(
-                snackBar("An unknown error, please contact support"));
-            _loading = false;
-            notifyListeners();
-        }
-      } else if (createShop == true) {
-        Scaffold.of(context).showSnackBar(
-            snackBar("Changes saved", Color.fromRGBO(36, 161, 156, 1)));
-        _loading = false;
+      // print(_logoUrl);
+      // print(_shopAvatar);
+      if ((_logoUrl != null) || (_shopAvatar != null)) {
+        _formKey.currentState.save();
+        _loading = true;
         notifyListeners();
+
+        ShopService shop = new ShopService(
+          shopName: _shopName.trim() ?? null,
+          shopOwnerLegalName: _shopOwnerLegalName.trim() ?? null,
+          shopContact: _shopPhoneContact.trim() ?? null,
+          shopEmail: _shopEmail ?? null,
+          shopLocation: _shopLocation ?? null,
+          shopWebsite: _shopWebsite ?? "None",
+          shopLogo: _shopAvatar,
+        );
+
+        await shop.editShop(shopRef, existingLogoPath).then((createShop) {
+          if (createShop != true) {
+            switch (createShop.code) {
+              case "FAILED_TO_UPDATE_SHOP":
+                Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+                _loading = false;
+                notifyListeners();
+                break;
+
+              case "NULL_REQUIRED_FIELD":
+                Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+                _loading = false;
+                notifyListeners();
+                break;
+
+              case "UPDATE_SHOP_DOCUMENT_LOGO_FAIL":
+                Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+                _loading = false;
+                notifyListeners();
+                break;
+
+              case "SHOP_LOGO_UPDATE_FAIL":
+                Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+                _loading = false;
+                notifyListeners();
+                break;
+
+              case "NULL_IMAGE_FILE":
+                Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+                _loading = false;
+                notifyListeners();
+                break;
+              default:
+                print("DEFAULT ============= $createShop ===============");
+                Scaffold.of(context).showSnackBar(
+                    snackBar("An unknown error, please contact support"));
+                _loading = false;
+                notifyListeners();
+            }
+          } else if (createShop == true) {
+            Scaffold.of(context).showSnackBar(
+                snackBar("Changes saved", Color.fromRGBO(36, 161, 156, 1)));
+            _loading = false;
+            notifyListeners();
+          } else {
+            Scaffold.of(context).showSnackBar(
+                snackBar("An unknown error occured while updating data"));
+            _loading = false;
+            notifyListeners();
+          }
+        });
       } else {
-        Scaffold.of(context).showSnackBar(
-            snackBar("An unknown error occured while updating data"));
+        Scaffold.of(context).showSnackBar(snackBar("Please choose logo"));
         _loading = false;
         notifyListeners();
       }
@@ -277,14 +266,10 @@ class AddShopProvider with ChangeNotifier {
   }
 
   Future<void> removeLogo(String imageUrl, DocumentReference shopRef) async {
-    // dynamic removeLogo = await new Shop().deleteLogoImage(photoUrl: imageUrl);
-    // print(removeLogo);
-
-    new Shop().deleteLogoImage(photoUrl: imageUrl).catchError((error) {
+    new ShopService().deleteLogoImage(photoUrl: imageUrl).catchError((error) {
       _scaffoldKey.currentState
           .showSnackBar(snackBar("Failed to remove image"));
     }).then((value) {
-      print(value);
       if (value == true) {
         shopRef.updateData({"shop_logo": null});
         _logoUrl = null;

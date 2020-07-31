@@ -52,7 +52,7 @@ class ProductService {
           'product_name': productName,
           'product_quantity': (productQuantity == null) ? 1 : productQuantity,
           'product_price': productPrice,
-          'product_discount': (productDiscount == null) ? 0 : productDiscount,
+          'product_discount': productDiscount,
           'product_description': productDescription,
           'date_posted': FieldValue.serverTimestamp(),
           'categories': {
@@ -85,7 +85,6 @@ class ProductService {
   }
 
 //////////////////////////////////////// EDIT PRODUCT //////////////////////////////////////////////
-
   Future<dynamic> editProduct(DocumentReference targetProduct,
       List<dynamic> productCurrentImages) async {
     try {
@@ -108,8 +107,14 @@ class ProductService {
           'product_photos': productCurrentImages
         }).then((value) async {
           print("PRODUCTS UPDATED, updating image data....");
-          return true;
-          // TODO: process product photos
+          return await updateProductPhotos(targetProduct).then((value) {
+            // print("VALUE AFTER F-STORAGE ========== $value =========");
+            if (value.runtimeType == PlatformException) {
+              return value;
+            } else {
+              return true;
+            }
+          });
         }).catchError((onError) => throw new PlatformException(
             code: "PRODUCT_UPDATE_FAILED",
             message: "Failed to update product"));
@@ -124,52 +129,55 @@ class ProductService {
   }
 
 //////////////////////////////////UPLOAD PRODUCT PHOTOS////////////////////////////////////////////
-  Future<dynamic> updateProductPhotos(
-      List<File> productPhoto, DocumentReference productRef) async {
+  Future<dynamic> updateProductPhotos(DocumentReference productRef) async {
     try {
-      if (productPhoto != null && productPhoto.isNotEmpty) {
+      if (productPhotos != null && productPhotos.isNotEmpty) {
         // Meaning user wants to add new image to existing ones
-        List<String> productPhotoDownloadPaths = [];
-        // productPhoto.forEach((imageFile) async {
-        //   StorageReference firebaseStorageRef = FirebaseStorage.instance
-        //       .ref()
-        //       .child(
-        //           "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}");
+        // List<String> productPhotoDownloadPaths = [];
+        productPhotos.forEach((imageFile) async {
+          StorageReference firebaseStorageRef = FirebaseStorage.instance
+              .ref()
+              .child(
+                  "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}");
 
-        //   StorageUploadTask task = firebaseStorageRef.putFile(imageFile);
-        //   String downloadUrl = await (await task.onComplete)
-        //       .ref
-        //       .getDownloadURL()
-        //       .catchError((error) {
-        //     //DELETE PRODUCT IF GET DOWNLOAD URL FAILS
-        //     productRef.delete();
-        //     firebaseStorageRef
-        //         .child(
-        //             "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}")
-        //         .delete();
-        //     throw new PlatformException(
-        //         code: "GET_DOWNLOAD_URL_FAILED",
-        //         message: "failed to retrieve images URLs");
-        //   });
-        //   productPhotoDownloadPaths.add(downloadUrl);
-        //   return await productRef
-        //       .updateData({'product_photos': productPhotoDownloadPaths})
-        //       .then((value) => true)
-        //       .catchError((error) {
-        //         deleteProductPhoto(photoUrl: downloadUrl);
-        //         productRef.delete();
-        //         throw new PlatformException(
-        //             code: "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL",
-        //             message:
-        //                 "Something went wrong while sending data, please try again");
-        //       });
-        // });
+          StorageUploadTask task = firebaseStorageRef.putFile(imageFile);
+          return await (await task.onComplete)
+              .ref
+              .getDownloadURL()
+              .catchError((error) {
+            //DELETE PRODUCT IMAGE FROM F-STORAGE IF UNABLE TO GET DOWNLOAD URL
+            firebaseStorageRef
+                .child(
+                    "productPhotos/${productRef.documentID.toString()}.${basename(imageFile.path)}")
+                .delete();
+            throw new PlatformException(
+                code: "GET_DOWNLOAD_URL_FAILED",
+                message: "Operation failed, unable to send image(s)");
+          }).then((downloadUrl) async {
+            // productPhotoDownloadPaths.add(downloadUrl);
+            // print(downloadUrl);
+            return await productRef
+                .updateData({
+                  'product_photos': FieldValue.arrayUnion([downloadUrl])
+                })
+                .then((value) => true)
+                .catchError((error) {
+                  print("============== CODE ${error.code} ===========");
+                  // DELETE PRODUCT IMAGE FROM F-STORAGE IF UNABLE TO UPDATE DOCUMENT IN DATABASE WITH DOWNLOAD URL
+                  deleteProductPhoto(photoUrl: downloadUrl);
+                  throw new PlatformException(
+                      code: "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL",
+                      message:
+                          "An error occured while sending data, please try again");
+                });
+          });
+        });
       } else {
         // Means no image was selected, therefore we maintain existing images for the particular product
         return true;
       }
     } on PlatformException catch (e) {
-      print(e.message);
+      print("============= ${e.message} ===============");
       return e;
     }
   }
@@ -229,16 +237,25 @@ class ProductService {
 //////////////////////////////////////////// DELETE PHOTO FROM FIREBASE STORAGE ///////////////////////////
   Future<dynamic> deleteProductPhoto({String photoUrl}) async {
     if (photoUrl != null) {
-      StorageReference photoRef = await FirebaseStorage.instance
-          .ref()
-          .getStorage()
-          .getReferenceFromUrl(photoUrl);
-
       try {
-        await photoRef.delete().catchError((error) =>
-            throw new PlatformException(
-                code: "UNABLE_TO_DELETE_PHOTO",
-                message: "Failed to delete product photo"));
+        return await FirebaseStorage.instance
+            .ref()
+            .getStorage()
+            .getReferenceFromUrl(photoUrl)
+            .then((photoRef) async {
+              return await photoRef
+                  .delete()
+                  .catchError((error) => throw new PlatformException(
+                      code: "UNABLE_TO_DELETE_PHOTO",
+                      message: "Failed to remove photo"))
+                  .then((value) => true);
+            })
+            .then((value) => true)
+            .catchError((error) => {
+                  throw new PlatformException(
+                      code: "IMAGE_NOT_FOUND",
+                      message: "Could not find image file")
+                });
       } on PlatformException catch (e) {
         return e;
       }
@@ -280,8 +297,23 @@ class ProductService {
             .then((value) => print("Porduct removed from favoourites..."));
       }
     } on PlatformException catch (e) {
-      print("Error unable to add favourite");
+      print("======= ${e.code} =========");
+
       return e.message;
+    }
+  }
+
+  Future<dynamic> deleteProduct(List<dynamic> imagesUrl) async {
+    try {
+      imagesUrl.forEach((url) {
+        deleteProductPhoto(photoUrl: url)
+            .then((value) => true)
+            .catchError((error) {
+          throw new PlatformException(code: "UNABLE_TO_REMOVE_IMAGE");
+        });
+      });
+    } on PlatformException catch (e) {
+      return e;
     }
   }
 }

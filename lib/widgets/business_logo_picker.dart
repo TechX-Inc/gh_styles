@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/providers/add_shop_provider.dart';
+import 'package:gh_styles/providers/shop_management_provider.dart';
 import 'package:provider/provider.dart';
 
 class ShopLogo extends StatefulWidget {
@@ -23,8 +23,7 @@ class _ShopLogoState extends State<ShopLogo> {
         margin: EdgeInsets.only(top: 20),
         decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
         child: Consumer<AddShopProvider>(builder: (context, data, _) {
-          // print("==========LOGO FILE : ${data.logoUrl} ===========");
-          if (widget.logoUrl != null) {
+          if (data.logoUrl != null) {
             return AnimatedContainer(
                 duration: Duration(milliseconds: 650),
                 height: 70,

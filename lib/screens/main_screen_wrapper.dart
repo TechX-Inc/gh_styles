@@ -1,19 +1,16 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/cart_model.dart';
-import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
-import 'package:gh_styles/screens/create_shop_bg.dart';
 import 'package:gh_styles/screens/product_favorites.dart';
 import 'package:gh_styles/screens/home_screen.dart';
-import 'package:gh_styles/screens/add_shop.dart';
 import 'package:gh_styles/screens/shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
-import 'package:gh_styles/services/search_service.dart';
-import 'package:gh_styles/services/user_service.dart';
+import 'package:gh_styles/services/fetch_shop_service.dart';
+
 import 'package:provider/provider.dart';
 
 class MainScreenWrapper extends StatefulWidget {
@@ -23,30 +20,21 @@ class MainScreenWrapper extends StatefulWidget {
 
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
-  final FetchCartService _cartService = new FetchCartService();
   User user;
+  final FetchCartService _cartService = new FetchCartService();
+  FetchShopService fetchShopService = new FetchShopService();
 
   bool _showAppBar = true;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      user = Provider.of<User>(context, listen: false);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-
-    List<Widget> bottomNavPages = [
-      ChangeNotifierProvider<HomeScreenStickyHeaderProvider>(
-          create: (context) => new HomeScreenStickyHeaderProvider(),
-          builder: (context, snapshot) {
-            return HomeScreen();
-          }),
-      user == null ? ToggleLoginSignUp() : Shop(),
-      Favorites(),
-      user == null ? ToggleLoginSignUp() : UserProfile(),
-    ];
-
     return SafeArea(
         child: Scaffold(
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
@@ -143,4 +131,27 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
       }
     });
   }
+
+  List<Widget> bottomNavPages = [
+    ChangeNotifierProvider<HomeScreenStickyHeaderProvider>(
+        create: (context) => new HomeScreenStickyHeaderProvider(),
+        builder: (context, snapshot) {
+          return HomeScreen();
+        }),
+    Consumer<User>(
+      builder: (context, user, child) {
+        return user == null ? ToggleLoginSignUp() : Shop();
+      },
+    ),
+    Consumer<User>(
+      builder: (context, user, child) {
+        return Favorites();
+      },
+    ),
+    Consumer<User>(
+      builder: (context, user, child) {
+        return user == null ? ToggleLoginSignUp() : UserProfile();
+      },
+    )
+  ];
 }

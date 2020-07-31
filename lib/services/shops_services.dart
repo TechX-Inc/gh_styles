@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 
-class Shop {
+class ShopService {
   DocumentReference shopRef = Firestore.instance.collection("Shops").document();
   final CollectionReference shops = Firestore.instance.collection('Shops');
   final CollectionReference shopOwner = Firestore.instance.collection("Users");
@@ -19,7 +19,7 @@ class Shop {
   String shopWebsite;
   File shopLogo;
 
-  Shop(
+  ShopService(
       {this.uid,
       this.shopName,
       this.shopOwnerLegalName,
@@ -77,7 +77,6 @@ class Shop {
           shopOwnerLegalName != null &&
           shopContact != null &&
           shopEmail != null &&
-          shopLogo != null &&
           shopLocation != null) {
         return await shopReference.updateData({
           'shop_name': shopName,
@@ -88,12 +87,11 @@ class Shop {
           'shop_owner_legal_name': shopOwnerLegalName,
           'shop_website': shopWebsite,
         }).then((value) async {
-          print("============ DATA INSERTED, updating logo ==========");
-          dynamic logo = await uploadLogoImage(shopReference);
+          print("============ DATA UPDATED, updating logo ==========");
+          dynamic logo = await updateLogoImage(shopReference);
           if (logo == true) {
             return true;
           }
-          return true;
         }).catchError((onError) => throw new PlatformException(
             code: "FAILED_TO_UPDATE_SHOP",
             message: "Could not update data, please try again"));
@@ -107,7 +105,40 @@ class Shop {
     }
   }
 
-//////////////////////////////////////////// UPLOAD SHOP LOGO TO FIREBASE STORAGE ////////////////////////
+//////////////////////////////////////////// UPDATE SHOP LOGO TO FIREBASE STORAGE ////////////////////////
+  Future<dynamic> updateLogoImage(DocumentReference shopRef) async {
+    try {
+      if (shopLogo != null) {
+        StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(
+            "businessLogo/${shopRef.documentID.toString()}.${basename(shopLogo.path)}");
+        StorageUploadTask task = firebaseStorageRef.putFile(shopLogo);
+
+        return await (await task.onComplete)
+            .ref
+            .getDownloadURL()
+            .then((downloadPath) async {
+          return await shopRef
+              .updateData({'shop_logo': downloadPath})
+              .then((value) => true)
+              .catchError((error) => {
+                    throw new PlatformException(
+                        code: "UPDATE_SHOP_DOCUMENT_LOGO_FAIL",
+                        message: "Failed to store image path")
+                  });
+        }).catchError((error) {
+          throw new PlatformException(
+              code: "SHOP_LOGO_UPDATE_FAIL",
+              message: "Failed to upload logo image file");
+        });
+      } else {
+        return true;
+      }
+    } on PlatformException catch (e) {
+      return e;
+    }
+  }
+
+////////////////////////////// UPLOAD SHOP LOGO TO FIREBASE STORAGE ////////////////////////
   Future<dynamic> uploadLogoImage(DocumentReference shopRef) async {
     try {
       if (shopLogo != null) {
@@ -165,7 +196,7 @@ class Shop {
     }
   }
 
-//////////////////////////////////////////// DELETE PHOTO FROM FIREBASE STORAGE ///////////////////////////
+////////////////////////z//// DELETE PHOTO FROM FIREBASE STORAGE ///////////////////////////
 
   Future<dynamic> deleteLogoImage({String photoUrl}) async {
     if (photoUrl != null) {
@@ -186,7 +217,7 @@ class Shop {
     }
   }
 
-/////////////////////////////////// UPDATE USER DATA AND SET add_shop to true //////////////////////////////////////
+/////////////////////////// UPDATE USER DATA AND SET add_shop to true ////////////////////////////////
   Future updateHasShopStatus() async {
     try {
       Firestore.instance.runTransaction((transaction) async {
@@ -200,6 +231,19 @@ class Shop {
     } on PlatformException catch (e) {
       print(
           "CANNOT UPDATE SHOP STATUS   <<<<<<==================>>>>>>  ${e.message}");
+      return e;
+    }
+  }
+
+//////////////////// DELETE SHOP //////////////////////
+  Future<dynamic> deleteShop(String imagesUrl) async {
+    try {
+      deleteLogoImage(photoUrl: imagesUrl)
+          .then((value) => true)
+          .catchError((error) {
+        throw new PlatformException(code: "UNABLE_TO_REMOVE_IMAGE");
+      });
+    } on PlatformException catch (e) {
       return e;
     }
   }
