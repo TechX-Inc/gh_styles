@@ -72,9 +72,15 @@ class _ProductHorizontalListContainerState
                         children: [
                           Text(
                             widget.sectionHeader,
-                            style: Theme.of(context).textTheme.headline6.apply(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6
+                                .apply(
                                   fontWeightDelta: 2,
-                                ),
+                                )
+                                .copyWith(
+                                    color: Color.fromRGBO(150, 150, 150, 1),
+                                    fontWeight: FontWeight.w400),
                           ),
                           SizedBox(
                             height: 10,
@@ -86,15 +92,13 @@ class _ProductHorizontalListContainerState
                                 physics: BouncingScrollPhysics(),
                                 itemCount: products.length,
                                 itemBuilder: (context, int index) {
-                                  // print(
-                                  //     products[index].productDiscount.toInt());
                                   return Row(
                                     children: [
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: Container(
-                                          color: Colors.white,
+                                          // color: Colors.red,
                                           child: GestureDetector(
                                             onTap: () => Navigator.of(context)
                                                 .pushNamed("/product_details",
@@ -125,9 +129,9 @@ class _ProductHorizontalListContainerState
                                                           .copyWith(
                                                               color: Color
                                                                   .fromRGBO(
-                                                                      34,
-                                                                      40,
-                                                                      49,
+                                                                      82,
+                                                                      87,
+                                                                      93,
                                                                       1),
                                                               fontSize: 18),
                                                     ),

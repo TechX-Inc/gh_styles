@@ -1,6 +1,4 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
@@ -10,7 +8,6 @@ import 'package:gh_styles/screens/shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/services/fetch_shop_service.dart';
-
 import 'package:provider/provider.dart';
 
 class MainScreenWrapper extends StatefulWidget {
@@ -24,7 +21,6 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   final FetchCartService _cartService = new FetchCartService();
   FetchShopService fetchShopService = new FetchShopService();
 
-  bool _showAppBar = true;
   @override
   void initState() {
     super.initState();
@@ -35,60 +31,11 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-      appBar: _showAppBar
-          ? AppBar(
-              iconTheme: IconThemeData(color: Colors.black),
-              backgroundColor: Colors.white,
-              elevation: 0.0,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.search,
-                  size: 28,
-                ),
-                onPressed: () {
-                  print("Searching...");
-                },
-              ),
-              actions: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 4.0),
-                  child: StreamBuilder<List<CartModel>>(
-                      stream: _cartService.shoppingCartProductStream(user?.uid),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(child: Icon(Icons.shopping_cart));
-                        }
-                        List<CartModel> cartData = snapshot?.data;
-                        cartData.removeWhere((value) => value == null);
-                        return Center(
-                          child: Badge(
-                            position: BadgePosition.topRight(top: 0, right: 3),
-                            animationDuration: Duration(milliseconds: 300),
-                            animationType: BadgeAnimationType.slide,
-                            badgeContent: Text(
-                              "${cartData.length}"
-                              // "5"
-                              ,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            child: IconButton(
-                                icon: Icon(Icons.shopping_cart),
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, '/cart')),
-                          ),
-                        );
-                      }),
-                )
-              ],
-            )
-          : null,
+    return Scaffold(
       body: bottomNavPages.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.grey,
-        selectedItemColor: Colors.blueAccent,
+        selectedItemColor: Color.fromRGBO(126, 37, 83, 1),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [
@@ -110,25 +57,12 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
           ),
         ],
       ),
-    ));
+    );
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      switch (_selectedIndex) {
-        case 1:
-        case 2:
-        case 3:
-          setState(() {
-            _showAppBar = false;
-          });
-          break;
-        default:
-          setState(() {
-            _showAppBar = true;
-          });
-      }
     });
   }
 

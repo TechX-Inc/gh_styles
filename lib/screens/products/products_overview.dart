@@ -1,10 +1,8 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/widgets/page_header_banner.dart';
 import 'package:gh_styles/widgets/product_horizontal_list_container.dart';
-import '../../test_data.dart';
 
 class ProductsOverView extends StatefulWidget {
   @override
@@ -37,14 +35,14 @@ class _ProductsOverViewState extends State<ProductsOverView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PageBanner(),
+          // PageBanner(),
           SizedBox(
             height: 10,
           ),
           ProductHorizontalListContainer(
             productsModelStream: FetchProductService().newProductsStream,
             heroID: "NEW_PRODUCTS_HERO",
-            sectionHeader: "New",
+            sectionHeader: "New Arrivals",
             sectionTopMargin: 0,
           ),
           ProductHorizontalListContainer(

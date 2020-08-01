@@ -1,10 +1,14 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:gh_styles/models/cart_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
 import 'package:gh_styles/screens/products/bags.dart';
 import 'package:gh_styles/screens/products/clothings.dart';
 import 'package:gh_styles/screens/products/footwears.dart';
 import 'package:gh_styles/screens/products/shirts.dart';
 import 'package:gh_styles/screens/products/shorts.dart';
+import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/widgets/product_grid_container.dart';
 import 'package:gh_styles/screens/products/products_overview.dart';
 import 'package:gh_styles/widgets/page_header_banner.dart';
@@ -19,8 +23,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   HomeScreenStickyHeaderProvider homeProvider;
-  int _selectedIndex = 0;
-  List<String> _categories = [
+  User user;
+  final FetchCartService _cartService = new FetchCartService();
+  List<String> _tabPagesText = [
     'Overview',
     'Footwears',
     'Bags',
@@ -29,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Shorts'
   ];
 
-  List<Widget> _pages = [
+  List<Widget> _tabPages = [
     ProductsOverView(),
     Footwears(),
     Bags(),
@@ -40,57 +45,105 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    super.initState();
+    user = Provider.of<User>(context, listen: false);
     homeProvider =
         Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 20,
-        ),
-        SizedBox(
-          height: 30,
-          child: Container(
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                itemBuilder: (context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    child: Container(
-                      child:
-                          CategoriesHeader(index, _selectedIndex, _categories),
-                    ),
-                  );
-                }),
-          ),
-        ),
-
-        SizedBox(
-          height: 20,
-        ),
-        Expanded(child:
-            Consumer<HomeScreenStickyHeaderProvider>(builder: (_, data, __) {
-          return SingleChildScrollView(
-            physics: data.scrollEnabled
-                ? BouncingScrollPhysics() //ScrollPhysics()
-                : NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[_pages[_selectedIndex]],
+    return DefaultTabController(
+      length: _tabPages.length,
+      child: Scaffold(
+          backgroundColor: Color.fromRGBO(247, 247, 247, 1),
+          appBar: AppBar(
+            iconTheme: IconThemeData(color: Colors.white),
+            backgroundColor: Color.fromRGBO(126, 37, 83, 1),
+            elevation: 0.0,
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+                size: 28,
+              ),
+              onPressed: () {
+                print("Searching...");
+              },
             ),
-          );
-        })),
-      ],
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: StreamBuilder<List<CartModel>>(
+                    stream: _cartService.shoppingCartProductStream(user?.uid),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: Icon(Icons.shopping_cart));
+                      }
+                      List<CartModel> cartData = snapshot?.data;
+                      cartData.removeWhere((value) => value == null);
+                      return Center(
+                        child: Badge(
+                          position: BadgePosition.topRight(top: 0, right: 3),
+                          animationDuration: Duration(milliseconds: 300),
+                          animationType: BadgeAnimationType.slide,
+                          badgeContent: Text(
+                            "${cartData.length}"
+                            // "5"
+                            ,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: IconButton(
+                              icon: Icon(Icons.shopping_cart),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/cart')),
+                        ),
+                      );
+                    }),
+              )
+            ],
+            bottom: TabBar(
+              labelColor: Colors.white,
+              indicatorColor: Colors.white,
+              indicatorWeight: 3.0,
+              isScrollable: true,
+              tabs: [
+                for (final tab in _tabPagesText)
+                  Tab(
+                    text: tab,
+                  ),
+              ],
+            ),
+          ),
+          body: TabBarView(
+              children: List.generate(_tabPages.length, (index) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  height: constraints.maxHeight,
+                  child: Consumer<HomeScreenStickyHeaderProvider>(
+                      builder: (_, data, __) {
+                    return SingleChildScrollView(
+                      physics: data.scrollEnabled
+                          ? BouncingScrollPhysics()
+                          : NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[_tabPages[index]],
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              },
+            );
+          }))),
     );
   }
 }
