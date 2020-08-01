@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/services/route_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
-
 import 'package:provider/provider.dart';
-
 import 'auth_and_validation/auth_service.dart';
 
 void main() {
