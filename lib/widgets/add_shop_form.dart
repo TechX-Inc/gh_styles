@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/shop_validator.dart';
-import 'package:gh_styles/models/users.dart';
-import 'package:gh_styles/providers/add_shop_provider.dart';
+import 'package:gh_styles/models/shops_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/providers/shop_management_provider.dart';
 import 'package:provider/provider.dart';
 
 class ShopForms extends StatefulWidget {
+  final ShopsModel shopsModel;
+  ShopForms({this.shopsModel});
   @override
   State<StatefulWidget> createState() => _ShopFormsWidgetState();
 }
@@ -14,9 +17,13 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   AddShopProvider _addShopFormHandler;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _addShopFormHandler = Provider.of<AddShopProvider>(context, listen: false);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     String uid = user?.uid;
     _addShopFormHandler.userID = uid;
@@ -58,6 +65,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       ),
       validator: (value) => ValidateShopData.checkRequired(value.trim()),
       onSaved: (sName) => _addShopFormHandler.shopName = sName,
+      initialValue:
+          widget.shopsModel != null ? widget.shopsModel.shopName : null,
     );
   }
 
@@ -72,6 +81,9 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       validator: (value) => ValidateShopData.checkRequired(value),
       onSaved: (ownerLegalName) =>
           _addShopFormHandler.ownerLegalName = ownerLegalName,
+      initialValue: widget.shopsModel != null
+          ? widget.shopsModel.shopOwnerLegalName
+          : null,
     );
   }
 
@@ -85,6 +97,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       ),
       validator: (value) => ValidateShopData.validateEmail(value.trim()),
       onSaved: (email) => _addShopFormHandler.email = email,
+      initialValue:
+          widget.shopsModel != null ? widget.shopsModel.shopEmail : null,
     );
   }
 
@@ -98,6 +112,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       ),
       validator: (value) => ValidateShopData.validateNumber(value),
       onSaved: (phone) => _addShopFormHandler.phoneContact = phone,
+      initialValue:
+          widget.shopsModel != null ? widget.shopsModel.shopContact : null,
     );
   }
 
@@ -111,6 +127,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       ),
       validator: (value) => ValidateShopData.checkRequired(value),
       onSaved: (location) => _addShopFormHandler.location = location,
+      initialValue:
+          widget.shopsModel != null ? widget.shopsModel.shopLocation : null,
     );
   }
 
@@ -124,6 +142,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       ),
       validator: (value) => ValidateShopData.validateUrl(value.trim()),
       onSaved: (url) => _addShopFormHandler.websiteURL = url,
+      initialValue:
+          widget.shopsModel != null ? widget.shopsModel.shopWebsite : null,
     );
   }
 
@@ -133,10 +153,15 @@ class _ShopFormsWidgetState extends State<ShopForms> {
           ? RaisedButton(
               color: Color.fromRGBO(109, 0, 39, 1),
               child: Text(
-                'Create Shop',
+                widget.shopsModel != null ? "Save Changes" : 'Create Shop',
                 style: TextStyle(color: Colors.white),
               ),
-              onPressed: () => _addShopFormHandler.processAndSave(context),
+              onPressed: () => widget.shopsModel == null
+                  ? _addShopFormHandler.processAndSave(context)
+                  : _addShopFormHandler.updateShop(
+                      context,
+                      widget.shopsModel.shopRef,
+                      widget.shopsModel.shopLogoPath),
             )
           : SpinKitWave(
               color: Color.fromRGBO(109, 0, 39, 1),

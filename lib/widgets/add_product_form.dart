@@ -1,22 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/auth_and_validation/validation_product.dart';
-import 'package:gh_styles/models/users.dart';
-import 'package:gh_styles/providers/add_product_provider.dart';
+import 'package:gh_styles/models/product_model.dart';
+import 'package:gh_styles/models/shops_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/providers/product_management_provider.dart';
+import 'package:gh_styles/services/fetch_shop_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 
-class NewProductForm extends StatefulWidget {
+class AddProductForm extends StatefulWidget {
+  final ProductModel productModel;
+  AddProductForm({this.productModel});
   @override
-  _NewProductFormState createState() => _NewProductFormState();
+  _AddProductFormState createState() => _AddProductFormState();
 }
 
-class _NewProductFormState extends State<NewProductForm> {
+class _AddProductFormState extends State<AddProductForm> {
   AddProductProvider _addProduct;
+  FetchShopService fetchShopService = new FetchShopService();
+
   int _currentStep = 0;
   User _user;
   DocumentReference shopRef;
@@ -29,7 +35,7 @@ class _NewProductFormState extends State<NewProductForm> {
     super.initState();
     _user = Provider.of<User>(context, listen: false);
     _addProduct = Provider.of<AddProductProvider>(context, listen: false);
-    _addProduct.setUID = _user.uid;
+    fetchShopService.setUid = _user.uid;
   }
 
   @override
@@ -39,217 +45,386 @@ class _NewProductFormState extends State<NewProductForm> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.productModel != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => {
+            _addProduct.setcollection = widget.productModel.collection,
+            _addProduct.setproductType = widget.productModel.productType,
+            _addProduct.setgender = widget.productModel.gender,
+            _addProduct.setExistingImage = widget.productModel.productPhotos
+          });
+    }
+
     return Consumer<AddProductProvider>(builder: (_, data, __) {
-      return ModalProgressHUD(
-        inAsyncCall: data.loading,
-        child: SingleChildScrollView(
-            child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  alignment: Alignment.topCenter,
-                  margin: EdgeInsets.only(top: 30),
-                  child: FutureBuilder<dynamic>(
-                      future: _addProduct.getShopData(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Text("...");
-                        }
-                        return CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                NetworkImage(snapshot.data['shop_logo']));
-                      }),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+      return Scaffold(
+        key: _addProduct.scaffoldKey,
+        body: ModalProgressHUD(
+          inAsyncCall: data.loading,
+          child: SingleChildScrollView(
               child: Column(
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  Row(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FutureBuilder<dynamic>(
-                          future: _addProduct.getShopData(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return Text("");
-                            }
-                            shopName = snapshot.data['shop_name'];
-                            return Text(
-                              shopName.toUpperCase(),
-                              style: GoogleFonts.ptSans(
-                                  textStyle: TextStyle(
-                                      color: Color.fromRGBO(181, 7, 107, 1),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15)),
-                            );
-                          })
-                    ],
-                  ),
-                  SizedBox(height: 30),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    alignment: Alignment.topCenter,
+                    margin: EdgeInsets.only(top: 30),
+                    child: StreamBuilder<List<ShopsModel>>(
+                        stream: fetchShopService.shopsStream,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            print(snapshot.error);
+                            return Text("...");
+                          }
+                          if ((snapshot.data == null ||
+                              snapshot.data.contains(null) ||
+                              snapshot.data.isEmpty)) {
+                            return Container();
+                          } else {
+                            WidgetsBinding.instance.addPostFrameCallback((_) =>
+                                {
+                                  _addProduct.setUserShopReference =
+                                      snapshot.data[0].shopRef
+                                });
+
+                            return CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                    snapshot.data[0].shopLogoPath));
+                          }
+                        }),
+                  )
                 ],
               ),
-            ),
-            Form(
-              key: _addProduct.formKey,
-              child: Stepper(
-                  physics: ClampingScrollPhysics(),
-                  currentStep: _currentStep,
-                  onStepContinue: () {
-                    if (_currentStep >= 1) return;
-                    if (_addProduct.formKeyStepperOne.currentState.validate()) {
-                      _addProduct.formKeyStepperOne.currentState.save();
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        StreamBuilder<List<ShopsModel>>(
+                            stream: fetchShopService.shopsStream,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Text("");
+                              }
+                              if ((snapshot.data == null ||
+                                  snapshot.data.contains(null) ||
+                                  snapshot.data.isEmpty)) {
+                                return Container();
+                              } else {
+                                return Text(
+                                  snapshot.data[0].shopName.toUpperCase(),
+                                  style: GoogleFonts.ptSans(
+                                      textStyle: TextStyle(
+                                          color: Color.fromRGBO(181, 7, 107, 1),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15)),
+                                );
+                              }
+                            })
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+              Form(
+                key: _addProduct.formKey,
+                child: Stepper(
+                    physics: ClampingScrollPhysics(),
+                    currentStep: _currentStep,
+                    onStepContinue: () {
+                      if (_currentStep >= 1) return;
+                      if (_addProduct.formKeyStepperOne.currentState
+                          .validate()) {
+                        _addProduct.formKeyStepperOne.currentState.save();
+                        setState(() {
+                          _currentStep += 1;
+                          _nextStepperToggleText = widget.productModel == null
+                              ? 'Add'
+                              : "Save Changes";
+                          _nextStepperToggleColor =
+                              Color.fromRGBO(181, 7, 107, 1);
+                        });
+                      }
+                    },
+                    onStepCancel: () {
+                      if (_currentStep <= 0) return;
                       setState(() {
-                        _currentStep += 1;
-                        _nextStepperToggleText = 'Add';
+                        _currentStep -= 1;
+                        _nextStepperToggleText = 'Next';
                         _nextStepperToggleColor =
-                            Color.fromRGBO(181, 7, 107, 1);
+                            Color.fromRGBO(32, 125, 255, 1);
                       });
-                    }
-                  },
-                  onStepCancel: () {
-                    if (_currentStep <= 0) return;
-                    setState(() {
-                      _currentStep -= 1;
-                      _nextStepperToggleText = 'Next';
-                      _nextStepperToggleColor = Color.fromRGBO(32, 125, 255, 1);
-                    });
-                  },
-                  controlsBuilder: (BuildContext context,
-                      {onStepCancel, onStepContinue}) {
-                    return Container(
-                      margin: EdgeInsets.only(top: 20),
-                      child: Row(
-                        children: <Widget>[
-                          FlatButton(
-                            color: _nextStepperToggleColor,
-                            child: Text(
-                              _nextStepperToggleText,
-                              style: TextStyle(color: Colors.white),
+                    },
+                    controlsBuilder: (BuildContext context,
+                        {onStepCancel, onStepContinue}) {
+                      return Container(
+                        margin: EdgeInsets.only(top: 20),
+                        child: Row(
+                          children: <Widget>[
+                            FlatButton(
+                                color: _nextStepperToggleColor,
+                                child: Text(
+                                  _nextStepperToggleText,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: _currentStep != 1
+                                    ? onStepContinue
+                                    : () => widget.productModel == null
+                                        ? _addProduct.processAndSave()
+                                        : _addProduct.updateProduct(
+                                            widget.productModel.productRef,
+                                            widget.productModel.productPhotos)),
+                            SizedBox(
+                              width: 20,
                             ),
-                            onPressed: _currentStep != 1
-                                ? onStepContinue
-                                : () => _addProduct.processAndSave(context),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          FlatButton(
-                              // color: Colors.red,
-                              child: Text("Previous"),
-                              onPressed: onStepCancel),
-                        ],
-                      ),
-                    );
-                  },
-                  steps: <Step>[
-                    Step(
-                        title: Text('Step 1'),
-                        content: Form(
-                          key: _addProduct.formKeyStepperOne,
-                          child: Column(
+                            FlatButton(
+                                child: Text("Previous"),
+                                onPressed: onStepCancel),
+                          ],
+                        ),
+                      );
+                    },
+                    steps: <Step>[
+                      Step(
+                          title: Text('Step 1'),
+                          content: Form(
+                            key: _addProduct.formKeyStepperOne,
+                            child: Column(
+                              children: <Widget>[
+                                _productName(),
+                                _productDescription(),
+                                _productQuantity(),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    _uploadProductPhoto(),
+                                    Expanded(child: Text("Choose photo(s)"))
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Consumer<AddProductProvider>(
+                                    builder: (_, data, __) {
+                                  return (data.existingImages.isNotEmpty &&
+                                          data.existingImages != null)
+                                      ? ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight: 80.0,
+                                          ),
+                                          child: LayoutBuilder(
+                                            builder: (context,
+                                                BoxConstraints constraint) {
+                                              return Container(
+                                                color: Color.fromRGBO(
+                                                    240, 240, 240, 1),
+                                                child: Row(
+                                                  children: [
+///////////////////////////////////////////////////
+                                                    Expanded(
+                                                      child: GridView.count(
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        primary: false,
+                                                        crossAxisCount: data
+                                                            .computeExistingImageWidth(),
+                                                        crossAxisSpacing: 10,
+                                                        children: List.generate(
+                                                            (data.existingImages
+                                                                .length),
+                                                            (index) {
+                                                          return Stack(
+                                                            fit:
+                                                                StackFit.expand,
+                                                            children: [
+                                                              Image.network(
+                                                                data.existingImages[
+                                                                    index],
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              ),
+                                                              Positioned(
+                                                                top: 0,
+                                                                right: 0,
+                                                                child:
+                                                                    GestureDetector(
+                                                                  behavior:
+                                                                      HitTestBehavior
+                                                                          .translucent,
+                                                                  onTap: () => data.removeProductPhoto(
+                                                                      data.existingImages[
+                                                                          index],
+                                                                      widget
+                                                                          .productModel
+                                                                          .productRef,
+                                                                      index),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .red,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          );
+                                                        }),
+                                                      ),
+                                                    ),
+
+///////////////////////////////////////////////////////////
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Visibility(
+                                                      visible: data
+                                                          .images.isNotEmpty,
+                                                      child: Expanded(
+                                                        child: GridView.count(
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
+                                                          primary: false,
+                                                          crossAxisCount: (data
+                                                                      .images
+                                                                      .length <=
+                                                                  1)
+                                                              ? 1
+                                                              : data.images
+                                                                  .length,
+                                                          crossAxisSpacing: 10,
+                                                          children:
+                                                              List.generate(
+                                                                  data.images
+                                                                      .length,
+                                                                  (index) {
+                                                            return Stack(
+                                                              fit: StackFit
+                                                                  .expand,
+                                                              children: [
+                                                                Image.file(
+                                                                  data.images[
+                                                                      index],
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                                Positioned(
+                                                                  top: 0,
+                                                                  right: 0,
+                                                                  child:
+                                                                      GestureDetector(
+                                                                    behavior:
+                                                                        HitTestBehavior
+                                                                            .translucent,
+                                                                    onTap: () =>
+                                                                        data.imageToRemoveIndex =
+                                                                            index,
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .delete,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            );
+                                                          }),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ))
+                                      : Visibility(
+                                          visible: data.images.isNotEmpty,
+                                          child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxHeight: 80.0,
+                                              ),
+                                              child: GridView.count(
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                primary: false,
+                                                crossAxisCount: 4,
+                                                crossAxisSpacing: 10,
+                                                children: List.generate(
+                                                    data.images.length,
+                                                    (index) {
+                                                  return Stack(
+                                                    fit: StackFit.expand,
+                                                    children: [
+                                                      Image.file(
+                                                        data.images[index],
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                      Positioned(
+                                                        top: 0,
+                                                        right: 0,
+                                                        child: GestureDetector(
+                                                          behavior:
+                                                              HitTestBehavior
+                                                                  .translucent,
+                                                          onTap: () {
+                                                            data.imageToRemoveIndex =
+                                                                index;
+                                                          },
+                                                          child: Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  );
+                                                }),
+                                              )),
+                                        );
+                                }),
+                              ],
+                            ),
+                          )),
+                      Step(
+                          title: Text('Step 2'),
+                          content: Column(
                             children: <Widget>[
-                              _productName(),
-                              _productDescription(),
-                              _productQuantity(),
-                              SizedBox(height: 10),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  _uploadProductPhoto(),
-                                  Expanded(child: Text("Choose photo(s)"))
+                                  Expanded(child: _productPrice()),
+                                  SizedBox(width: 30),
+                                  Expanded(child: _productDiscount()),
                                 ],
                               ),
-                              SizedBox(
-                                height: 10,
+                              SizedBox(height: 10),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _productCategory()),
+                                  SizedBox(width: 30),
+                                  Expanded(child: _gender()),
+                                ],
                               ),
-                              Consumer<AddProductProvider>(
-                                  builder: (_, data, __) {
-                                return Visibility(
-                                  visible: data.images.isNotEmpty,
-                                  child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxHeight: 80.0,
-                                      ),
-                                      child: GridView.count(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        primary: false,
-                                        crossAxisCount: 4,
-                                        crossAxisSpacing: 10,
-                                        children: List.generate(
-                                            data.images.length, (index) {
-                                          return Stack(
-                                            fit: StackFit.expand,
-                                            children: [
-                                              Image.file(
-                                                data.images[index],
-                                                fit: BoxFit.cover,
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                right: 0,
-                                                child: GestureDetector(
-                                                  behavior: HitTestBehavior
-                                                      .translucent,
-                                                  onTap: () {
-                                                    data.imageToRemoveIndex =
-                                                        index;
-                                                  },
-                                                  child: Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          );
-                                        }),
-                                      )),
-                                );
-                              }),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _productSize()),
+                                  SizedBox(width: 30),
+                                  Expanded(child: _collection()),
+                                ],
+                              ),
                             ],
-                          ),
-                        )),
-                    Step(
-                        title: Text('Step 2'),
-                        content: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(child: _productPrice()),
-                                SizedBox(width: 30),
-                                Expanded(child: _productDiscount()),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              children: <Widget>[
-                                Expanded(child: _productCategory()),
-                                SizedBox(width: 30),
-                                Expanded(child: _gender()),
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(child: _productSize()),
-                                SizedBox(width: 30),
-                                Expanded(child: _collection()),
-                              ],
-                            ),
-                          ],
-                        )),
-                  ]),
-            )
-          ],
-        )),
+                          )),
+                    ]),
+              )
+            ],
+          )),
+        ),
       );
     });
   }
@@ -260,6 +435,8 @@ class _NewProductFormState extends State<NewProductForm> {
       decoration: InputDecoration(hintText: "Product Name*"),
       validator: (value) => ValidateProducts.validateProductName(value.trim()),
       onSaved: (productName) => _addProduct.setproductName = productName,
+      initialValue:
+          widget.productModel != null ? widget.productModel.productName : null,
     );
   }
 
@@ -268,6 +445,8 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.text,
       decoration: InputDecoration(hintText: "Size"),
       onSaved: (size) => _addProduct.setproductSize = size,
+      initialValue:
+          widget.productModel != null ? widget.productModel.productSize : null,
     );
   }
 
@@ -276,7 +455,10 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Price*"),
       validator: (value) => ValidateProducts.validatePrice(value.trim()),
-      onSaved: (price) => _addProduct.setproductPrice = price,
+      onSaved: (price) => _addProduct.setproductPrice = double.parse(price),
+      initialValue: widget.productModel != null
+          ? widget.productModel.productPrice.toString()
+          : null,
     );
   }
 
@@ -284,7 +466,13 @@ class _NewProductFormState extends State<NewProductForm> {
     return TextFormField(
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Discount(%)"),
-      onSaved: (discount) => _addProduct.setproductDescription = discount,
+      onSaved: (discount) => {
+        _addProduct.setproductDiscount =
+            discount.isEmpty ? 0.toDouble() : double.parse(discount)
+      },
+      initialValue: widget.productModel != null
+          ? widget.productModel.productDiscount.toString()
+          : '',
     );
   }
 
@@ -293,7 +481,11 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(hintText: "Quantity*"),
       validator: (value) => ValidateProducts.validateQuantity(value.trim()),
-      onSaved: (quantity) => _addProduct.setproductQuantity = quantity,
+      onSaved: (quantity) =>
+          _addProduct.setproductQuantity = int.parse(quantity),
+      initialValue: widget.productModel != null
+          ? widget.productModel.productQuantity.toString()
+          : null,
     );
   }
 
@@ -303,9 +495,12 @@ class _NewProductFormState extends State<NewProductForm> {
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(hintText: "Description"),
       inputFormatters: [
-        LengthLimitingTextInputFormatter(150),
+        LengthLimitingTextInputFormatter(400),
       ],
       onSaved: (productDesc) => _addProduct.setproductDescription = productDesc,
+      initialValue: widget.productModel != null
+          ? widget.productModel.productDescription
+          : null,
     );
   }
 
@@ -372,29 +567,29 @@ class _NewProductFormState extends State<NewProductForm> {
     );
   }
 
-  Widget _signInBtn() {
-    return RaisedButton(
-      color: Color.fromRGBO(181, 7, 107, 1),
-      child: FractionallySizedBox(
-        widthFactor: 1,
-        child: Container(child: Consumer<AddProductProvider>(
-          builder: (context, data, _) {
-            return !data.loading
-                ? Text(
-                    "Add",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  )
-                : SpinKitThreeBounce(
-                    color: Colors.white,
-                    size: 25.0,
-                  );
-          },
-        )),
-      ),
-      shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(30.0)),
-      onPressed: () => _addProduct.processAndSave(context),
-    );
-  }
+  // Widget _signInBtn() {
+  //   return RaisedButton(
+  //     color: Color.fromRGBO(181, 7, 107, 1),
+  //     child: FractionallySizedBox(
+  //       widthFactor: 1,
+  //       child: Container(child: Consumer<AddProductProvider>(
+  //         builder: (context, data, _) {
+  //           return !data.loading
+  //               ? Text(
+  //                   "Add",
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(color: Colors.white),
+  //                 )
+  //               : SpinKitThreeBounce(
+  //                   color: Colors.white,
+  //                   size: 25.0,
+  //                 );
+  //         },
+  //       )),
+  //     ),
+  //     shape: new RoundedRectangleBorder(
+  //         borderRadius: new BorderRadius.circular(30.0)),
+  //     onPressed: () => _addProduct.processAndSave(context),
+  //   );
+  // }
 }

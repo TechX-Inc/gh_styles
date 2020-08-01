@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/auth_and_validation/auth_service.dart';
-import 'package:gh_styles/models/users.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 
 class LoginProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -51,15 +51,14 @@ class LoginProvider with ChangeNotifier {
       notifyListeners();
 
       dynamic result = await _auth.login(_email.trim(), _password.trim());
-
+      print(result);
       if (result != FirebaseUser) {
-        print(
-            "<<<<<<<<<<<<==================== INVALID LOGIN VALUES ==================>>>>>>>>>>>");
         switch (result) {
           case "ERROR_USER_NOT_FOUND":
             Scaffold.of(context)
                 .showSnackBar(snackBar("Email or password is incorrect"));
             _loading = false;
+            print(result.code);
             notifyListeners();
             break;
 
@@ -67,6 +66,7 @@ class LoginProvider with ChangeNotifier {
             Scaffold.of(context)
                 .showSnackBar(snackBar("Email or password is incorrect"));
             _loading = false;
+            print(result.code);
             notifyListeners();
             break;
           default:

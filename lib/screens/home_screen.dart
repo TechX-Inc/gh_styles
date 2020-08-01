@@ -1,69 +1,162 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:gh_styles/screens/products/widgets/productcontainer.dart';
+import 'package:gh_styles/models/cart_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/screens/products/bags.dart';
+import 'package:gh_styles/screens/products/clothings.dart';
+import 'package:gh_styles/screens/products/footwears.dart';
+import 'package:gh_styles/screens/products/shirts.dart';
+import 'package:gh_styles/screens/products/shorts.dart';
+import 'package:gh_styles/services/fetch_cart_service.dart';
+import 'package:gh_styles/widgets/product_grid_container.dart';
+import 'package:gh_styles/screens/products/products_overview.dart';
+import 'package:gh_styles/widgets/page_header_banner.dart';
+import 'package:gh_styles/widgets/sticky_header.dart';
+import 'package:provider/provider.dart';
 import '../test_data.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  HomeScreenStickyHeaderProvider homeProvider;
+  User user;
+  final FetchCartService _cartService = new FetchCartService();
+  List<String> _tabPagesText = [
+    'Overview',
+    'Footwears',
+    'Bags',
+    'Clothings',
+    'Shirts',
+    'Shorts'
+  ];
+
+  List<Widget> _tabPages = [
+    ProductsOverView(),
+    Footwears(),
+    Bags(),
+    Clothings(),
+    Shirts(),
+    Shorts(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    user = Provider.of<User>(context, listen: false);
+    homeProvider =
+        Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            "Our",
-            style: Theme.of(context).textTheme.headline4.apply(
-                  fontWeightDelta: 2,
-                  color: Colors.black,
-                ),
+    return DefaultTabController(
+      length: _tabPages.length,
+      child: Scaffold(
+          backgroundColor: Color.fromRGBO(247, 247, 247, 1),
+          appBar: AppBar(
+            iconTheme: IconThemeData(color: Colors.white),
+            backgroundColor: Color.fromRGBO(126, 37, 83, 1),
+            elevation: 0.0,
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+                size: 28,
+              ),
+              onPressed: () {
+                print("Searching...");
+              },
+            ),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: StreamBuilder<List<CartModel>>(
+                    stream: _cartService.shoppingCartProductStream(user?.uid),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: Icon(Icons.shopping_cart));
+                      }
+                      List<CartModel> cartData = snapshot?.data;
+                      cartData.removeWhere((value) => value == null);
+                      return Center(
+                        child: Badge(
+                          position: BadgePosition.topRight(top: 0, right: 3),
+                          animationDuration: Duration(milliseconds: 300),
+                          animationType: BadgeAnimationType.slide,
+                          badgeContent: Text(
+                            "${cartData.length}"
+                            // "5"
+                            ,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: IconButton(
+                              icon: Icon(Icons.shopping_cart),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/cart')),
+                        ),
+                      );
+                    }),
+              )
+            ],
+            bottom: TabBar(
+              labelColor: Colors.white,
+              indicatorColor: Colors.white,
+              indicatorWeight: 3.0,
+              isScrollable: true,
+              tabs: [
+                for (final tab in _tabPagesText)
+                  Tab(
+                    text: tab,
+                  ),
+              ],
+            ),
           ),
-          Text("Products",
-              style:
-                  Theme.of(context).textTheme.headline4.copyWith(height: .9)),
-          SizedBox(
-            height: 15,
-          ),
-          // TextField(
-          //   decoration: InputDecoration(
-          //     fillColor: Colors.white,
-          //     filled: true,
-          //     border: InputBorder.none,
-          //     prefixIcon: Icon(Icons.search),
-          //     hintText: "Search",
-          //   ),
-          // ),
-          SizedBox(
-            height: 15,
-          ),
-
-          SizedBox(
-            height: 15,
-          ),
-          Text(
-            "New Products",
-            style: Theme.of(context).textTheme.headline6.apply(
-                  fontWeightDelta: 2,
-                ),
-          ),
-          SizedBox(
-            height: 11,
-          ),
-          GridView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: .7),
-            itemCount: productsList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ProductContainer(id: index);
-            },
-          )
-        ],
-      ),
+          body: TabBarView(
+              children: List.generate(_tabPages.length, (index) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  height: constraints.maxHeight,
+                  child: Consumer<HomeScreenStickyHeaderProvider>(
+                      builder: (_, data, __) {
+                    return SingleChildScrollView(
+                      physics: data.scrollEnabled
+                          ? BouncingScrollPhysics()
+                          : NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[_tabPages[index]],
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              },
+            );
+          }))),
     );
   }
 }
+
+//////////////// MIGHT NEED LATER, DO NOT DELETE ///////////////////////
+/////////////////SEARCH BAR/////////////////
+
+// TextField(
+//   decoration: InputDecoration(
+//     fillColor: Colors.white,
+//     filled: true,
+//     border: InputBorder.none,
+//     prefixIcon: Icon(Icons.search),
+//     hintText: "Search",
+//   ),
+// ),

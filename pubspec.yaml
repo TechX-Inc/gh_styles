@@ -36,6 +36,13 @@ dependencies:
   toast: ^0.1.5
   grouped_buttons: ^1.0.4
   modal_progress_hud: ^0.1.3
+  badges: ^1.1.1
+  path_provider: ^1.6.11
+  shimmer: ^1.1.1
+  expandable: ^4.1.4
+  intl: ^0.16.1
+  carousel_pro: ^1.0.0
+  rxdart: ^0.24.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

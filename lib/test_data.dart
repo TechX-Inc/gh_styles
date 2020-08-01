@@ -1,6 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_icons/flutter_icons.dart';
-
 class Product {
   final String title, description, price, img;
   Product({this.title, this.description, this.price, this.img});

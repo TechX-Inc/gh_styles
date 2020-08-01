@@ -265,19 +265,16 @@ class _UserProfileState extends State<UserProfile> {
                                       color: Colors.blueAccent,
                                       width: 1,
                                       style: BorderStyle.solid),
-                                  // borderRadius: BorderRadius.circular(50)
                                 ),
                               ),
                               OutlineButton(
                                 onPressed: () {
                                   print("hello");
                                 },
-                                // borderSide: BorderSide(color: Colors.redAccent),
                                 child: Text("Delete Shop"),
                                 textColor: Colors.redAccent,
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(style: BorderStyle.solid),
-                                  // borderRadius: BorderRadius.circular(50)
                                 ),
                               ),
                             ],

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:gh_styles/models/users.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -59,6 +59,7 @@ class AuthService {
           .catchError((onError) => throw new PlatformException(
               code: onError.code, message: onError.message));
     } on PlatformException catch (e) {
+      print(e);
       return e.code;
     }
   }
