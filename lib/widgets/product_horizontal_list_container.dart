@@ -2,8 +2,6 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
-import 'package:gh_styles/providers/product_details_provider.dart';
-import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -26,14 +24,14 @@ class ProductHorizontalListContainer extends StatefulWidget {
 
 class _ProductHorizontalListContainerState
     extends State<ProductHorizontalListContainer> {
-  HomeScreenStickyHeaderProvider _homeHeaderProvider;
+  MainAppStateProvider _homeHeaderProvider;
   final f = new NumberFormat("###.0#", "en_US");
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _homeHeaderProvider =
-        Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
+        Provider.of<MainAppStateProvider>(context, listen: false);
   }
 
   @override

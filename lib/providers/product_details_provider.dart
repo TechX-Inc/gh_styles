@@ -30,6 +30,7 @@ class ProductDetailsProvider with ChangeNotifier {
   }
 
   set setUID(String uid) {
+    print(uid);
     if (uid != null) {
       _uid = uid;
     }
@@ -69,17 +70,21 @@ class ProductDetailsProvider with ChangeNotifier {
   }
 
   void addToCart(BuildContext context) {
-    if (_quantityInStock != 0) {
-      _cartService
-          .addToCart(_uid, _productRef, _quantityCounter, _quantityInStock,
-              _totalSelectionPrice)
-          .then((value) =>
-              {_quantityInStock -= _quantityCounter, notifyListeners()});
+    if (_uid != null) {
+      if (_quantityInStock != 0) {
+        _cartService
+            .addToCart(_uid, _productRef, _quantityCounter, _quantityInStock,
+                _totalSelectionPrice)
+            .then((value) =>
+                {_quantityInStock -= _quantityCounter, notifyListeners()});
+      } else {
+        print("item out of stock");
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Item out of stock", Color.fromRGBO(227, 99, 135, 1)));
+        return null;
+      }
     } else {
-      print("item out of stock");
-      _scaffoldKey.currentState.showSnackBar(
-          snackBar("Item out of stock", Color.fromRGBO(227, 99, 135, 1)));
-      return null;
+      // print("User not authenticated");
     }
   }
 }

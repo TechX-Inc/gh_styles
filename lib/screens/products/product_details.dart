@@ -12,6 +12,7 @@ import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/services/products_services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:toast/toast.dart';
 
 class DetailsScreen extends StatefulWidget {
   final ProductModel productModel;
@@ -33,7 +34,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   User user;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     user = Provider.of<User>(context, listen: false);
     detailsProvider =
@@ -41,7 +41,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     detailsProvider.setProductStockQuantity =
         widget.productModel.productQuantity;
     detailsProvider.setProductRef = widget.productModel.productRef;
-    detailsProvider.setUID = user.uid;
+    detailsProvider.setUID = user?.uid;
   }
 
   @override
@@ -64,34 +64,37 @@ class _DetailsScreenState extends State<DetailsScreen> {
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 4.0),
-                child: StreamBuilder<List<CartModel>>(
-                    stream: _cartService.shoppingCartProductStream(user?.uid),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(child: Icon(Icons.shopping_cart));
-                      }
-
-                      List<CartModel> cartData = snapshot?.data;
-                      cartData.removeWhere((value) => value == null);
-
-                      return Center(
-                        child: Badge(
-                          position: BadgePosition.topRight(top: 0, right: 3),
-                          animationDuration: Duration(milliseconds: 300),
-                          animationType: BadgeAnimationType.slide,
-                          badgeContent: Text(
-                            "${cartData.length}"
-                            // "5"
-                            ,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          child: IconButton(
-                              icon: Icon(Icons.shopping_cart),
-                              onPressed: () =>
-                                  Navigator.pushNamed(context, '/cart')),
-                        ),
-                      );
-                    }),
+                child: user == null
+                    ? IconButton(
+                        icon: Icon(Icons.shopping_cart),
+                        onPressed: () => Navigator.pushNamed(context, '/cart'))
+                    : StreamBuilder<List<CartModel>>(
+                        stream:
+                            _cartService.shoppingCartProductStream(user?.uid),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            print(snapshot.error);
+                            return Center(child: Icon(Icons.shopping_cart));
+                          }
+                          List<CartModel> cartData = snapshot?.data;
+                          cartData.removeWhere((value) => value == null);
+                          return Center(
+                            child: Badge(
+                              position:
+                                  BadgePosition.topRight(top: 0, right: 3),
+                              animationDuration: Duration(milliseconds: 300),
+                              animationType: BadgeAnimationType.slide,
+                              badgeContent: Text(
+                                "${cartData.length}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              child: IconButton(
+                                  icon: Icon(Icons.shopping_cart),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/cart')),
+                            ),
+                          );
+                        }),
               )
             ],
           ),
@@ -106,7 +109,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   children: [
                     Container(
                       height:
-                          computeDimensions(90, viewportConstraints.maxHeight),
+                          computeDimensions(88, viewportConstraints.maxHeight),
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,11 +125,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         ? Carousel(
                                             indicatorBgPadding: 5.0,
                                             dotSize: 6,
-                                            autoplay: false,
+                                            autoplay: true,
                                             dotColor: Colors.black,
                                             dotIncreasedColor: Colors.blue,
-                                            dotBgColor:
-                                                Color.fromRGBO(0, 0, 0, 0.02),
+                                            dotBgColor: Color(0xfff9f9f9),
                                             images: widget
                                                 .productModel.productPhotos
                                                 .map(
@@ -167,36 +169,51 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   SizedBox(
                                     width: 30,
                                   ),
-                                  StreamBuilder<List<Stream<ProductModel>>>(
-                                      stream: _fetchProductService
-                                          .singleFavouriteProductsStream(
-                                              user.uid,
-                                              widget.productModel.productRef),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData) {
-                                          // print(snapshot.error);
-                                          return Icon(
-                                            Icons.favorite_border,
-                                            color: Colors.red,
-                                          );
-                                        }
-                                        int favCount = snapshot.data.length;
-                                        return IconButton(
+                                  user == null
+                                      ? IconButton(
                                           icon: Icon(
-                                            favCount <= 0
-                                                ? Icons.favorite_border
-                                                : Icons.favorite,
+                                            Icons.favorite_border,
                                             color: Colors.red,
                                           ),
                                           onPressed: () {
-                                            _productService
-                                                .favoriteProductHandler(
-                                                    user.uid,
-                                                    widget.productModel
-                                                        .productRef);
+                                            Toast.show(
+                                                "Please Login to add favourite",
+                                                context,
+                                                duration: 3,
+                                                gravity: Toast.BOTTOM);
                                           },
-                                        );
-                                      }),
+                                        )
+                                      : StreamBuilder<
+                                              List<Stream<ProductModel>>>(
+                                          stream: _fetchProductService
+                                              .singleFavouriteProductsStream(
+                                                  user.uid,
+                                                  widget
+                                                      .productModel.productRef),
+                                          builder: (context, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return Icon(
+                                                Icons.favorite_border,
+                                                color: Colors.red,
+                                              );
+                                            }
+                                            int favCount = snapshot.data.length;
+                                            return IconButton(
+                                              icon: Icon(
+                                                favCount <= 0
+                                                    ? Icons.favorite_border
+                                                    : Icons.favorite,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                _productService
+                                                    .favoriteProductHandler(
+                                                        user.uid,
+                                                        widget.productModel
+                                                            .productRef);
+                                              },
+                                            );
+                                          }),
                                 ],
                               ),
                             ),
@@ -204,9 +221,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: ExpandablePanel(
                                 header: Text(
-                                  "More",
+                                  "Description",
                                   style: TextStyle(
-                                      fontSize: 19, color: Colors.blueAccent
+                                      fontSize: 19,
+                                      color: Color.fromRGBO(150, 150, 150, 1)
                                       // fontWeight: FontWeight.bold
                                       ),
                                 ),
@@ -230,24 +248,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 ),
                               ),
                             ),
+
                             SizedBox(
-                              height: 15,
-                            ),
-                            widget.productModel.productDiscount.toInt() != 0
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Text(
-                                      "${f.format(widget.productModel.productPrice)} GHS",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          decoration:
-                                              TextDecoration.lineThrough),
-                                    ),
-                                  )
-                                : Container(),
-                            SizedBox(
-                              height: 20,
+                              height: 10,
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -256,6 +259,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   ProductQuantityCounter(),
+                                  Container(
+                                    child: Center(
+                                      child: Consumer<ProductDetailsProvider>(
+                                          builder: (_, data, __) {
+                                        return Text(
+                                          "${data.computePrice(widget.productModel.productDiscount, widget.productModel.productPrice)} GHS",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            // color: Color.fromRGBO(4, 222, 173, 1)
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
                                   Badge(
                                       padding: EdgeInsets.all(6),
                                       badgeColor: Colors.white,
@@ -283,6 +311,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                     fontSize: 16),
                                               );
                                       })),
+                                  widget.productModel.productDiscount.toInt() !=
+                                          0
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Text(
+                                            "${f.format(widget.productModel.productPrice)} GHS",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Color.fromRGBO(
+                                                    232, 74, 91, 0.5),
+                                                decoration:
+                                                    TextDecoration.lineThrough),
+                                          ),
+                                        )
+                                      : Container(),
                                 ],
                               ),
                             ),
@@ -291,36 +335,25 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                     Container(
+                      padding: EdgeInsets.only(top: 10),
                       height:
-                          computeDimensions(10, viewportConstraints.maxHeight),
+                          computeDimensions(12, viewportConstraints.maxHeight),
                       child: Row(
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Center(
-                              child: Consumer<ProductDetailsProvider>(
-                                  builder: (_, data, __) {
-                                return Text(
-                                  "${data.computePrice(widget.productModel.productDiscount, widget.productModel.productPrice)} GHS",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    // color: Color.fromRGBO(4, 222, 173, 1)
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
                           Expanded(
                             child: Container(
-                              margin: EdgeInsets.only(right: 10, top: 15),
-                              child: RaisedButton(
-                                color: Color.fromRGBO(231, 48, 91, 1),
-                                onPressed: () {
-                                  detailsProvider.addToCart(context);
-                                },
-                                child: Text(
-                                  "Add to Cart",
-                                  style: TextStyle(color: Colors.white),
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: ButtonTheme(
+                                height: 45,
+                                child: RaisedButton(
+                                  color: Color.fromRGBO(231, 48, 91, 1),
+                                  onPressed: () {
+                                    detailsProvider.addToCart(context);
+                                  },
+                                  child: Text(
+                                    "Add to Cart",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
                             ),
@@ -330,7 +363,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       decoration: BoxDecoration(
                           border: Border(
                               top: BorderSide(
-                                  color: Color.fromRGBO(250, 250, 250, 1)))),
+                                  color: Color.fromRGBO(240, 240, 240, 1)))),
                     )
                   ],
                 ),

@@ -67,8 +67,8 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   }
 
   List<Widget> bottomNavPages = [
-    ChangeNotifierProvider<HomeScreenStickyHeaderProvider>(
-        create: (context) => new HomeScreenStickyHeaderProvider(),
+    ChangeNotifierProvider<MainAppStateProvider>(
+        create: (context) => new MainAppStateProvider(),
         builder: (context, snapshot) {
           return HomeScreen();
         }),
