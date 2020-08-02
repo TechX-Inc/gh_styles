@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
-import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/product_favorites.dart';
 import 'package:gh_styles/screens/home_screen.dart';
 import 'package:gh_styles/screens/shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
-import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/services/fetch_shop_service.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +17,7 @@ class MainScreenWrapper extends StatefulWidget {
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
   User user;
-  final FetchCartService _cartService = new FetchCartService();
+  // final FetchCartService _cartService = new FetchCartService();
   FetchShopService fetchShopService = new FetchShopService();
 
   @override
@@ -67,8 +66,8 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   }
 
   List<Widget> bottomNavPages = [
-    ChangeNotifierProvider<HomeScreenStickyHeaderProvider>(
-        create: (context) => new HomeScreenStickyHeaderProvider(),
+    ChangeNotifierProvider<MainAppStateProvider>(
+        create: (context) => new MainAppStateProvider(),
         builder: (context, snapshot) {
           return HomeScreen();
         }),

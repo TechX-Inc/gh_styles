@@ -22,8 +22,12 @@ class MyApp extends StatelessWidget {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
 
-    return StreamProvider.value(
-      value: AuthService().user,
+    return MultiProvider(
+      providers: [
+        StreamProvider.value(
+          value: AuthService().user,
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

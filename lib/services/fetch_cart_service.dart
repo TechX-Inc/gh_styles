@@ -23,6 +23,7 @@ class FetchCartService extends FetchProductService {
   Stream<List<CartModel>> shoppingCartProductStream(String uid) {
     return Rx.combineLatest2(super.allProductsStream(), shoppingCart(uid),
         (List<ProductModel> products, List<CartModel> carts) {
+      // ignore: missing_return
       return products.map((product) {
         final cartData = carts?.firstWhere(
             (cart) =>

@@ -47,6 +47,7 @@ class _AddShopState extends State<AddShop> {
   }
 }
 
+// ignore: must_be_immutable
 class FormWrapper extends StatelessWidget {
   final ShopsModel shopsModel;
   FormWrapper({this.shopsModel});

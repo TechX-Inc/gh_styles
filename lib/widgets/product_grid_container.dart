@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
-import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:badges/badges.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';
@@ -17,13 +17,13 @@ class ProductGridContainer extends StatefulWidget {
 }
 
 class _ProductGridContainerState extends State<ProductGridContainer> {
-  HomeScreenStickyHeaderProvider _homeHeaderProvider;
+  MainAppStateProvider _homeHeaderProvider;
   final f = new NumberFormat("###.0#", "en_US");
   @override
   void initState() {
     super.initState();
     _homeHeaderProvider =
-        Provider.of<HomeScreenStickyHeaderProvider>(context, listen: false);
+        Provider.of<MainAppStateProvider>(context, listen: false);
   }
 
   @override

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gh_styles/providers/cart_provider.dart';
 import 'package:gh_styles/providers/product_details_provider.dart';
 import 'package:gh_styles/screens/add_shop.dart';
-import 'package:gh_styles/screens/auth_screens/forgot.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/register.dart';
 import 'package:gh_styles/screens/add_product.dart';

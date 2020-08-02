@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/utils/constants.dart';
@@ -113,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class SlideDots extends StatelessWidget {
-  bool isActive;
+  final bool isActive;
   SlideDots(this.isActive);
 
   @override

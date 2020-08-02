@@ -57,6 +57,7 @@ class ShopService {
             await updateHasShopStatus();
             return true;
           }
+          return null;
         }).catchError((onError) => throw new PlatformException(
             code: "FAILED_TO_CREATE_SHOP",
             message: "failed to create shop, please try again"));
@@ -92,6 +93,7 @@ class ShopService {
           if (logo == true) {
             return true;
           }
+          return null;
         }).catchError((onError) => throw new PlatformException(
             code: "FAILED_TO_UPDATE_SHOP",
             message: "Could not update data, please try again"));

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class HomeScreenStickyHeaderProvider with ChangeNotifier {
+class MainAppStateProvider with ChangeNotifier {
   bool _scrollEnabled = false;
 
   bool get scrollEnabled => _scrollEnabled;
