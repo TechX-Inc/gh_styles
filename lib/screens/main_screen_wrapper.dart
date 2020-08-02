@@ -66,11 +66,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   }
 
   List<Widget> bottomNavPages = [
-    ChangeNotifierProvider<MainAppStateProvider>(
-        create: (context) => new MainAppStateProvider(),
-        builder: (context, snapshot) {
-          return HomeScreen();
-        }),
+    HomeScreen(),
     Consumer<User>(
       builder: (context, user, child) {
         return user == null ? ToggleLoginSignUp() : Shop();

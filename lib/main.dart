@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:gh_styles/services/route_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -26,6 +27,9 @@ class MyApp extends StatelessWidget {
       providers: [
         StreamProvider.value(
           value: AuthService().user,
+        ),
+        ChangeNotifierProvider<MainAppStateProvider>(
+          create: (context) => new MainAppStateProvider(),
         ),
       ],
       child: MaterialApp(

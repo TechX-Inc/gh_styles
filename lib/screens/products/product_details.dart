@@ -163,7 +163,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   Expanded(
                                     child: Text(
                                       "${widget.productModel.productName}",
-                                      style: TextStyle(fontSize: 28),
+                                      style: TextStyle(
+                                          fontSize: 28,
+                                          color: Color.fromRGBO(80, 80, 80, 1)),
                                     ),
                                   ),
                                   SizedBox(
