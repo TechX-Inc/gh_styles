@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
-import 'package:gh_styles/providers/HomeScreenStickyHeaderProvider.dart';
+import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:badges/badges.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';

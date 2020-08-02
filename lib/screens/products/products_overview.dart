@@ -18,7 +18,6 @@ class _ProductsOverViewState extends State<ProductsOverView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     shirts = productService.productsOverviewStream("type", "Shirts");
     bags = productService.productsOverviewStream("type", "Bags");

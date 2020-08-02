@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class SlideDots extends StatelessWidget {
-  bool isActive;
+  final bool isActive;
   SlideDots(this.isActive);
 
   @override
