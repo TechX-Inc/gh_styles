@@ -8,7 +8,6 @@ import 'package:gh_styles/screens/main_screen_wrapper.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/screens/products/shopping_cart.dart';
 import 'package:gh_styles/screens/wrapper.dart';
-import 'package:gh_styles/screens/splashscreen.dart';
 import 'package:provider/provider.dart';
 
 class RouteGenerator {
@@ -16,10 +15,10 @@ class RouteGenerator {
     final args = settings.arguments;
 
     switch (settings.name) {
-      case '/':
-        return MaterialPageRoute(builder: (_) => SplashScreen());
+      // case '/':
+      //   return MaterialPageRoute(builder: (_) => SplashScreen());
 
-      case '/wrapper':
+      case '/':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
       case '/main_screen_wrapper':

@@ -38,7 +38,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Center(
-                child: Text("Loading box..."),
+                child: Image.asset('assets/images/gh_style.png'),
               );
             }
             return bottomNavPages.elementAt(_selectedIndex);
