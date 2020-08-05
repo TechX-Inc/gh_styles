@@ -67,10 +67,70 @@ class CartProvider with ChangeNotifier {
     } else if (clearCart == null) {
       print(clearCart);
       _scaffoldKey.currentState.showSnackBar(snackBar(
-          "Cart successfully cleared", Color.fromRGBO(36, 161, 156, 1)));
+          "Cart cleared successfully", Color.fromRGBO(36, 161, 156, 1)));
     } else {
       _scaffoldKey.currentState
           .showSnackBar(snackBar("An error occured, please try again"));
     }
+  }
+
+  clearHiveCart() {
+    _cartService.clearHiveCart().then((clearCart) {
+      if (clearCart.runtimeType == PlatformException) {
+        switch (clearCart.code) {
+          case "EMPTY_CART":
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar(clearCart.message, Color.fromRGBO(36, 161, 156, 1)));
+            break;
+
+          case "CLEAR_CART_FAILED":
+            _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
+            break;
+
+          case "RESTORE_STOCK_FAILED":
+            _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
+            break;
+          default:
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar("An unknown error occured, try again"));
+        }
+      } else if (clearCart == null) {
+        print(clearCart);
+        _scaffoldKey.currentState.showSnackBar(snackBar(
+            "Cart cleared successfully", Color.fromRGBO(36, 161, 156, 1)));
+      } else {
+        _scaffoldKey.currentState
+            .showSnackBar(snackBar("An error occured, please try again"));
+      }
+    });
+  }
+
+  removeHiveCartItem(int index, String cartProductID, int quantityRemoved) {
+    _cartService
+        .removeHiveCartItem(index, cartProductID, quantityRemoved)
+        .then((removeCartItem) {
+      if (removeCartItem.runtimeType == PlatformException) {
+        switch (removeCartItem.code) {
+          case "REMOVE_CART_FROM_HIVE_FAILED":
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar(removeCartItem.message));
+            break;
+
+          case "RESTORE_STOCK_FAILED":
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar(removeCartItem.message));
+            break;
+          default:
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("An unknown error occured, please try again"));
+        }
+      } else if (removeCartItem == true) {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Item removed", Color.fromRGBO(36, 161, 156, 1)));
+      } else {
+        _scaffoldKey.currentState
+            .showSnackBar(snackBar("An error occured, please try again"));
+      }
+    });
   }
 }

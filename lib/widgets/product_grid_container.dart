@@ -57,7 +57,8 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                           onTap: () => Navigator.of(context)
                               .pushNamed("/product_details", arguments: {
                             "product_model": products[index],
-                            "hero_id": '$index${widget.heroID}'
+                            "hero_id": '$index${widget.heroID}',
+                            "index": index
                           }),
                           child: Container(
                             child: Column(
@@ -81,7 +82,16 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                   child: Align(
                                     alignment: Alignment.center,
                                     child: Hero(
+                                        transitionOnUserGestures: true,
                                         tag: '$index${widget.heroID}',
+                                        placeholderBuilder:
+                                            (context, heroSize, child) {
+                                          return Container(
+                                            height: 150.0,
+                                            width: 150.0,
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        },
                                         child: FractionallySizedBox(
                                             widthFactor: 0.9,
                                             heightFactor: 1.0,
@@ -186,8 +196,6 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
   }
 
   String computePrice(double discount, double price) {
-    // double discount = double.parse(discountString);
-    // double price = double.parse(priceString);
     String productPrice;
     if (discount <= 0) {
       productPrice = price.toString();

@@ -10,15 +10,19 @@ import 'package:gh_styles/providers/product_details_provider.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/services/products_services.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DetailsScreen extends StatefulWidget {
   final ProductModel productModel;
   final String heroID;
+  final int index;
 
-  DetailsScreen({Key key, this.productModel, this.heroID}) : super(key: key);
+  DetailsScreen({Key key, this.productModel, this.heroID, this.index})
+      : super(key: key);
 
   @override
   _DetailsScreenState createState() => _DetailsScreenState();
@@ -65,34 +69,62 @@ class _DetailsScreenState extends State<DetailsScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 4.0),
                 child: user == null
-                    ? IconButton(
-                        icon: Icon(Icons.shopping_cart),
-                        onPressed: () => Navigator.pushNamed(context, '/cart'))
+                    //////////// ADD TO CART ICON FOR UNAUTHENTICATED USERS ////////////
+                    ? ValueListenableBuilder(
+                        valueListenable:
+                            Hive.box<CartModel>("cartBox").listenable(),
+                        builder: (context, Box<CartModel> cartModelBox, _) {
+                          return cartModelBox.length == 0
+                              ? IconButton(
+                                  icon: Icon(Icons.shopping_cart),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/cart'))
+                              : Badge(
+                                  position:
+                                      BadgePosition.topRight(top: 0, right: 3),
+                                  animationDuration:
+                                      Duration(milliseconds: 300),
+                                  animationType: BadgeAnimationType.slide,
+                                  badgeContent: Text(
+                                    "${cartModelBox.length}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  child: IconButton(
+                                      icon: Icon(Icons.shopping_cart),
+                                      onPressed: () => Navigator.pushNamed(
+                                          context, '/cart')),
+                                );
+                        })
                     : StreamBuilder<List<CartModel>>(
                         stream:
                             _cartService.shoppingCartProductStream(user?.uid),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            print(snapshot.error);
                             return Center(child: Icon(Icons.shopping_cart));
                           }
                           List<CartModel> cartData = snapshot?.data;
                           cartData.removeWhere((value) => value == null);
                           return Center(
-                            child: Badge(
-                              position:
-                                  BadgePosition.topRight(top: 0, right: 3),
-                              animationDuration: Duration(milliseconds: 300),
-                              animationType: BadgeAnimationType.slide,
-                              badgeContent: Text(
-                                "${cartData.length}",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              child: IconButton(
-                                  icon: Icon(Icons.shopping_cart),
-                                  onPressed: () =>
-                                      Navigator.pushNamed(context, '/cart')),
-                            ),
+                            child: cartData.length <= 0
+                                ? IconButton(
+                                    icon: Icon(Icons.shopping_cart),
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, '/cart'))
+                                : Badge(
+                                    position: BadgePosition.topRight(
+                                        top: 0, right: 3),
+                                    animationDuration:
+                                        Duration(milliseconds: 300),
+                                    animationType: BadgeAnimationType.slide,
+                                    badgeContent: Text(
+                                      "${cartData.length}",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    child: IconButton(
+                                        icon: Icon(Icons.shopping_cart),
+                                        onPressed: () => Navigator.pushNamed(
+                                            context, '/cart')),
+                                  ),
                           );
                         }),
               )
@@ -350,7 +382,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 child: RaisedButton(
                                   color: Color.fromRGBO(231, 48, 91, 1),
                                   onPressed: () {
-                                    detailsProvider.addToCart(context);
+                                    user != null
+                                        ? detailsProvider.addToCart(context)
+                                        : detailsProvider
+                                            .addCartToHive(CartModel.toHive(
+                                                detailsProvider.quantityCounter,
+                                                double.parse(
+                                                    detailsProvider.computePrice(
+                                                        widget.productModel
+                                                            .productDiscount,
+                                                        widget.productModel
+                                                            .productPrice)),
+                                                widget.productModel));
                                   },
                                   child: Text(
                                     "Add to Cart",

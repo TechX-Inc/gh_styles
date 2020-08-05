@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/services/shopping_cart_services.dart';
 import 'package:intl/intl.dart';
 
@@ -30,7 +31,6 @@ class ProductDetailsProvider with ChangeNotifier {
   }
 
   set setUID(String uid) {
-    print(uid);
     if (uid != null) {
       _uid = uid;
     }
@@ -58,6 +58,9 @@ class ProductDetailsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
   String computePrice(double discount, double price) {
     String productPrice;
     if (discount <= 0) {
@@ -69,6 +72,9 @@ class ProductDetailsProvider with ChangeNotifier {
     return f.format(_totalSelectionPrice);
   }
 
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
   void addToCart(BuildContext context) {
     if (_uid != null) {
       if (_quantityInStock != 0) {
@@ -83,8 +89,24 @@ class ProductDetailsProvider with ChangeNotifier {
             snackBar("Item out of stock", Color.fromRGBO(227, 99, 135, 1)));
         return null;
       }
-    } else {
-      // print("User not authenticated");
+    }
+  }
+
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
+  Future addCartToHive(CartModel cartModel) async {
+    // print(index);
+    if (cartModel != null) {
+      if (_quantityInStock != 0) {
+        _cartService.addCartToHive(cartModel).then((value) =>
+            {_quantityInStock -= _quantityCounter, notifyListeners()});
+      } else {
+        print("item out of stock");
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Item out of stock", Color.fromRGBO(227, 99, 135, 1)));
+        return null;
+      }
     }
   }
 }

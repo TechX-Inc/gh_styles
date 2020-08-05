@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
@@ -7,6 +8,7 @@ import 'package:gh_styles/screens/home_screen.dart';
 import 'package:gh_styles/screens/shop.dart';
 import 'package:gh_styles/screens/user_profile.dart';
 import 'package:gh_styles/services/fetch_shop_service.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
 class MainScreenWrapper extends StatefulWidget {
@@ -31,7 +33,16 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: bottomNavPages.elementAt(_selectedIndex),
+      body: FutureBuilder<Box<CartModel>>(
+          future: Hive.openBox("cartBox"),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: Text("Loading box..."),
+              );
+            }
+            return bottomNavPages.elementAt(_selectedIndex);
+          }),
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.grey,
         selectedItemColor: Color.fromRGBO(126, 37, 83, 1),

@@ -95,7 +95,6 @@ class _ProductHorizontalListContainerState
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: Container(
-                                          // color: Colors.red,
                                           child: GestureDetector(
                                             onTap: () => Navigator.of(context)
                                                 .pushNamed("/product_details",
@@ -103,7 +102,8 @@ class _ProductHorizontalListContainerState
                                                   "product_model":
                                                       products[index],
                                                   "hero_id":
-                                                      '$index${widget.heroID}'
+                                                      '$index${widget.heroID}',
+                                                  "index": index
                                                 }),
                                             child: ConstrainedBox(
                                               constraints: BoxConstraints(
@@ -138,6 +138,18 @@ class _ProductHorizontalListContainerState
                                                       alignment:
                                                           Alignment.center,
                                                       child: Hero(
+                                                        transitionOnUserGestures:
+                                                            true,
+                                                        placeholderBuilder:
+                                                            (context, heroSize,
+                                                                child) {
+                                                          return Container(
+                                                            height: 150.0,
+                                                            width: 150.0,
+                                                            child:
+                                                                CircularProgressIndicator(),
+                                                          );
+                                                        },
                                                         tag:
                                                             '$index${widget.heroID}',
                                                         child: Stack(

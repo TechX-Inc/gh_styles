@@ -66,6 +66,7 @@ class RouteGenerator {
                     return DetailsScreen(
                       productModel: args["product_model"],
                       heroID: args["hero_id"],
+                      index: args["index"],
                     );
                   }));
         }

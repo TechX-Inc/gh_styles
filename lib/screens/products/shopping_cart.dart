@@ -4,6 +4,9 @@ import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/cart_provider.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -22,10 +25,16 @@ class ShoppingCart extends StatefulWidget {
 class _ShoppingCartState extends State<ShoppingCart> {
   User user;
   final FetchCartService _cartService = new FetchCartService();
+  MainAppStateProvider mainAppStateProvider = new MainAppStateProvider();
   @override
   void initState() {
     super.initState();
     user = Provider.of<User>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -35,7 +44,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
         key: _cartProvider.scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          centerTitle: true,
+          centerTitle: false,
           title: Text(
             "My Cart",
             style: TextStyle(color: Colors.black),
@@ -57,7 +66,11 @@ class _ShoppingCartState extends State<ShoppingCart> {
                   "Clear All",
                   style: TextStyle(color: Colors.redAccent),
                 ),
-                onPressed: () => _cartProvider.removeAllFromCart(user.uid))
+                onPressed: () {
+                  user != null
+                      ? _cartProvider.removeAllFromCart(user.uid)
+                      : _cartProvider.clearHiveCart();
+                })
           ],
         ),
         body: LayoutBuilder(
@@ -68,76 +81,166 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 child: ChangeNotifierProvider<CartProvider>(
                     create: (context) => new CartProvider(),
                     builder: (context, data) {
-                      return StreamBuilder<List<CartModel>>(
-                          stream:
-                              _cartService.shoppingCartProductStream(user?.uid),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return Center(
-                                child: Text("Loading..."),
-                              );
-                            }
-                            List<CartModel> cartData = snapshot.data;
-                            cartData.removeWhere((value) => value == null);
-                            return cartData.isNotEmpty
-                                ? Column(
-                                    children: [
-                                      Container(
-                                          height: computeDimensions(
-                                              90, constraints.maxHeight),
-                                          child: ConstrainedBox(
-                                              constraints: BoxConstraints(
-                                                maxHeight: double.infinity,
-                                              ),
-                                              child: ListView.builder(
-                                                  itemCount: cartData.length,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return Dismissible(
-                                                        key: ValueKey(
-                                                            "${index}_CART"),
-                                                        child: CartListTile(
-                                                          cartModel:
-                                                              cartData[index],
-                                                          index: index,
-                                                          user: user,
-                                                        ),
-                                                        onDismissed: (direction) =>
-                                                            _cartProvider.removeCartItem(
-                                                                user.uid,
-                                                                cartData[index]
-                                                                    .productRef,
-                                                                cartData[index]
-                                                                    .orderQuantity));
-                                                  }))),
-                                      CartBottomSection(
-                                        height: computeDimensions(
-                                            10, constraints.maxHeight),
-                                        totalItemsPrice: cartData.fold(
-                                            0, (p, c) => p + c.selectionPrice),
+                      return user == null
+                          ? ValueListenableBuilder(
+                              valueListenable:
+                                  Hive.box<CartModel>("cartBox").listenable(),
+                              builder:
+                                  (context, Box<CartModel> cartModelBox, _) {
+                                return cartModelBox.isNotEmpty
+                                    ? Column(
+                                        children: [
+                                          Container(
+                                              height: computeDimensions(
+                                                  90, constraints.maxHeight),
+                                              child: ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    maxHeight: double.infinity,
+                                                  ),
+                                                  child: ListView.builder(
+                                                      itemCount: cartModelBox
+                                                          .keys
+                                                          .toList()
+                                                          .length,
+                                                      itemBuilder:
+                                                          (BuildContext context,
+                                                              int index) {
+                                                        CartModel cartModel =
+                                                            cartModelBox
+                                                                .getAt(index);
+                                                        return Dismissible(
+                                                            key: UniqueKey(),
+                                                            child: CartListTile(
+                                                              cartModel:
+                                                                  cartModel,
+                                                              index: index,
+                                                              user: user,
+                                                            ),
+                                                            onDismissed:
+                                                                (direction) {
+                                                              user != null
+                                                                  ? _cartProvider.removeCartItem(
+                                                                      user.uid,
+                                                                      cartModel
+                                                                          .productRef,
+                                                                      cartModel
+                                                                          .orderQuantity)
+                                                                  : _cartProvider.removeHiveCartItem(
+                                                                      index,
+                                                                      cartModel
+                                                                          .productID,
+                                                                      cartModel
+                                                                          .orderQuantity);
+                                                            });
+                                                      }))),
+                                          CartBottomSection(
+                                            height: computeDimensions(
+                                                10, constraints.maxHeight),
+                                            totalItemsPrice: cartModelBox.values
+                                                .toList()
+                                                .fold(
+                                                    0,
+                                                    (p, c) =>
+                                                        p + c.selectionPrice),
+                                          )
+                                        ],
                                       )
-                                    ],
-                                  )
-                                : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.shopping_cart,
-                                          color:
-                                              Color.fromRGBO(200, 200, 200, 1)),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        "Empty",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: Color.fromRGBO(
-                                                200, 200, 200, 1)),
-                                      ),
-                                    ],
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.shopping_cart,
+                                              color: Color.fromRGBO(
+                                                  200, 200, 200, 1)),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            "Empty",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Color.fromRGBO(
+                                                    200, 200, 200, 1)),
+                                          ),
+                                        ],
+                                      );
+                              },
+                            )
+                          : StreamBuilder<List<CartModel>>(
+                              stream: _cartService
+                                  .shoppingCartProductStream(user?.uid),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: Text("Loading..."),
                                   );
-                          });
+                                }
+                                List<CartModel> cartData = snapshot.data;
+                                cartData.removeWhere((value) => value == null);
+                                return cartData.isNotEmpty
+                                    ? Column(
+                                        children: [
+                                          Container(
+                                              height: computeDimensions(
+                                                  90, constraints.maxHeight),
+                                              child: ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    maxHeight: double.infinity,
+                                                  ),
+                                                  child: ListView.builder(
+                                                      itemCount:
+                                                          cartData.length,
+                                                      itemBuilder:
+                                                          (BuildContext context,
+                                                              int index) {
+                                                        return Dismissible(
+                                                            key: ValueKey(
+                                                                "${index}_CART"),
+                                                            child: CartListTile(
+                                                              cartModel:
+                                                                  cartData[
+                                                                      index],
+                                                              index: index,
+                                                              user: user,
+                                                            ),
+                                                            onDismissed: (direction) =>
+                                                                _cartProvider.removeCartItem(
+                                                                    user.uid,
+                                                                    cartData[
+                                                                            index]
+                                                                        .productRef,
+                                                                    cartData[
+                                                                            index]
+                                                                        .orderQuantity));
+                                                      }))),
+                                          CartBottomSection(
+                                            height: computeDimensions(
+                                                10, constraints.maxHeight),
+                                            totalItemsPrice: cartData.fold(0,
+                                                (p, c) => p + c.selectionPrice),
+                                          )
+                                        ],
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.shopping_cart,
+                                              color: Color.fromRGBO(
+                                                  200, 200, 200, 1)),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            "Empty",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Color.fromRGBO(
+                                                    200, 200, 200, 1)),
+                                          ),
+                                        ],
+                                      );
+                              });
                     }));
           },
         ),
@@ -221,8 +324,11 @@ class CartListTile extends StatelessWidget {
                           Icons.close,
                           color: Colors.redAccent,
                         ),
-                        onPressed: () => _cartProvider.removeCartItem(user.uid,
-                            cartModel.productRef, cartModel.orderQuantity),
+                        onPressed: () => user != null
+                            ? _cartProvider.removeCartItem(user.uid,
+                                cartModel.productRef, cartModel.orderQuantity)
+                            : _cartProvider.removeHiveCartItem(index,
+                                cartModel.productID, cartModel.orderQuantity),
                       ),
                     ],
                   )
@@ -261,7 +367,6 @@ class _CartBottomSectionState extends State<CartBottomSection> {
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Center(
               child: Consumer<CartProvider>(builder: (_, data, __) {
-                // print(data.totalItemsPrice.toString());
                 return Text(
                   "${f.format(widget.totalItemsPrice)} GHS",
                   style: TextStyle(fontSize: 20),

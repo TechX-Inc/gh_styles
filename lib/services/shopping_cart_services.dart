@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:gh_styles/models/cart_model.dart';
+import 'package:hive/hive.dart';
 
 class ShoppingCartService {
   CollectionReference _shoppingCart = Firestore.instance.collection("Cart");
   CollectionReference _userCollection = Firestore.instance.collection("Users");
   CollectionReference _products = Firestore.instance.collection("Products");
-  // DocumentReference _cartRef = Firestore.instance.collection("Cart").document();
+  final Box _cartBox = Hive.box<CartModel>("cartBox");
 
-/////////////////////////// CHECKS IF PRODUCT ALREADY EXIST IN CART, THEN UPDATE ELSE CREATE NEW //////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future<QuerySnapshot> checkProductExist(
       String uid, DocumentReference cartProductRef) async {
     return _shoppingCart
@@ -16,7 +20,9 @@ class ShoppingCartService {
         .getDocuments();
   }
 
-/////////////////////////// ADD PRODUCT TO CART //////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future<void> addToCart(
       String uid,
       DocumentReference cartProductRef,
@@ -50,7 +56,9 @@ class ShoppingCartService {
     }
   }
 
-///////////////////////////////// UPDATE CART IF USER TRIES ADDING SAME PRODUCT MULTIPLE TIMES //////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future<void> updateCart(String uid, DocumentReference cartProductRef,
       int productQuantity, double selectionPrice) async {
     try {
@@ -77,7 +85,9 @@ class ShoppingCartService {
     }
   }
 
-////////////////////////////// UPDATE ITEM STOCK IN PRODUCT WHENEVER AN ITEM IS REMOVED OR ADDED FROM/TO CART//////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future updateProductStock(
       DocumentReference productRef, int productCurrentQuantityStock) async {
     try {
@@ -96,7 +106,9 @@ class ShoppingCartService {
     }
   }
 
-////////////////////////////// REMOVE SINGLE CART ITEM //////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future<dynamic> removeItemFromCart(
       String uid, DocumentReference cartProductRef, int quantityRemoved) async {
     try {
@@ -122,7 +134,9 @@ class ShoppingCartService {
     }
   }
 
-////////////////////////////// CLEAR CART ITEMS //////////////////////////////////////////////////
+//*****************************************************************************************/
+//
+//*************************************************************************************** */
   Future<dynamic> removeAllFromCart(String uid) async {
     try {
       QuerySnapshot cartProduct = await _shoppingCart
@@ -152,6 +166,102 @@ class ShoppingCartService {
         throw new PlatformException(
             code: "EMPTY_CART", message: "Your cart is empty");
       }
+    } on PlatformException catch (e) {
+      return e;
+    }
+  }
+
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
+  Future addCartToHive(CartModel cartModel) async {
+    final cartProductRef = _products.document(cartModel.productID);
+    try {
+      if (!_cartBox.containsKey(cartModel.productID)) {
+        return _cartBox.put(cartModel.productID, cartModel).then((value) => {
+              updateProductStock(cartProductRef, (-cartModel.orderQuantity))
+                  .catchError((onError) => throw new PlatformException(
+                      code: onError.code, message: onError.message)),
+              true
+            });
+      } else {
+        double selectionPrice =
+            _cartBox.get(cartModel.productID).selectionPrice as double;
+        int orderQuantity = _cartBox.get(cartModel.productID).orderQuantity;
+        CartModel cartModelUpdate = CartModel(
+          selectionPrice: selectionPrice + cartModel.selectionPrice,
+          orderQuantity: orderQuantity + cartModel.orderQuantity,
+          productID: cartModel.productID,
+          productName: cartModel.productName,
+          productQuantity: cartModel.productQuantity,
+          productPrice: cartModel.productPrice,
+          productDiscount: cartModel.productDiscount,
+          productSize: cartModel.productSize,
+          productPhotos: cartModel.productPhotos ?? [],
+        );
+
+        _cartBox.put(cartModel.productID, cartModelUpdate).then((value) =>
+            updateProductStock(cartProductRef, (-cartModel.orderQuantity))
+                .catchError((onError) => throw new PlatformException(
+                    code: onError.code, message: onError.message)));
+
+        throw new PlatformException(
+            code: "DUPLICATE_CART_ITEM",
+            message:
+                "Adding ${orderQuantity + cartModel.orderQuantity} more item(s) to existing ${cartModel.orderQuantity}");
+      }
+    } on PlatformException catch (e) {
+      return e;
+    }
+  }
+
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
+  Future clearHiveCart() async {
+    try {
+      List<CartModel> _cartModelList = _cartBox.values.toList();
+
+      if (_cartModelList.isNotEmpty) {
+        _cartModelList.forEach((cartModel) {
+          updateProductStock(_products.document(cartModel.productID),
+                  cartModel.orderQuantity)
+              .then((value) {
+            _cartBox.clear().then((value) => true).catchError((error) {
+              updateProductStock(_products.document(cartModel.productID),
+                  -(cartModel.orderQuantity));
+              throw new PlatformException(
+                  code: "CLEAR_CART_FAILED",
+                  message: "Operation failed, please try again");
+            });
+          }).catchError((error) => throw new PlatformException(
+                  code: "RESTORE_STOCK_FAILED",
+                  message: "Error restoring stock, please try again"));
+        });
+      } else {
+        print("CART EMPTY");
+        throw new PlatformException(
+            code: "EMPTY_CART", message: "Your cart is empty");
+      }
+    } on PlatformException catch (e) {
+      return e;
+    }
+  }
+
+//*****************************************************************************************/
+//
+//*****************************************************************************************/
+  Future<dynamic> removeHiveCartItem(
+      int index, String cartProductID, int quantityRemoved) async {
+    final cartProductRef = _products.document(cartProductID);
+    try {
+      return updateProductStock(cartProductRef, quantityRemoved).then((value) {
+        return _cartBox.deleteAt(index).then((value) => true).catchError(
+            (error) => throw new PlatformException(
+                code: "REMOVE_CART_FROM_HIVE_FAILED",
+                message: "Failed to remove item"));
+      }).catchError((onError) => throw new PlatformException(
+          code: "RESTORE_STOCK_FAILED", message: "Error removing item"));
     } on PlatformException catch (e) {
       return e;
     }

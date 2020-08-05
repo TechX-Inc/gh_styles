@@ -10,6 +10,8 @@ import 'package:gh_styles/screens/products/shirts.dart';
 import 'package:gh_styles/screens/products/shorts.dart';
 import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/screens/products/products_overview.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -38,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Shirts(),
     Shorts(),
   ];
-
   @override
   void initState() {
     super.initState();
@@ -71,9 +72,31 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 4.0),
                 child: user == null
-                    ? IconButton(
-                        icon: Icon(Icons.shopping_cart),
-                        onPressed: () => Navigator.pushNamed(context, '/cart'))
+                    ? ValueListenableBuilder(
+                        valueListenable:
+                            Hive.box<CartModel>("cartBox").listenable(),
+                        builder: (context, Box<CartModel> cartModelBox, _) {
+                          return cartModelBox.length == 0
+                              ? IconButton(
+                                  icon: Icon(Icons.shopping_cart),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/cart'))
+                              : Badge(
+                                  position:
+                                      BadgePosition.topRight(top: 0, right: 3),
+                                  animationDuration:
+                                      Duration(milliseconds: 300),
+                                  animationType: BadgeAnimationType.slide,
+                                  badgeContent: Text(
+                                    "${cartModelBox.length}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  child: IconButton(
+                                      icon: Icon(Icons.shopping_cart),
+                                      onPressed: () => Navigator.pushNamed(
+                                          context, '/cart')),
+                                );
+                        })
                     : StreamBuilder<List<CartModel>>(
                         stream:
                             _cartService.shoppingCartProductStream(user?.uid),
@@ -85,20 +108,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           List<CartModel> cartData = snapshot?.data;
                           cartData.removeWhere((value) => value == null);
                           return Center(
-                            child: Badge(
-                              position:
-                                  BadgePosition.topRight(top: 0, right: 3),
-                              animationDuration: Duration(milliseconds: 300),
-                              animationType: BadgeAnimationType.slide,
-                              badgeContent: Text(
-                                "${cartData.length}",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              child: IconButton(
-                                  icon: Icon(Icons.shopping_cart),
-                                  onPressed: () =>
-                                      Navigator.pushNamed(context, '/cart')),
-                            ),
+                            child: cartData.length <= 0
+                                ? IconButton(
+                                    icon: Icon(Icons.shopping_cart),
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, '/cart'))
+                                : Badge(
+                                    position: BadgePosition.topRight(
+                                        top: 0, right: 3),
+                                    animationDuration:
+                                        Duration(milliseconds: 300),
+                                    animationType: BadgeAnimationType.slide,
+                                    badgeContent: Text(
+                                      "${cartData.length}",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    child: IconButton(
+                                        icon: Icon(Icons.shopping_cart),
+                                        onPressed: () => Navigator.pushNamed(
+                                            context, '/cart')),
+                                  ),
                           );
                         }),
               )
