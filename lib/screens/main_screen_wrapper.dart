@@ -32,40 +32,42 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<Box<CartModel>>(
-          future: Hive.openBox("cartBox"),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: Image.asset('assets/images/gh_style.png'),
-              );
-            }
-            return bottomNavPages.elementAt(_selectedIndex);
-          }),
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: Color.fromRGBO(126, 37, 83, 1),
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text("Home"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text("Business"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            title: Text("Favorites"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            title: Text("My Account"),
-          ),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        body: FutureBuilder<Box<CartModel>>(
+            future: Hive.openBox("cartBox"),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Image.asset('assets/images/gh_style.png'),
+                );
+              }
+              return bottomNavPages.elementAt(_selectedIndex);
+            }),
+        bottomNavigationBar: BottomNavigationBar(
+          unselectedItemColor: Colors.grey,
+          selectedItemColor: Color.fromRGBO(126, 37, 83, 1),
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              title: Text("Home"),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.business),
+              title: Text("Business"),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border),
+              title: Text("Favorites"),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              title: Text("My Account"),
+            ),
+          ],
+        ),
       ),
     );
   }

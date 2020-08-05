@@ -24,23 +24,21 @@ class _AddShopState extends State<AddShop> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: Container(
-          child: LayoutBuilder(
-            builder: (context, constraint) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraint.maxHeight),
-                  child: IntrinsicHeight(
-                      child: ChangeNotifierProvider(
-                          create: (context) => AddShopProvider(),
-                          child: FormWrapper(
-                            shopsModel: widget.shopsModel,
-                          ))),
-                ),
-              );
-            },
-          ),
+      child: Container(
+        child: LayoutBuilder(
+          builder: (context, constraint) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                child: IntrinsicHeight(
+                    child: ChangeNotifierProvider(
+                        create: (context) => AddShopProvider(),
+                        child: FormWrapper(
+                          shopsModel: widget.shopsModel,
+                        ))),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -61,6 +59,7 @@ class FormWrapper extends StatelessWidget {
     }
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       key: _addShopProvider.scaffoldKey,
       backgroundColor: Color.fromRGBO(109, 0, 39, 1),
       body: Column(

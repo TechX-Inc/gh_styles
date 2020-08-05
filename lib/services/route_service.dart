@@ -7,6 +7,7 @@ import 'package:gh_styles/screens/add_product.dart';
 import 'package:gh_styles/screens/main_screen_wrapper.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/screens/products/shopping_cart.dart';
+import 'package:gh_styles/screens/splashscreen.dart';
 import 'package:gh_styles/screens/wrapper.dart';
 import 'package:provider/provider.dart';
 
