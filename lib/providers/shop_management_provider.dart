@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:gh_styles/services/shops_services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:toast/toast.dart';
 
 class AddShopProvider with ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -79,17 +80,25 @@ class AddShopProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future pickImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    _shopAvatar = File(pickedFile.path);
-    notifyListeners();
+  Future pickImage({BuildContext context}) async {
+    try {
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      _shopAvatar = File(pickedFile.path);
+      notifyListeners();
+    } on PlatformException catch (e) {
+      print(e);
+      switch (e.code) {
+        case "photo_access_denied":
+          Toast.show("Permission denied", context,
+              duration: 2, gravity: Toast.BOTTOM);
+      }
+    }
   }
 
   // ignore: missing_return
   Future<File> getImageFileFromAssets() async {
-    final byteData = await rootBundle.load('assets/images/logo_default.jpg');
-    final file =
-        File('${(await getTemporaryDirectory()).path}/logo_default.jpg');
+    final byteData = await rootBundle.load('assets/images/dummy_logo.jpg');
+    final file = File('${(await getTemporaryDirectory()).path}/dummy_logo.jpg');
     await file.writeAsBytes(byteData.buffer
         .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
     if (await file.exists()) {

@@ -1,5 +1,6 @@
 import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/providers/shop_management_provider.dart';
+import 'package:gh_styles/shop_form.dart';
 import 'package:gh_styles/widgets/add_shop_form.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/widgets/business_logo_picker.dart';
@@ -24,21 +25,36 @@ class _AddShopState extends State<AddShop> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
-        child: LayoutBuilder(
-          builder: (context, constraint) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraint.maxHeight),
-                child: IntrinsicHeight(
+      child: Scaffold(
+        key: AddShopProvider().scaffoldKey,
+        backgroundColor: Color.fromRGBO(248, 252, 255, 1),
+        body: Container(
+          padding: EdgeInsets.all(16),
+          child: LayoutBuilder(
+            builder: (context, constraint) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraint.maxHeight),
                     child: ChangeNotifierProvider(
                         create: (context) => AddShopProvider(),
-                        child: FormWrapper(
-                          shopsModel: widget.shopsModel,
-                        ))),
-              ),
-            );
-          },
+                        child: ShopForms(shopsModel: widget.shopsModel))
+
+                    // child: IntrinsicHeight(
+                    //     child: ChangeNotifierProvider(
+                    //         create: (context) => AddShopProvider(),
+                    //         child: ShopForms(shopsModel: widget.shopsModel)
+
+                    //         // FormWrapper(
+                    //         //   shopsModel: widget.shopsModel,
+                    //         // )
+
+                    //         )
+                    //         ),
+                    ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -79,7 +95,6 @@ class FormWrapper extends StatelessWidget {
                 Consumer<AddShopProvider>(
                   builder: (context, data, _) {
                     if (data?.logoUrl != null) {
-                      // print("==========|| ${data.logoUrl} ||===========");
                       return FlatButton(
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         child: Icon(Icons.cancel, color: Colors.white),

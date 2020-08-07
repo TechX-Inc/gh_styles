@@ -16,10 +16,10 @@ class RouteGenerator {
     final args = settings.arguments;
 
     switch (settings.name) {
-      // case '/':
-      //   return MaterialPageRoute(builder: (_) => SplashScreen());
-
       case '/':
+        return MaterialPageRoute(builder: (_) => SplashScreen());
+
+      case '/wrapper':
         return MaterialPageRoute(builder: (_) => Wrapper());
 
       case '/main_screen_wrapper':

@@ -14,57 +14,154 @@ class ShopForms extends StatefulWidget {
 }
 
 class _ShopFormsWidgetState extends State<ShopForms> {
-  AddShopProvider _addShopFormHandler;
+  AddShopProvider _addShopFormProvider;
+  User user;
 
   @override
   void initState() {
     super.initState();
-    _addShopFormHandler = Provider.of<AddShopProvider>(context, listen: false);
+    _addShopFormProvider = Provider.of<AddShopProvider>(context, listen: false);
+    user = Provider.of<User>(context, listen: false);
+    _addShopFormProvider.userID = user?.uid;
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    String uid = user?.uid;
-    _addShopFormHandler.userID = uid;
+    if (widget.shopsModel != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          _addShopFormProvider.setLogoUrl = widget.shopsModel.shopLogoPath);
+    }
 
     return Form(
-      key: _addShopFormHandler.formKey,
-      autovalidate: _addShopFormHandler.autovalidate,
-      child: Column(
-        children: <Widget>[
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
-              child: Column(
-                children: <Widget>[
-                  _shopNameField(),
-                  _ownerLegalNameField(),
-                  _shopEmailField(),
-                  _shopPhoneField(),
-                  _shopLocationField(),
-                  _websiteUrlField(),
-                  SizedBox(height: 40),
-                  _buildSubmitButton(),
-                ],
+      key: _addShopFormProvider.formKey,
+      autovalidate: _addShopFormProvider.autovalidate,
+      child: Column(children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Consumer<AddShopProvider>(builder: (context, data, _) {
+              if (data.logoUrl != null && data.image == null) {
+                return Column(
+                  children: [
+                    CircleAvatar(
+                        radius: 30,
+                        backgroundImage:
+                            NetworkImage(widget.shopsModel.shopLogoPath)),
+                    SizedBox(height: 5),
+                    FlatButton(
+                        onPressed: () => data.removeLogo(
+                            widget.shopsModel.shopLogoPath,
+                            widget.shopsModel.shopRef),
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(color: Colors.redAccent),
+                        ))
+                  ],
+                );
+              } else {
+                return data.image != null
+                    ? Column(
+                        children: [
+                          Container(
+                            child: CircleAvatar(
+                                radius: 30,
+                                backgroundImage: FileImage(data.image)),
+                          ),
+                          SizedBox(height: 5),
+                          FlatButton(
+                              onPressed: () => data.removePhoto = null,
+                              child: Text(
+                                "Remove",
+                                style: TextStyle(color: Colors.redAccent),
+                              ))
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Container(
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage:
+                                  AssetImage("assets/images/dummy_logo.png"),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text("Business Logo")
+                        ],
+                      );
+              }
+            }),
+            Text(
+              widget.shopsModel == null ? "Register Business" : "Edit Business",
+              style: TextStyle(
+                fontSize: 18,
               ),
+            )
+          ],
+        ),
+        SizedBox(
+          height: 30,
+        ),
+        _shopNameField(),
+        SizedBox(
+          height: 15,
+        ),
+        _ownerLegalNameField(),
+        SizedBox(
+          height: 15,
+        ),
+        _shopEmailField(),
+        SizedBox(
+          height: 15,
+        ),
+        _shopPhoneField(),
+        SizedBox(
+          height: 15,
+        ),
+        _shopLocationField(),
+        SizedBox(
+          height: 15,
+        ),
+        Row(
+          children: [
+            Expanded(child: _websiteUrlField()),
+            SizedBox(
+              width: 30,
             ),
-          ),
-        ],
-      ),
+            IconButton(
+                onPressed: () =>
+                    _addShopFormProvider.pickImage(context: context),
+                icon: Icon(
+                  Icons.camera_enhance,
+                  size: 30,
+                ))
+          ],
+        ),
+        SizedBox(height: 40),
+        _buildSubmitButton()
+      ]),
     );
   }
 
   Widget _shopNameField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Shop Name *",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Shop Name ',
+        // labelText: "Shop Name *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.checkRequired(value.trim()),
-      onSaved: (sName) => _addShopFormHandler.shopName = sName,
+      onSaved: (sName) => _addShopFormProvider.shopName = sName,
       initialValue:
           widget.shopsModel != null ? widget.shopsModel.shopName : null,
     );
@@ -73,14 +170,23 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   Widget _ownerLegalNameField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Owner Legal Name *",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Owner Legal Name ',
+        // labelText: "Owner Legal Name *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.checkRequired(value),
       onSaved: (ownerLegalName) =>
-          _addShopFormHandler.ownerLegalName = ownerLegalName,
+          _addShopFormProvider.ownerLegalName = ownerLegalName,
       initialValue: widget.shopsModel != null
           ? widget.shopsModel.shopOwnerLegalName
           : null,
@@ -90,13 +196,22 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   Widget _shopEmailField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Email *",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Email ',
+        // labelText: "Email *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.validateEmail(value.trim()),
-      onSaved: (email) => _addShopFormHandler.email = email,
+      onSaved: (email) => _addShopFormProvider.email = email,
       initialValue:
           widget.shopsModel != null ? widget.shopsModel.shopEmail : null,
     );
@@ -104,14 +219,24 @@ class _ShopFormsWidgetState extends State<ShopForms> {
 
   Widget _shopPhoneField() {
     return TextFormField(
+      keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "Phone Number *",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Phone Number ',
+        // labelText: "Phone Number *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.validateNumber(value),
-      onSaved: (phone) => _addShopFormHandler.phoneContact = phone,
+      onSaved: (phone) => _addShopFormProvider.phoneContact = phone,
       initialValue:
           widget.shopsModel != null ? widget.shopsModel.shopContact : null,
     );
@@ -120,13 +245,22 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   Widget _shopLocationField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Location *",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Location',
+        // labelText: "Location *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.checkRequired(value),
-      onSaved: (location) => _addShopFormHandler.location = location,
+      onSaved: (location) => _addShopFormProvider.location = location,
       initialValue:
           widget.shopsModel != null ? widget.shopsModel.shopLocation : null,
     );
@@ -135,13 +269,22 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   Widget _websiteUrlField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: "Website URL",
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(109, 0, 39, 1)),
+        hintText: 'Website URL ',
+        // labelText: "Website URL *",
+        hintStyle: TextStyle(fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 0,
+            style: BorderStyle.none,
+          ),
         ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        // fillColor: colorSearchBg,
       ),
       validator: (value) => ValidateShopData.validateUrl(value.trim()),
-      onSaved: (url) => _addShopFormHandler.websiteURL = url,
+      onSaved: (url) => _addShopFormProvider.websiteURL = url,
       initialValue:
           widget.shopsModel != null ? widget.shopsModel.shopWebsite : null,
     );
@@ -150,22 +293,30 @@ class _ShopFormsWidgetState extends State<ShopForms> {
   Widget _buildSubmitButton() {
     return Consumer<AddShopProvider>(builder: (context, data, _) {
       return !data.loading
-          ? RaisedButton(
-              color: Color.fromRGBO(109, 0, 39, 1),
-              child: Text(
-                widget.shopsModel != null ? "Save Changes" : 'Create Shop',
-                style: TextStyle(color: Colors.white),
+          ? SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
+                // color: Color.fromRGBO(109, 0, 39, 1),
+                color: Color.fromRGBO(85, 179, 223, 1),
+                child: Text(
+                  widget.shopsModel != null ? "Save Changes" : 'Create Shop',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () => widget.shopsModel == null
+                    ? _addShopFormProvider.processAndSave(context)
+                    : _addShopFormProvider.updateShop(
+                        context,
+                        widget.shopsModel.shopRef,
+                        widget.shopsModel.shopLogoPath),
               ),
-              onPressed: () => widget.shopsModel == null
-                  ? _addShopFormHandler.processAndSave(context)
-                  : _addShopFormHandler.updateShop(
-                      context,
-                      widget.shopsModel.shopRef,
-                      widget.shopsModel.shopLogoPath),
             )
-          : SpinKitWave(
-              color: Color.fromRGBO(109, 0, 39, 1),
-              size: 20.0,
+          : SpinKitFadingCircle(
+              color: Color.fromRGBO(85, 179, 223, 1),
+              size: 50.0,
             );
     });
   }
