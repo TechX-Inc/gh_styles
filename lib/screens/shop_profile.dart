@@ -25,6 +25,7 @@ class _ShopProfileState extends State<ShopProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Color.fromRGBO(248, 252, 255, 1),
         key: _shopProfileProvider.scaffoldKey,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +35,7 @@ class _ShopProfileState extends State<ShopProfile> {
                 maxHeight: 200,
               ),
               child: Container(
-                color: Colors.white,
+                // color: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -132,7 +133,7 @@ class _ShopProfileState extends State<ShopProfile> {
                     }
                     List<ProductModel> products = snapshot.data;
                     return Container(
-                        color: Colors.white,
+                        // color: Colors.white,
                         width: double.infinity,
                         child: GridView.builder(
                             scrollDirection: Axis.vertical,

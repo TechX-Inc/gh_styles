@@ -91,12 +91,22 @@ class _ShopFormsWidgetState extends State<ShopForms> {
                       );
               }
             }),
-            Text(
-              widget.shopsModel == null ? "Register Business" : "Edit Business",
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            )
+            widget.shopsModel != null
+                ? Expanded(
+                    child: Container(
+                        alignment: Alignment.topRight,
+                        child: Icon(
+                          Icons.edit,
+                          size: 40,
+                          color: Colors.blueAccent,
+                        )),
+                  )
+                : Text(
+                    "Register Business",
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  )
           ],
         ),
         SizedBox(

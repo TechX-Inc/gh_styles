@@ -38,106 +38,11 @@ class _AddShopState extends State<AddShop> {
                         BoxConstraints(minHeight: constraint.maxHeight),
                     child: ChangeNotifierProvider(
                         create: (context) => AddShopProvider(),
-                        child: ShopForms(shopsModel: widget.shopsModel))
-
-                    // child: IntrinsicHeight(
-                    //     child: ChangeNotifierProvider(
-                    //         create: (context) => AddShopProvider(),
-                    //         child: ShopForms(shopsModel: widget.shopsModel)
-
-                    //         // FormWrapper(
-                    //         //   shopsModel: widget.shopsModel,
-                    //         // )
-
-                    //         )
-                    //         ),
-                    ),
+                        child: ShopForms(shopsModel: widget.shopsModel))),
               );
             },
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class FormWrapper extends StatelessWidget {
-  final ShopsModel shopsModel;
-  FormWrapper({this.shopsModel});
-  AddShopProvider _addShopProvider;
-  @override
-  Widget build(BuildContext context) {
-    _addShopProvider = Provider.of<AddShopProvider>(context, listen: false);
-    if (shopsModel != null) {
-      WidgetsBinding.instance.addPostFrameCallback(
-          (_) => _addShopProvider.setLogoUrl = shopsModel.shopLogoPath);
-    }
-
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      key: _addShopProvider.scaffoldKey,
-      backgroundColor: Color.fromRGBO(109, 0, 39, 1),
-      body: Column(
-        children: <Widget>[
-          FractionallySizedBox(
-            widthFactor: 1,
-            child: Container(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                shopsModel?.shopLogoPath != null
-                    ? ShopLogo(logoUrl: shopsModel?.shopLogoPath)
-                    : ShopLogo(),
-                SizedBox(
-                  height: 10,
-                ),
-                Consumer<AddShopProvider>(
-                  builder: (context, data, _) {
-                    if (data?.logoUrl != null) {
-                      return FlatButton(
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        child: Icon(Icons.cancel, color: Colors.white),
-                        onPressed: () {
-                          data.removeLogo(
-                              shopsModel.shopLogoPath, shopsModel.shopRef);
-                        },
-                      );
-                    } else {
-                      return data.image == null
-                          ? Text(
-                              "Add Logo",
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
-                            )
-                          : FlatButton(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              child: Icon(Icons.cancel, color: Colors.white),
-                              onPressed: () {
-                                data.removePhoto = null;
-                              },
-                            );
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-              ],
-            )),
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25))),
-              child: ShopForms(shopsModel: shopsModel),
-            ),
-          ),
-        ],
       ),
     );
   }
