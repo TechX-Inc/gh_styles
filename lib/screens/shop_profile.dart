@@ -1,10 +1,17 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/shops_model.dart';
 import 'package:gh_styles/providers/shop_profile_provider.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
+import 'package:gh_styles/widgets/nav_drawer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+double computeDimensions(double percentage, double constraints) {
+  return ((percentage / 100) * constraints);
+}
 
 class ShopProfile extends StatefulWidget {
   final List<ShopsModel> shopModel;
@@ -25,257 +32,288 @@ class _ShopProfileState extends State<ShopProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromRGBO(248, 252, 255, 1),
+        backgroundColor: Color.fromRGBO(245, 248, 255, 1),
+        // backgroundColor: Color.fromRGBO(242, 246, 255, 1),
         key: _shopProfileProvider.scaffoldKey,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: 200,
-              ),
-              child: Container(
-                // color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+        drawer: NavDrawer(shopsModel: widget.shopModel[0]),
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(245, 248, 255, 1),
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () =>
+                _shopProfileProvider.scaffoldKey.currentState.openDrawer(),
+            icon: Icon(
+              Icons.menu,
+              color: Color.fromRGBO(77, 8, 154, 1),
+            ),
+          ),
+        ),
+        body: LayoutBuilder(builder: (context, BoxConstraints constraints) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: StreamBuilder<List<ProductModel>>(
+                stream: new FetchProductService().allProductsStream(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                        child: SpinKitFadingCircle(
+                      color: Color.fromRGBO(0, 188, 212, 1),
+                      size: 50.0,
+                    ));
+                  }
+                  List<ProductModel> products = snapshot.data;
+
+                  if (products.isEmpty || products == null) {
+                    return Center(
+                        child: Column(
+                      children: [
+                        Text("You have no products"),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          alignment: Alignment.topCenter,
+                          width: 100,
+                          height: 30,
+                          child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                              ),
+                              color: Color.fromRGBO(85, 179, 223, 1),
+                              child: Text(
+                                'Add Product',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, "/add_product")),
+                        ),
+                      ],
+                    ));
+                  }
+                  return ListView(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
                     children: [
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          widget?.shopModel[0]?.shopLogoPath != null
+                              ? CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: NetworkImage(
+                                      widget.shopModel[0]?.shopLogoPath))
+                              : Container(),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              widget?.shopModel[0]?.shopLogoPath != null
-                                  ? CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: NetworkImage(
-                                          widget.shopModel[0]?.shopLogoPath))
-                                  : Container(),
-                              SizedBox(
-                                height: 10,
+                              Text(
+                                "Total Sales",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color.fromRGBO(140, 140, 140, 1)),
                               ),
-                              Container(
-                                child: Text(
-                                  widget.shopModel[0].shopName,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(right: 10),
-                                child: Text(
-                                  "\₵500 SOLD",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(200, 200, 200, 1)),
-                                ),
+                              SizedBox(height: 10),
+                              Text(
+                                "50,000 GHS",
+                                style: TextStyle(
+                                    color: Colors.green, fontSize: 16),
                               ),
                             ],
-                          ),
-                          Expanded(
-                            child: Container(
-                              alignment: Alignment.topRight,
-                              child: new OutlineButton(
-                                  child: new Text(
-                                    "Edit Shop",
-                                    style: TextStyle(color: Colors.blueAccent),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamed("/edit_shop", arguments: {
-                                      "edit_mode": true,
-                                      "shop_model": widget.shopModel[0]
-                                    });
-                                  },
-                                  shape: new RoundedRectangleBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(30.0))),
-                            ),
                           )
                         ],
                       ),
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              child: Text(
-                                "My Products",
-                                style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(200, 200, 200, 1)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget?.shopModel[0]?.shopName,
+                            style: GoogleFonts.kulimPark(
+                                fontSize: 25,
+                                color: Color.fromRGBO(77, 8, 154, 1)),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.of(context)
+                                .pushNamed("/edit_shop", arguments: {
+                              "edit_mode": true,
+                              "shop_model": widget.shopModel[0]
+                            }),
+                            icon: Icon(
+                              Icons.edit,
+                              size: 20,
+                              color: Color.fromRGBO(77, 8, 154, 1),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 40),
+                      GridView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 15,
+                            mainAxisSpacing: 25,
+                          ),
+                          itemCount: products.length,
+                          itemBuilder: (context, int index) {
+                            return Container(
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, left: 8.0, right: 8.0),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(247, 250, 255, 1),
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(6),
+                                    bottomRight: Radius.circular(6)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 2,
+                                    blurRadius: 3,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<List<ProductModel>>(
-                  stream: new FetchProductService().allProductsStream(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(child: Text("Loading"));
-                    }
-                    List<ProductModel> products = snapshot.data;
-                    return Container(
-                        // color: Colors.white,
-                        width: double.infinity,
-                        child: GridView.builder(
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 25,
-                            ),
-                            itemCount: products.length,
-                            itemBuilder: (context, int index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  _showBottomSheet(products[index]);
-                                },
-                                child: Container(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: FractionallySizedBox(
+                                          widthFactor: 0.9,
+                                          heightFactor: 1.0,
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: FadeInImage.assetNetwork(
+                                                  placeholder:
+                                                      'assets/images/loading.gif',
+                                                  image:
+                                                      "${products[index].productPhotos[0]}",
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 5,
+                                                right: 5,
+                                                child: Badge(
+                                                    padding: EdgeInsets.all(6),
+                                                    badgeColor: Colors.white,
+                                                    borderRadius: 20,
+                                                    shape: BadgeShape.square,
+                                                    toAnimate: false,
+                                                    badgeContent: Text(
+                                                      "Stock: ${products[index].productQuantity}",
+                                                      style: TextStyle(
+                                                          fontSize: 11),
+                                                    )),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    width: double.infinity,
+                                    child: Text(
+                                      products[index].productName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .subtitle1
+                                          .copyWith(
+                                              color: Color.fromRGBO(
+                                                  118, 118, 118, 1),
+                                              fontSize: 16),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: FractionallySizedBox(
-                                              widthFactor: 0.9,
-                                              heightFactor: 1.0,
-                                              child: Stack(
-                                                fit: StackFit.expand,
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                    child: FadeInImage
-                                                        .assetNetwork(
-                                                      placeholder:
-                                                          'assets/images/loading.gif',
-                                                      image:
-                                                          "${products[index].productPhotos[0]}",
-                                                      fit: BoxFit.fill,
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    bottom: 5,
-                                                    right: 5,
-                                                    child: Badge(
-                                                        padding:
-                                                            EdgeInsets.all(6),
-                                                        badgeColor:
-                                                            Colors.white,
-                                                        borderRadius: 20,
-                                                        shape:
-                                                            BadgeShape.square,
-                                                        toAnimate: false,
-                                                        badgeContent: Text(
-                                                            "Stock: ${products[index].productQuantity}")),
-                                                  ),
-                                                ],
-                                              )),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10.0,
-                                      ),
+                                    children: [
                                       Container(
-                                        // alignment: Alignment.center,
-                                        padding:
-                                            const EdgeInsets.only(left: 10.0),
-                                        width: double.infinity,
-
-                                        child: Text(
-                                          products[index].productName,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .subtitle1
-                                              .copyWith(
-                                                  color: Colors.black,
-                                                  fontSize: 17),
-                                        ),
-                                      )
+                                          child: IconButton(
+                                        onPressed: () => Navigator.of(context)
+                                            .pushNamed("/edit_product",
+                                                arguments: {
+                                              "edit_mode": true,
+                                              "product_model": products[index]
+                                            }),
+                                        icon: Icon(Icons.edit,
+                                            size: 20, color: Colors.blueAccent),
+                                      )),
+                                      Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 10.0),
+                                          // width: double.infinity,
+                                          child: IconButton(
+                                            onPressed: () => showAlertDialog(
+                                                products[index]),
+                                            icon: Icon(
+                                              Icons.delete,
+                                              size: 20,
+                                              color: Colors.redAccent,
+                                            ),
+                                          )),
                                     ],
-                                  ),
-                                ),
-                              );
-                            }));
-                  }),
-            ),
-          ],
-        ));
+                                  )
+                                ],
+                              ),
+                            );
+                          })
+                    ],
+                  );
+                }),
+          );
+        }));
   }
 
-  void _showBottomSheet(ProductModel productModel) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            height: 100,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      new OutlineButton(
-                          child: new Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.blueAccent),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed("/edit_product",
-                                arguments: {
-                                  "edit_mode": true,
-                                  "product_model": productModel
-                                });
-                          },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0))),
-                      OutlineButton(
-                          child: new Text(
-                            "Delete",
-                            style: TextStyle(color: Colors.redAccent),
-                          ),
-                          onPressed: () {
-                            _shopProfileProvider.deleteProduct(
-                                productModel.productPhotos,
-                                productModel.productRef);
-                          },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
+  showAlertDialog(ProductModel productModel) {
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () => Navigator.of(context).pop(),
+    );
+    Widget deleteButton = FlatButton(
+      child: Text(
+        "Delete",
+        style: TextStyle(color: Colors.redAccent),
+      ),
+      onPressed: () => {
+        Navigator.of(context).pop(),
+        _shopProfileProvider.deleteProduct(
+            productModel.productPhotos, productModel.productRef)
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text("Delete Product"),
+      content: Text("Are you sure you want to delete this product?"),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }

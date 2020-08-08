@@ -13,9 +13,11 @@ class ProductModel {
   String productSize;
   String collection;
   List productPhotos;
+  DocumentReference favProductRef;
 
   ProductModel(
-      {this.productRef,
+      {this.favProductRef,
+      this.productRef,
       this.productOwner,
       this.productName,
       this.productQuantity,
@@ -28,8 +30,10 @@ class ProductModel {
       this.collection,
       this.productPhotos});
 
-  factory ProductModel.fromSnapshot(DocumentSnapshot product) {
+  factory ProductModel.fromSnapshot(DocumentSnapshot product,
+      {DocumentReference favProductRef}) {
     return ProductModel(
+      favProductRef: favProductRef ?? null,
       productRef: product.reference,
       productOwner: product.data['shop_ref'],
       productName: product.data['product_name'],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
+import 'package:gh_styles/widgets/page_header_banner.dart';
 import 'package:gh_styles/widgets/product_horizontal_list_container.dart';
 
 class ProductsOverView extends StatefulWidget {
@@ -33,7 +34,7 @@ class _ProductsOverViewState extends State<ProductsOverView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // PageBanner(),
+          PageBanner(),
           SizedBox(
             height: 10,
           ),

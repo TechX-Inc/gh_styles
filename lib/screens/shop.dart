@@ -25,25 +25,28 @@ class _ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<ShopsModel>>(
-        stream: fetchShopService.shopsStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-                child: SpinKitSpinningCircle(
-              color: Color.fromRGBO(148, 15, 55, 1),
-              size: 40.0,
-            ));
-          } else
-            return (snapshot.data == null ||
-                    snapshot.data.contains(null) ||
-                    snapshot.data.isEmpty)
-                ? AddShop()
-                : ChangeNotifierProvider<ShopProfileProvider>(
-                    create: (context) => new ShopProfileProvider(),
-                    builder: (context, data) {
-                      return ShopProfile(shopModel: snapshot.data);
-                    });
-        });
+    return Container(
+      color: Color.fromRGBO(248, 252, 255, 1),
+      child: StreamBuilder<List<ShopsModel>>(
+          stream: fetchShopService.shopsStream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                  child: SpinKitFadingCircle(
+                color: Color.fromRGBO(0, 188, 212, 1),
+                size: 50.0,
+              ));
+            } else
+              return (snapshot.data == null ||
+                      snapshot.data.contains(null) ||
+                      snapshot.data.isEmpty)
+                  ? AddShop()
+                  : ChangeNotifierProvider<ShopProfileProvider>(
+                      create: (context) => new ShopProfileProvider(),
+                      builder: (context, data) {
+                        return ShopProfile(shopModel: snapshot.data);
+                      });
+          }),
+    );
   }
 }

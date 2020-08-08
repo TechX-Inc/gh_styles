@@ -12,6 +12,8 @@ import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
 class MainScreenWrapper extends StatefulWidget {
+  final int pageIndex;
+  MainScreenWrapper({this.pageIndex});
   @override
   _MainScreenWrapperState createState() => _MainScreenWrapperState();
 }
@@ -19,7 +21,6 @@ class MainScreenWrapper extends StatefulWidget {
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
   int _selectedIndex = 0;
   User user;
-  // final FetchCartService _cartService = new FetchCartService();
   FetchShopService fetchShopService = new FetchShopService();
 
   @override
@@ -34,6 +35,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.red,
         body: FutureBuilder<Box<CartModel>>(
             future: Hive.openBox("cartBox"),
             builder: (context, snapshot) {

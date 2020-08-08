@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gh_styles/models/product_model.dart';
+import 'package:gh_styles/test_data.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FetchProductService {
   CollectionReference products = Firestore.instance.collection("Products");
@@ -57,14 +59,44 @@ class FetchProductService {
     });
   }
 
-  Stream<List<Stream<ProductModel>>> allFavouriteProductsStream(String uid) {
+  // Stream<List<Stream<ProductModel>>> allFavouriteProductsStream(String uid) {
+  //   return _favourites
+  //       .where('user_ref', isEqualTo: _userCollection.document(uid))
+  //       .snapshots()
+  //       .map((querySnap) {
+  //     return querySnap.documents.map((docSnapshot) {
+  //       DocumentReference favRef = docSnapshot.data["product_ref"];
+  //       return favRef.snapshots().map((fav) => ProductModel.fromSnapshot(fav));
+  //     }).toList();
+  //   });
+  // }
+
+  Stream<List<ProductModel>> allFavouriteProductsStream(String uid) {
     return _favourites
         .where('user_ref', isEqualTo: _userCollection.document(uid))
         .snapshots()
-        .map((querySnap) {
-      return querySnap.documents.map((docSnapshot) {
-        DocumentReference favRef = docSnapshot.data["product_ref"];
-        return favRef.snapshots().map((fav) => ProductModel.fromSnapshot(fav));
+        .map((snapshot) {
+      return snapshot.documents.map<ProductModel>((product) {
+        DocumentReference favProductRef = product.data['product_ref'];
+        return ProductModel.fromSnapshot(product, favProductRef: favProductRef);
+      }).toList();
+    });
+  }
+
+  Stream<List<ProductModel>> userFavouritesStream(String uid) {
+    return Rx.combineLatest2(
+        allProductsStream(), allFavouriteProductsStream(uid),
+        (List<ProductModel> products, List<ProductModel> favourites) {
+      return products.map((product) {
+        final favouriteData = favourites?.firstWhere(
+            (favourite) =>
+                favourite.productRef.documentID ==
+                product.productRef.documentID,
+            orElse: () => null);
+        print(favouriteData);
+        if (favouriteData != null) {
+          // return ProductModel.fromProducts(cartData, product);
+        }
       }).toList();
     });
   }

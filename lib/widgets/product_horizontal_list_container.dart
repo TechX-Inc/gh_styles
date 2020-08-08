@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/main_app_state_provider.dart';
+import 'package:gh_styles/widgets/page_header_banner.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +56,7 @@ class _ProductHorizontalListContainerState
           List<ProductModel> products = snapshot.data;
           return products.isNotEmpty
               ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       height: widget.sectionTopMargin,
@@ -77,6 +79,7 @@ class _ProductHorizontalListContainerState
                                 )
                                 .copyWith(
                                     color: Color.fromRGBO(150, 150, 150, 1),
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w400),
                           ),
                           SizedBox(

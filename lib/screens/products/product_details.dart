@@ -53,6 +53,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     return SafeArea(
       child: Scaffold(
           key: detailsProvider.scaffoldKey,
+          // backgroundColor: Color(0xfff9f9f9),
+          // backgroundColor: Colors.white,
           appBar: AppBar(
             iconTheme: IconThemeData(
               color: Colors.black, //change your color here
@@ -130,7 +132,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
               )
             ],
           ),
-          backgroundColor: Color(0xfff9f9f9),
           body: LayoutBuilder(
             builder:
                 (BuildContext context, BoxConstraints viewportConstraints) {
@@ -152,38 +153,39 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   50, viewportConstraints.maxHeight),
                               child: Hero(
                                 tag: '${widget.heroID}',
-                                child:
-                                    widget.productModel.productPhotos.length > 1
-                                        ? Carousel(
-                                            indicatorBgPadding: 5.0,
-                                            dotSize: 6,
-                                            autoplay: true,
-                                            dotColor: Colors.black,
-                                            dotIncreasedColor: Colors.blue,
-                                            dotBgColor: Color(0xfff9f9f9),
-                                            images: widget
-                                                .productModel.productPhotos
-                                                .map(
-                                                  (photo) => Image.network(
-                                                    "$photo",
-                                                    fit: BoxFit.fill,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            .7,
-                                                  ),
-                                                )
-                                                .toList(),
-                                          )
-                                        : Image.network(
-                                            "${widget.productModel.productPhotos[0]}",
-                                            fit: BoxFit.fill,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                child: widget
+                                            .productModel.productPhotos.length >
+                                        1
+                                    ? Carousel(
+                                        indicatorBgPadding: 5.0,
+                                        dotSize: 6,
+                                        autoplay: true,
+                                        dotColor: Colors.black,
+                                        dotIncreasedColor: Colors.blue,
+                                        // dotBgColor: Color(0xfff9f9f9),
+                                        dotBgColor:
+                                            Color.fromRGBO(247, 250, 255, 1),
+                                        images: widget
+                                            .productModel.productPhotos
+                                            .map(
+                                              (photo) => Image.network(
+                                                "$photo",
+                                                fit: BoxFit.fill,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    .7,
+                                              ),
+                                            )
+                                            .toList(),
+                                      )
+                                    : Image.network(
+                                        "${widget.productModel.productPhotos[0]}",
+                                        fit: BoxFit.fill,
+                                        width:
+                                            MediaQuery.of(context).size.width *
                                                 .7,
-                                          ),
+                                      ),
                               ),
                             ),
                             Padding(

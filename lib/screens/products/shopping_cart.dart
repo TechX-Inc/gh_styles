@@ -42,7 +42,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
     return SafeArea(
       child: Scaffold(
         key: _cartProvider.scaffoldKey,
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
         appBar: AppBar(
           centerTitle: false,
           title: Text(
@@ -50,7 +50,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
             style: TextStyle(color: Colors.black),
           ),
           iconTheme: IconThemeData(
-            color: Colors.black, //change your color here
+            color: Colors.black,
           ),
           elevation: 0,
           leading: IconButton(
@@ -59,7 +59,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          backgroundColor: Colors.white,
+          // backgroundColor: Colors.white,
+          backgroundColor: Color.fromRGBO(247, 250, 255, 1),
           actions: [
             FlatButton(
                 child: Text(

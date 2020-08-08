@@ -52,11 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return DefaultTabController(
       length: _tabPages.length,
       child: Scaffold(
-          backgroundColor: Color.fromRGBO(247, 247, 247, 1),
+          // backgroundColor: Color.fromRGBO(248, 252, 255, 1),
+
           appBar: AppBar(
             iconTheme: IconThemeData(color: Colors.white),
             backgroundColor: Color.fromRGBO(126, 37, 83, 1),
-            elevation: 0.0,
+            // elevation: 5.0,
             automaticallyImplyLeading: false,
             leading: IconButton(
               icon: Icon(

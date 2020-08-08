@@ -52,6 +52,7 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          canvasColor: Color.fromRGBO(247, 250, 255, 1),
           primarySwatch: Colors.blue,
           platform: TargetPlatform.android,
         ),
@@ -61,3 +62,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+/*
+Color.fromRGBO(239, 243, 247, 1)
+ */

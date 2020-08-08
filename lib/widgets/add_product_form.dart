@@ -85,7 +85,6 @@ class _AddProductFormState extends State<AddProductForm> {
                                   _addProduct.setUserShopReference =
                                       snapshot.data[0].shopRef
                                 });
-
                             return CircleAvatar(
                                 radius: 30,
                                 backgroundImage: NetworkImage(

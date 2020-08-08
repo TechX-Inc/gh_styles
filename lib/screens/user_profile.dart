@@ -11,7 +11,7 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(246, 246, 246, 1),
+      backgroundColor: Color.fromRGBO(248, 252, 255, 1),
       body: Container(
         child: Padding(
           padding: const EdgeInsets.all(18.0),
@@ -39,7 +39,7 @@ class _UserProfileState extends State<UserProfile> {
                 // height: 180,
                 child: Card(
                   elevation: 6,
-                  color: Color.fromRGBO(255, 255, 255, 1),
+                  color: Color.fromRGBO(242, 246, 255, 1),
                   shadowColor: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -122,7 +122,7 @@ class _UserProfileState extends State<UserProfile> {
                 // height: 180,
                 child: Card(
                   elevation: 6,
-                  color: Color.fromRGBO(255, 255, 255, 1),
+                  color: Color.fromRGBO(242, 246, 255, 1),
                   shadowColor: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -207,7 +207,7 @@ class _UserProfileState extends State<UserProfile> {
                 // height: 180,
                 child: Card(
                   elevation: 6,
-                  color: Color.fromRGBO(255, 255, 255, 1),
+                  color: Color.fromRGBO(242, 246, 255, 1),
                   shadowColor: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
