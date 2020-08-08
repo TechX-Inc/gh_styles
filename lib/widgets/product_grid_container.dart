@@ -108,7 +108,7 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                                         'assets/images/loading.gif',
                                                     image:
                                                         "${products[index].productPhotos[0]}",
-                                                    fit: BoxFit.fill,
+                                                    fit: BoxFit.cover,
                                                   ),
                                                 ),
                                                 products[index]
@@ -121,9 +121,9 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                                                         child: Badge(
                                                           badgeColor:
                                                               Color.fromRGBO(
-                                                                  148,
-                                                                  15,
-                                                                  55,
+                                                                  255,
+                                                                  103,
+                                                                  125,
                                                                   1),
                                                           // badgeColor: Color.fromRGBO(231, 48, 91, 1),
                                                           shape:

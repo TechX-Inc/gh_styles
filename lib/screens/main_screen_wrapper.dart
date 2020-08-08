@@ -35,7 +35,6 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.red,
         body: FutureBuilder<Box<CartModel>>(
             future: Hive.openBox("cartBox"),
             builder: (context, snapshot) {
@@ -48,7 +47,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
             }),
         bottomNavigationBar: BottomNavigationBar(
           unselectedItemColor: Colors.grey,
-          selectedItemColor: Color.fromRGBO(126, 37, 83, 1),
+          selectedItemColor: Color.fromRGBO(132, 140, 207, 1),
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: [

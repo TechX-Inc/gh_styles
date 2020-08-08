@@ -9,12 +9,12 @@ class PageBanner extends StatelessWidget {
         Text(
           "Our",
           style: Theme.of(context).textTheme.headline4.apply(
-                fontWeightDelta: 2,
-                color: Colors.black,
-              ),
+              fontWeightDelta: 2, color: Color.fromRGBO(132, 140, 207, 1)),
         ),
+        SizedBox(height: 5),
         Text("Products",
-            style: Theme.of(context).textTheme.headline4.copyWith(height: .9)),
+            style: Theme.of(context).textTheme.headline4.copyWith(
+                height: .9, color: Color.fromRGBO(132, 140, 207, 0.7))),
         SizedBox(
           height: 30,
         ),

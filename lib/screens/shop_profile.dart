@@ -33,7 +33,6 @@ class _ShopProfileState extends State<ShopProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color.fromRGBO(245, 248, 255, 1),
-        // backgroundColor: Color.fromRGBO(242, 246, 255, 1),
         key: _shopProfileProvider.scaffoldKey,
         drawer: NavDrawer(shopsModel: widget.shopModel[0]),
         appBar: AppBar(
@@ -44,7 +43,7 @@ class _ShopProfileState extends State<ShopProfile> {
                 _shopProfileProvider.scaffoldKey.currentState.openDrawer(),
             icon: Icon(
               Icons.menu,
-              color: Color.fromRGBO(77, 8, 154, 1),
+              color: Color.fromRGBO(132, 140, 207, 1),
             ),
           ),
         ),
@@ -130,7 +129,7 @@ class _ShopProfileState extends State<ShopProfile> {
                             widget?.shopModel[0]?.shopName,
                             style: GoogleFonts.kulimPark(
                                 fontSize: 25,
-                                color: Color.fromRGBO(77, 8, 154, 1)),
+                                color: Color.fromRGBO(132, 140, 207, 1)),
                           ),
                           IconButton(
                             onPressed: () => Navigator.of(context)
@@ -141,7 +140,7 @@ class _ShopProfileState extends State<ShopProfile> {
                             icon: Icon(
                               Icons.edit,
                               size: 20,
-                              color: Color.fromRGBO(77, 8, 154, 1),
+                              color: Color.fromRGBO(132, 140, 207, 1),
                             ),
                           ),
                         ],

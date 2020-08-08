@@ -2,7 +2,6 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/main_app_state_provider.dart';
-import 'package:gh_styles/widgets/page_header_banner.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -94,135 +93,128 @@ class _ProductHorizontalListContainerState
                                 itemBuilder: (context, int index) {
                                   return Row(
                                     children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: Container(
-                                          child: GestureDetector(
-                                            onTap: () => Navigator.of(context)
-                                                .pushNamed("/product_details",
-                                                    arguments: {
-                                                  "product_model":
-                                                      products[index],
-                                                  "hero_id":
-                                                      '$index${widget.heroID}',
-                                                  "index": index
-                                                }),
-                                            child: ConstrainedBox(
-                                              constraints: BoxConstraints(
-                                                minWidth: 160.0,
-                                                maxWidth: 170.0,
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      "\₵${computePrice(products[index].productDiscount, products[index].productPrice)}",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headline6
-                                                          .copyWith(
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      82,
-                                                                      87,
-                                                                      93,
-                                                                      1),
-                                                              fontSize: 18),
-                                                    ),
+                                      Container(
+                                        // color: Colors.red,
+                                        // color: Color.fromRGBO(250, 252, 255, 1),
+                                        child: GestureDetector(
+                                          onTap: () => Navigator.of(context)
+                                              .pushNamed("/product_details",
+                                                  arguments: {
+                                                "product_model":
+                                                    products[index],
+                                                "hero_id":
+                                                    '$index${widget.heroID}',
+                                                "index": index
+                                              }),
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              minWidth: 160.0,
+                                              maxWidth: 170.0,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    "\₵${computePrice(products[index].productDiscount, products[index].productPrice)}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline6
+                                                        .copyWith(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    82,
+                                                                    87,
+                                                                    93,
+                                                                    1),
+                                                            fontSize: 18),
                                                   ),
-                                                  Expanded(
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Hero(
-                                                        transitionOnUserGestures:
-                                                            true,
-                                                        placeholderBuilder:
-                                                            (context, heroSize,
-                                                                child) {
-                                                          return Container(
-                                                            height: 150.0,
-                                                            width: 150.0,
-                                                            child:
-                                                                CircularProgressIndicator(),
-                                                          );
-                                                        },
-                                                        tag:
-                                                            '$index${widget.heroID}',
-                                                        child: Stack(
-                                                          fit: StackFit.expand,
-                                                          children: [
-                                                            FadeInImage
-                                                                .assetNetwork(
-                                                              placeholder:
-                                                                  'assets/images/loading.gif',
-                                                              image:
-                                                                  "${products[index].productPhotos[0]}",
-                                                              fit: BoxFit.fill,
-                                                            ),
-                                                            products[index]
-                                                                        .productDiscount
-                                                                        .toInt() !=
-                                                                    0
-                                                                ? Positioned(
-                                                                    top: 0,
-                                                                    right: 0,
-                                                                    child:
-                                                                        Badge(
-                                                                      badgeColor:
-                                                                          Color.fromRGBO(
-                                                                              148,
-                                                                              15,
-                                                                              55,
-                                                                              1),
-                                                                      shape: BadgeShape
-                                                                          .square,
-                                                                      borderRadius:
-                                                                          20,
-                                                                      toAnimate:
-                                                                          false,
-                                                                      badgeContent: Text(
-                                                                          '-${products[index].productDiscount.toInt()}%',
-                                                                          style:
-                                                                              TextStyle(color: Colors.white)),
-                                                                    ),
-                                                                  )
-                                                                : Container()
-                                                          ],
+                                                ),
+                                                Expanded(
+                                                  child: Hero(
+                                                    transitionOnUserGestures:
+                                                        true,
+                                                    placeholderBuilder:
+                                                        (context, heroSize,
+                                                            child) {
+                                                      return Container(
+                                                        height: 100.0,
+                                                        width: 100.0,
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      );
+                                                    },
+                                                    tag:
+                                                        '$index${widget.heroID}',
+                                                    child: Stack(
+                                                      fit: StackFit.expand,
+                                                      children: [
+                                                        FadeInImage
+                                                            .assetNetwork(
+                                                          placeholder:
+                                                              'assets/images/loading.gif',
+                                                          image:
+                                                              "${products[index].productPhotos[0]}",
+                                                          fit: BoxFit.cover,
                                                         ),
-                                                      ),
+                                                        products[index]
+                                                                    .productDiscount
+                                                                    .toInt() !=
+                                                                0
+                                                            ? Positioned(
+                                                                top: 0,
+                                                                right: 0,
+                                                                child: Badge(
+                                                                  badgeColor: Color
+                                                                      .fromRGBO(
+                                                                          255,
+                                                                          103,
+                                                                          125,
+                                                                          1),
+                                                                  shape:
+                                                                      BadgeShape
+                                                                          .square,
+                                                                  borderRadius:
+                                                                      20,
+                                                                  toAnimate:
+                                                                      false,
+                                                                  badgeContent: Text(
+                                                                      '-${products[index].productDiscount.toInt()}%',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white)),
+                                                                ),
+                                                              )
+                                                            : Container()
+                                                      ],
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 10.0,
+                                                ),
+                                                SizedBox(
+                                                  height: 10.0,
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 3.0),
+                                                  width: double.infinity,
+                                                  child: Text(
+                                                    "${products[index].productName}",
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .subtitle1
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 17),
                                                   ),
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10.0),
-                                                    width: double.infinity,
-                                                    child: Text(
-                                                      "${products[index].productName}",
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .subtitle1
-                                                          .copyWith(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 17),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                                )
+                                              ],
                                             ),
                                           ),
                                         ),

@@ -19,7 +19,7 @@ class NavDrawer extends StatelessWidget {
               child: Text(
                 shopsModel?.shopName,
                 style: GoogleFonts.kulimPark(
-                    fontSize: 25, color: Color.fromRGBO(77, 8, 154, 1)),
+                    fontSize: 25, color: Color.fromRGBO(132, 140, 207, 1)),
               ),
             ),
             decoration: BoxDecoration(
