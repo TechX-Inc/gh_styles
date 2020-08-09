@@ -238,15 +238,31 @@ class ShopService {
   }
 
 //////////////////// DELETE SHOP //////////////////////
-  Future<dynamic> deleteShop(String imagesUrl) async {
-    try {
-      deleteLogoImage(photoUrl: imagesUrl)
-          .then((value) => true)
-          .catchError((error) {
-        throw new PlatformException(code: "UNABLE_TO_REMOVE_IMAGE");
-      });
-    } on PlatformException catch (e) {
-      return e;
+
+  Future<dynamic> deleteShop(String photoUrl) async {
+    if (photoUrl != null) {
+      try {
+        return await FirebaseStorage.instance
+            .ref()
+            .getStorage()
+            .getReferenceFromUrl(photoUrl)
+            .then((photoRef) async {
+              return await photoRef
+                  .delete()
+                  .catchError((error) => throw new PlatformException(
+                      code: "UNABLE_TO_DELETE_PHOTO",
+                      message: "Failed to remove photo"))
+                  .then((value) => true);
+            })
+            .then((value) => true)
+            .catchError((error) => {
+                  throw new PlatformException(
+                      code: "IMAGE_NOT_FOUND",
+                      message: "Could not find image file")
+                });
+      } on PlatformException catch (e) {
+        return e;
+      }
     }
   }
 }

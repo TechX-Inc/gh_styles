@@ -55,16 +55,16 @@ class ShopProfileProvider with ChangeNotifier {
     });
   }
 
-  void deleteShop(String imageUrl, DocumentReference productRef) {
+  void deleteShop(String imageUrl, DocumentReference shopRef) {
     _shopService.deleteShop(imageUrl).then((value) {
       if (value == true) {
         Firestore.instance.runTransaction((Transaction tx) async {
-          DocumentSnapshot productSnapshot = await tx.get(productRef);
-          if (productSnapshot.exists) {
-            await tx.delete(productRef).then((value) {
-              print("Product Deleted");
-            }).then((value) => _scaffoldKey.currentState.showSnackBar(
-                snackBar("Product removed", Color.fromRGBO(34, 40, 49, 1))));
+          DocumentSnapshot shopSnapshot = await tx.get(shopRef);
+          if (shopSnapshot.exists) {
+            await tx.delete(shopRef).then((value) {
+              print("Shop Deleted");
+            }).then((value) => _scaffoldKey.currentState.showSnackBar(snackBar(
+                "Shop deleted successfully", Color.fromRGBO(34, 40, 49, 1))));
           }
         });
       } else {
@@ -72,10 +72,10 @@ class ShopProfileProvider with ChangeNotifier {
           case "IMAGE_NOT_FOUND":
             print("404 image not found");
             Firestore.instance.runTransaction((Transaction tx) async {
-              DocumentSnapshot productSnapshot = await tx.get(productRef);
-              if (productSnapshot.exists) {
-                await tx.delete(productRef).then((value) {
-                  print("Product Deleted");
+              DocumentSnapshot shopSnapshot = await tx.get(shopRef);
+              if (shopSnapshot.exists) {
+                await tx.delete(shopRef).then((value) {
+                  print("Shop Removed...");
                 });
               }
             });

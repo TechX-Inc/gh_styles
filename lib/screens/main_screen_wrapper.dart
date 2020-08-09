@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
-import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:gh_styles/screens/auth_screens/login_signup_toggle.dart';
 import 'package:gh_styles/screens/product_favorites.dart';
 import 'package:gh_styles/screens/home_screen.dart';
@@ -40,8 +40,10 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return Center(
-                  child: Text("Loading..."),
-                );
+                    child: SpinKitThreeBounce(
+                  color: Color.fromRGBO(0, 188, 212, 1),
+                  size: 30.0,
+                ));
               }
               return bottomNavPages.elementAt(_selectedIndex);
             }),

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gh_styles/auth_and_validation/auth_service.dart';
 import 'package:gh_styles/models/shops_model.dart';
-import 'package:gh_styles/screens/main_screen_wrapper.dart';
+import 'package:gh_styles/providers/shop_profile_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NavDrawer extends StatelessWidget {
   final ShopsModel shopsModel;
   NavDrawer({this.shopsModel});
   final AuthService _auth = new AuthService();
+  ShopProfileProvider _shopProfileProvider = new ShopProfileProvider();
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -29,7 +30,7 @@ class NavDrawer extends StatelessWidget {
                     image: NetworkImage(shopsModel?.shopLogoPath))),
           ),
           ListTile(
-            leading: Icon(Icons.new_releases),
+            leading: Icon(Icons.add_circle),
             title: Text('New Product'),
             onTap: () => Navigator.pushNamed(context, "/add_product"),
           ),
@@ -39,18 +40,6 @@ class NavDrawer extends StatelessWidget {
             onTap: () => Navigator.of(context).pushNamed("/edit_shop",
                 arguments: {"edit_mode": true, "shop_model": shopsModel}),
           ),
-          // ListTile(
-          //   leading: Icon(Icons.person),
-          //   title: Text('Profile'),
-          //   onTap: () => {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => MainScreenWrapper(pageIndex: 3),
-          //       ),
-          //     )
-          //   },
-          // ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
@@ -62,10 +51,46 @@ class NavDrawer extends StatelessWidget {
               'Delete Business',
               style: TextStyle(color: Colors.redAccent),
             ),
-            onTap: () => {Navigator.of(context).pop()},
+            onTap: () => showAlertDialog(shopsModel, context),
           ),
         ],
       ),
+    );
+  }
+
+  showAlertDialog(ShopsModel shopsModel, BuildContext context) {
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () => Navigator.of(context).pop(),
+    );
+    Widget deleteButton = FlatButton(
+      child: Text(
+        "Delete",
+        style: TextStyle(color: Colors.redAccent),
+      ),
+      onPressed: () => {
+        Navigator.of(context).pop(),
+        _shopProfileProvider.deleteShop(
+            shopsModel.shopLogoPath, shopsModel.shopRef),
+        Navigator.of(context).pop()
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text("Delete Shop"),
+      content: Text(
+          "By tapping on Delete, everything about this business will be permanently deleted, do you want to proceed?"),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

@@ -1,10 +1,13 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/services/fetch_cart_service.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/services/products_services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +17,16 @@ double computeDimensions(double percentage, double constraintHeight) {
 
 final f = new NumberFormat("###.0#", "en_US");
 
+String computePrice(double discount, double price) {
+  String productPrice;
+  if (discount <= 0) {
+    productPrice = price.toString();
+  } else {
+    productPrice = (price - (discount / 100) * price).toString();
+  }
+  return f.format(double.parse(productPrice));
+}
+
 class Favorites extends StatefulWidget {
   @override
   _FavoritesState createState() => _FavoritesState();
@@ -21,6 +34,7 @@ class Favorites extends StatefulWidget {
 
 class _FavoritesState extends State<Favorites> {
   User user;
+  final FetchCartService _cartService = new FetchCartService();
   FetchProductService _productService = new FetchProductService();
   @override
   void initState() {
@@ -36,65 +50,105 @@ class _FavoritesState extends State<Favorites> {
         elevation: 0.0,
         centerTitle: false,
         title: Text(
-          "Wishlist",
-          style: TextStyle(color: Color.fromRGBO(0, 188, 212, 1), fontSize: 25),
+          'Favourites',
+          style: GoogleFonts.sintony(
+            textStyle: TextStyle(
+                letterSpacing: .5,
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w500),
+          ),
         ),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: StreamBuilder<List<CartModel>>(
+                stream: _cartService.shoppingCartProductStream(user?.uid),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    print(snapshot.error);
+                    return Center(child: Icon(Icons.shopping_cart));
+                  }
+                  List<CartModel> cartData = snapshot?.data;
+                  cartData.removeWhere((value) => value == null);
+                  return Center(
+                    child: cartData.length <= 0
+                        ? IconButton(
+                            color: Colors.black,
+                            icon: Icon(Icons.shopping_cart),
+                            onPressed: () =>
+                                Navigator.pushNamed(context, '/cart'))
+                        : Badge(
+                            position: BadgePosition.topRight(top: 0, right: 3),
+                            animationDuration: Duration(milliseconds: 300),
+                            animationType: BadgeAnimationType.slide,
+                            badgeContent: Text(
+                              "${cartData.length}",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            child: IconButton(
+                                color: Colors.black,
+                                icon: Icon(Icons.shopping_cart),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/cart')),
+                          ),
+                  );
+                }),
+          )
+        ],
       ),
       backgroundColor: Color.fromRGBO(248, 252, 255, 1),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: StreamBuilder<List<ProductModel>>(
-                stream: _productService.userFavouritesStream(user.uid),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                        child: SpinKitFadingCircle(
-                      color: Color.fromRGBO(0, 188, 212, 1),
-                      size: 50.0,
-                    ));
-                  }
-                  List<ProductModel> favourites = snapshot.data;
-                  favourites.removeWhere((value) => value == null);
-                  return favourites.isNotEmpty
-                      ? ListView.builder(
-                          padding: EdgeInsets.only(top: 30),
-                          itemCount: favourites.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                return Navigator.of(context)
-                                    .pushNamed("/product_details", arguments: {
-                                  "product_model": favourites[index],
-                                  "index": index
-                                });
-                              },
-                              child: FavouriteListTile(
-                                index: index,
-                                productModel: favourites[index],
-                                user: user,
+          return Container(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: StreamBuilder<List<ProductModel>>(
+                  stream: _productService.userFavouritesStream(user.uid),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                          child: SpinKitFadingCircle(
+                        color: Color.fromRGBO(0, 188, 212, 1),
+                        size: 50.0,
+                      ));
+                    }
+                    List<ProductModel> favourites = snapshot.data;
+                    favourites.removeWhere((value) => value == null);
+                    return favourites.isNotEmpty
+                        ? ListView.builder(
+                            padding: EdgeInsets.only(top: 30),
+                            itemCount: favourites.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  return Navigator.of(context).pushNamed(
+                                      "/product_details",
+                                      arguments: {
+                                        "product_model": favourites[index],
+                                        "index": index
+                                      });
+                                },
+                                child: FavouriteListTile(
+                                  index: index,
+                                  productModel: favourites[index],
+                                  user: user,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            child: Center(
+                              child: Text(
+                                "You have no favourites",
+                                style: TextStyle(
+                                    color: Color.fromRGBO(160, 160, 160, 1)),
                               ),
-                            );
-                          },
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.shopping_cart,
-                                color: Color.fromRGBO(200, 200, 200, 1)),
-                            SizedBox(height: 10),
-                            Text(
-                              "Empty",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(200, 200, 200, 1)),
                             ),
-                          ],
-                        );
-                }),
+                          );
+                  }),
+            ),
           );
         },
       ),
@@ -112,7 +166,7 @@ class FavouriteListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 165),
+      constraints: BoxConstraints(maxHeight: 160),
       child: LayoutBuilder(builder: (context, constraints) {
         return Container(
           // color: Colors.blueAccent,
@@ -121,6 +175,7 @@ class FavouriteListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
+                  height: 130,
                   width: computeDimensions(35, constraints.maxWidth),
                   child: Image.network(
                     productModel.productPhotos[0],
@@ -145,12 +200,32 @@ class FavouriteListTile extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Container(
-                      child: Text(
-                        "${f.format(productModel.productPrice)} GHS",
-                        style:
-                            TextStyle(color: Color.fromRGBO(50, 219, 198, 1)),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          child: Text(
+                              "${computePrice(productModel.productDiscount, productModel.productPrice)} GHS",
+                              style: TextStyle(
+                                color: Color.fromRGBO(30, 201, 180, 1),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              )),
+                        ),
+                        productModel.productDiscount.toInt() != 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 18.0),
+                                child: Text(
+                                  "${f.format(productModel.productPrice)} GHS",
+                                  style: TextStyle(
+                                      // fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(232, 74, 91, 0.5),
+                                      decoration: TextDecoration.lineThrough),
+                                ),
+                              )
+                            : Container()
+                      ],
                     ),
                     SizedBox(height: 20),
                     Row(
@@ -163,6 +238,7 @@ class FavouriteListTile extends StatelessWidget {
                                   badgeColor: Colors.white,
                                   shape: BadgeShape.square,
                                   borderRadius: 20,
+                                  padding: EdgeInsets.all(4),
                                   toAnimate: false,
                                   badgeContent: Text("Out of Stock",
                                       style: TextStyle(
@@ -204,5 +280,3 @@ class FavouriteListTile extends StatelessWidget {
     );
   }
 }
-
-// Color.fromRGBO(178, 235, 242, 1)

@@ -310,7 +310,6 @@ class _ShopFormsWidgetState extends State<ShopForms> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
                 ),
-                // color: Color.fromRGBO(109, 0, 39, 1),
                 color: Color.fromRGBO(85, 179, 223, 1),
                 child: Text(
                   widget.shopsModel != null ? "Save Changes" : 'Create Shop',
