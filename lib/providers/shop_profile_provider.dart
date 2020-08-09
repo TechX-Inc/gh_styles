@@ -19,7 +19,6 @@ class ShopProfileProvider with ChangeNotifier {
 
   void deleteProduct(List<dynamic> imageUrl, DocumentReference productRef) {
     _productService.deleteProduct(imageUrl).then((value) {
-      // print(value);
       if (value == null) {
         Firestore.instance.runTransaction((Transaction tx) async {
           DocumentSnapshot productSnapshot = await tx.get(productRef);

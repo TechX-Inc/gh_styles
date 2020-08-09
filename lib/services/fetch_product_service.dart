@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gh_styles/models/product_model.dart';
-import 'package:gh_styles/test_data.dart';
 import 'package:rxdart/rxdart.dart';
 
 class FetchProductService {
@@ -59,26 +58,13 @@ class FetchProductService {
     });
   }
 
-  // Stream<List<Stream<ProductModel>>> allFavouriteProductsStream(String uid) {
-  //   return _favourites
-  //       .where('user_ref', isEqualTo: _userCollection.document(uid))
-  //       .snapshots()
-  //       .map((querySnap) {
-  //     return querySnap.documents.map((docSnapshot) {
-  //       DocumentReference favRef = docSnapshot.data["product_ref"];
-  //       return favRef.snapshots().map((fav) => ProductModel.fromSnapshot(fav));
-  //     }).toList();
-  //   });
-  // }
-
   Stream<List<ProductModel>> allFavouriteProductsStream(String uid) {
     return _favourites
         .where('user_ref', isEqualTo: _userCollection.document(uid))
         .snapshots()
         .map((snapshot) {
       return snapshot.documents.map<ProductModel>((product) {
-        DocumentReference favProductRef = product.data['product_ref'];
-        return ProductModel.fromSnapshot(product, favProductRef: favProductRef);
+        return ProductModel.asFavourites(product);
       }).toList();
     });
   }
@@ -90,12 +76,11 @@ class FetchProductService {
       return products.map((product) {
         final favouriteData = favourites?.firstWhere(
             (favourite) =>
-                favourite.productRef.documentID ==
+                favourite.favProductRef.documentID ==
                 product.productRef.documentID,
             orElse: () => null);
-        print(favouriteData);
         if (favouriteData != null) {
-          // return ProductModel.fromProducts(cartData, product);
+          return ProductModel.productModelAsFavourite(product);
         }
       }).toList();
     });

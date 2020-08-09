@@ -13,10 +13,16 @@ class ProductModel {
   String productSize;
   String collection;
   List productPhotos;
-  DocumentReference favProductRef;
+  DocumentReference
+      favProductRef; // THIS IS THE REFERENCE OF THE PRODUCT THAT WAS ADDED TO FAVOURITES
+  DocumentReference userRef;
+  DocumentReference
+      favRef; // THIS IS THE ACTUAL FAVOURITE DOCUMENT<favProductRef is a field in favRef>
 
   ProductModel(
-      {this.favProductRef,
+      {this.favRef,
+      this.userRef,
+      this.favProductRef,
       this.productRef,
       this.productOwner,
       this.productName,
@@ -30,10 +36,10 @@ class ProductModel {
       this.collection,
       this.productPhotos});
 
-  factory ProductModel.fromSnapshot(DocumentSnapshot product,
-      {DocumentReference favProductRef}) {
+  factory ProductModel.fromSnapshot(
+    DocumentSnapshot product,
+  ) {
     return ProductModel(
-      favProductRef: favProductRef ?? null,
       productRef: product.reference,
       productOwner: product.data['shop_ref'],
       productName: product.data['product_name'],
@@ -47,5 +53,33 @@ class ProductModel {
       collection: product.data['categories']['collection'],
       productPhotos: product.data['product_photos'] ?? [],
     );
+  }
+
+  factory ProductModel.productModelAsFavourite(
+    ProductModel product,
+  ) {
+    return ProductModel(
+      productRef: product.productRef,
+      productOwner: product.productOwner,
+      productName: product.productName,
+      productQuantity: product.productQuantity,
+      productDescription: product.productDescription,
+      productPrice: (product.productPrice).toDouble(),
+      productDiscount: (product.productDiscount).toDouble(),
+      productType: product.productType,
+      gender: product.gender,
+      productSize: product.productSize,
+      collection: product.collection,
+      productPhotos: product.productPhotos ?? [],
+    );
+  }
+
+  factory ProductModel.asFavourites(
+    DocumentSnapshot favourite,
+  ) {
+    return ProductModel(
+        favProductRef: favourite.data['product_ref'] ?? null,
+        favRef: favourite.reference,
+        userRef: favourite.data['user_ref']);
   }
 }

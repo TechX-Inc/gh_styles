@@ -360,41 +360,43 @@ class _CartBottomSectionState extends State<CartBottomSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: widget.height,
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Center(
-              child: Consumer<CartProvider>(builder: (_, data, __) {
-                return Text(
-                  "${f.format(widget.totalItemsPrice)} GHS",
-                  style: TextStyle(fontSize: 20),
-                );
-              }),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(right: 10, top: 15),
-              child: RaisedButton(
-                color: Color.fromRGBO(231, 48, 91, 1),
-                onPressed: () {
-                  print("Checking out...");
-                },
-                child: Text(
-                  "Checkout",
-                  style: TextStyle(color: Colors.white),
-                ),
+    return LayoutBuilder(builder: (context, BoxConstraints constraints) {
+      return Container(
+        height: widget.height,
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Center(
+                child: Consumer<CartProvider>(builder: (_, data, __) {
+                  return Text(
+                    "${f.format(widget.totalItemsPrice)} GHS",
+                    style: TextStyle(fontSize: 20),
+                  );
+                }),
               ),
             ),
-          )
-        ],
-      ),
-      decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Color.fromRGBO(250, 250, 250, 1)))),
-    );
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: 10, top: 15),
+                child: RaisedButton(
+                  color: Color.fromRGBO(231, 48, 91, 1),
+                  onPressed: () {
+                    print("Checking out...");
+                  },
+                  child: Text(
+                    "Checkout",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+        decoration: BoxDecoration(
+            border: Border(
+                top: BorderSide(color: Color.fromRGBO(250, 250, 250, 1)))),
+      );
+    });
   }
 }
