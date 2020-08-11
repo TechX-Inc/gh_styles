@@ -16,8 +16,8 @@ class _ShimmerLoaderHorizontalState extends State<ShimmerLoaderHorizontal> {
         maxHeight: 180.0,
       ),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[300],
-        highlightColor: Colors.grey[100],
+        baseColor: Colors.white,
+        highlightColor: Colors.grey[200],
         child: ListView.builder(
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,

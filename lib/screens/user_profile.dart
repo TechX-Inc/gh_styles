@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gh_styles/auth_and_validation/auth_service.dart';
+import 'package:gh_styles/models/shops_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
+import 'package:gh_styles/services/fetch_shop_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class UserProfile extends StatefulWidget {
   @override
@@ -7,11 +13,22 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+  FetchShopService fetchShopService = new FetchShopService();
   final AuthService _auth = new AuthService();
+  User _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = Provider.of<User>(context, listen: false);
+    fetchShopService.setUid = _user.uid;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(248, 252, 255, 1),
+      // backgroundColor: Color.fromRGBO(248, 252, 255, 1),
+      backgroundColor: Color.fromRGBO(245, 248, 255, 1),
       body: Container(
         child: Padding(
           padding: const EdgeInsets.all(18.0),
@@ -21,24 +38,51 @@ class _UserProfileState extends State<UserProfile> {
                 children: <Widget>[
                   Icon(
                     Icons.person,
-                    size: 22,
+                    size: 25,
+                    color: Color.fromRGBO(132, 140, 207, 1),
                   ),
                   SizedBox(
                     width: 8,
                   ),
-                  Text(
-                    "Account",
-                    style: TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      "Account",
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(132, 140, 207, 1)),
+                    ),
                   ),
+                  InkWell(
+                    onTap: () => _auth.signOut(),
+                    child: Container(
+                      alignment: Alignment.topRight,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.signOutAlt,
+                            color: Colors.red,
+                          ),
+                          SizedBox(
+                            width: 7,
+                          ),
+                          Text(
+                            "Sign Out",
+                            style: TextStyle(color: Colors.redAccent),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
               SizedBox(
-                height: 10,
+                height: 40,
               ),
               Container(
-                // height: 180,
                 child: Card(
-                  elevation: 6,
+                  elevation: 0,
                   color: Color.fromRGBO(242, 246, 255, 1),
                   shadowColor: Colors.white,
                   child: Padding(
@@ -46,57 +90,40 @@ class _UserProfileState extends State<UserProfile> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 10.0,
-                              ),
-                              child: Text(
-                                "Ben Acq",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {},
-                              iconSize: 16,
-                              color: Colors.blueAccent,
-                            )
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 10.0,
+                          ),
+                          child: Text(
+                            "Ben Acq",
+                            style: TextStyle(fontSize: 15),
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Text(
-                                "benacq44@gmail.com",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {},
-                              iconSize: 16,
-                              color: Colors.blueAccent,
-                            )
-                          ],
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            "benacq44@gmail.com",
+                            style: TextStyle(fontSize: 15),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             GestureDetector(
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Text(
-                                  "Sign Out",
-                                  style: TextStyle(color: Colors.red),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(
+                                    "Edit",
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
                                 ),
-                              ),
-                              onTap: () => _auth.signOut(),
-                            )
+                                onTap: () => null)
                           ],
                         ),
                       ],
@@ -107,13 +134,19 @@ class _UserProfileState extends State<UserProfile> {
               SizedBox(height: 30),
               Row(
                 children: <Widget>[
-                  Icon(Icons.show_chart),
+                  Icon(
+                    Icons.show_chart,
+                    color: Color.fromRGBO(132, 140, 207, 1),
+                  ),
                   SizedBox(
                     width: 8,
                   ),
                   Text(
                     "Activities",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(
+                        fontSize: 17,
+                        color: Color.fromRGBO(132, 140, 207, 1),
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -121,7 +154,7 @@ class _UserProfileState extends State<UserProfile> {
               Container(
                 // height: 180,
                 child: Card(
-                  elevation: 6,
+                  elevation: 0,
                   color: Color.fromRGBO(242, 246, 255, 1),
                   shadowColor: Colors.white,
                   child: Padding(
@@ -145,7 +178,7 @@ class _UserProfileState extends State<UserProfile> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 25),
+                        SizedBox(height: 30),
                         Padding(
                           padding:
                               const EdgeInsets.only(left: 10.0, right: 10.0),
@@ -162,7 +195,7 @@ class _UserProfileState extends State<UserProfile> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 25),
+                        SizedBox(height: 30),
                         Padding(
                           padding:
                               const EdgeInsets.only(left: 10.0, right: 10.0),
@@ -184,107 +217,130 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
               ),
-              SizedBox(height: 30),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.business_center,
-                    size: 20,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "Shop",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-
-              //======================================== SETTINGS =====================================
-              SizedBox(height: 10),
-              Container(
-                // height: 180,
-                child: Card(
-                  elevation: 6,
-                  color: Color.fromRGBO(242, 246, 255, 1),
-                  shadowColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              StreamBuilder<List<ShopsModel>>(
+                  stream: fetchShopService.shopsStream,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Container();
+                    }
+                    if ((snapshot.data == null ||
+                        snapshot.data.contains(null) ||
+                        snapshot.data.isEmpty)) {
+                      return Container();
+                    } else {
+                      return Column(
+                        children: [
+                          SizedBox(height: 30),
+                          Row(
                             children: <Widget>[
-                              Text(
-                                "Sales",
-                                style: TextStyle(fontSize: 15),
+                              Icon(
+                                Icons.business_center,
+                                size: 25,
+                                color: Color.fromRGBO(132, 140, 207, 1),
+                              ),
+                              SizedBox(
+                                width: 8,
                               ),
                               Text(
-                                "12",
+                                "Shop",
+                                style: TextStyle(
+                                    fontSize: 17,
+                                    color: Color.fromRGBO(132, 140, 207, 1),
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 25),
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Products",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              Text(
-                                "82",
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 25),
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              OutlineButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, "/add_product");
-                                },
-                                child: Text("New Product"),
-                                textColor: Colors.blueAccent,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: Colors.blueAccent,
-                                      width: 1,
-                                      style: BorderStyle.solid),
+                          SizedBox(height: 10),
+                          Container(
+                            child: Card(
+                              elevation: 0,
+                              color: Color.fromRGBO(242, 246, 255, 1),
+                              shadowColor: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(
+                                            "Sales",
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            "12",
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(
+                                            "Products",
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            "82",
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 30),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          OutlineButton(
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, "/add_product");
+                                            },
+                                            child: Text("New Product"),
+                                            textColor: Colors.blueAccent,
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                  color: Colors.blueAccent,
+                                                  width: 1,
+                                                  style: BorderStyle.solid),
+                                            ),
+                                          ),
+                                          OutlineButton(
+                                            onPressed: () {
+                                              print("hello");
+                                            },
+                                            child: Text("Delete Shop"),
+                                            textColor: Colors.redAccent,
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                  style: BorderStyle.solid),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              OutlineButton(
-                                onPressed: () {
-                                  print("hello");
-                                },
-                                child: Text("Delete Shop"),
-                                textColor: Colors.redAccent,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(style: BorderStyle.solid),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                        ],
+                      );
+                    }
+                  }),
             ],
           ),
         ),
@@ -298,6 +354,4 @@ Products    45
 Sales       324gh
 Add Product
 Delete Shop
-
-
  */

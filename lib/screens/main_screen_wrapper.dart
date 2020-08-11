@@ -90,7 +90,7 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
     ),
     Consumer<User>(
       builder: (context, user, child) {
-        return Favorites();
+        return user == null ? ToggleLoginSignUp() : Favorites();
       },
     ),
     Consumer<User>(
