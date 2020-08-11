@@ -304,12 +304,14 @@ class CartListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                  height: 130,
-                  width: computeDimensions(35, constraints.maxWidth),
-                  child: Image.network(
-                    cartModel.productPhotos[0],
-                    fit: BoxFit.cover,
-                  )),
+                height: 130,
+                width: computeDimensions(35, constraints.maxWidth),
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/loader_network.gif',
+                  image: cartModel.productPhotos[0],
+                  fit: BoxFit.cover,
+                ),
+              ),
               SizedBox(
                 width: 20,
               ),

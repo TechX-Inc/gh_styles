@@ -38,6 +38,7 @@ class _ShopFormsWidgetState extends State<ShopForms> {
       child: Column(children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Consumer<AddShopProvider>(builder: (context, data, _) {
               if (data.logoUrl != null && data.image == null) {
@@ -96,8 +97,8 @@ class _ShopFormsWidgetState extends State<ShopForms> {
                     child: Container(
                         alignment: Alignment.topRight,
                         child: Icon(
-                          Icons.edit,
-                          size: 40,
+                          Icons.edit_attributes,
+                          size: 50,
                           color: Colors.blueAccent,
                         )),
                   )
@@ -110,7 +111,7 @@ class _ShopFormsWidgetState extends State<ShopForms> {
           ],
         ),
         SizedBox(
-          height: 30,
+          height: 20,
         ),
         _shopNameField(),
         SizedBox(

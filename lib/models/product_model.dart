@@ -55,7 +55,7 @@ class ProductModel {
     );
   }
 
-  factory ProductModel.productModelAsFavourite(
+  factory ProductModel.fromSelf(
     ProductModel product,
   ) {
     return ProductModel(

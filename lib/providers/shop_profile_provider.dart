@@ -63,8 +63,9 @@ class ShopProfileProvider with ChangeNotifier {
           if (shopSnapshot.exists) {
             await tx.delete(shopRef).then((value) {
               print("Shop Deleted");
-            }).then((value) => _scaffoldKey.currentState.showSnackBar(snackBar(
-                "Shop deleted successfully", Color.fromRGBO(34, 40, 49, 1))));
+            }).then((value) {
+              print("Shop deleted");
+            });
           }
         });
       } else {

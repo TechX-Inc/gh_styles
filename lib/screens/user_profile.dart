@@ -29,6 +29,35 @@ class _UserProfileState extends State<UserProfile> {
     return Scaffold(
       // backgroundColor: Color.fromRGBO(248, 252, 255, 1),
       backgroundColor: Color.fromRGBO(245, 248, 255, 1),
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(247, 250, 255, 1),
+        actions: [
+          InkWell(
+            onTap: () => _auth.signOut(),
+            child: Container(
+              padding: EdgeInsets.only(right: 10, top: 10),
+              alignment: Alignment.topRight,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.signOutAlt,
+                    color: Colors.red,
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  Text(
+                    "Sign Out",
+                    style: TextStyle(color: Colors.redAccent),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+        elevation: 0,
+      ),
       body: Container(
         child: Padding(
           padding: const EdgeInsets.all(18.0),
@@ -53,28 +82,6 @@ class _UserProfileState extends State<UserProfile> {
                           color: Color.fromRGBO(132, 140, 207, 1)),
                     ),
                   ),
-                  InkWell(
-                    onTap: () => _auth.signOut(),
-                    child: Container(
-                      alignment: Alignment.topRight,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.signOutAlt,
-                            color: Colors.red,
-                          ),
-                          SizedBox(
-                            width: 7,
-                          ),
-                          Text(
-                            "Sign Out",
-                            style: TextStyle(color: Colors.redAccent),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
                 ],
               ),
               SizedBox(
@@ -218,7 +225,7 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               StreamBuilder<List<ShopsModel>>(
-                  stream: fetchShopService.shopsStream,
+                  stream: fetchShopService.shopsStream(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return Container();
@@ -304,29 +311,17 @@ class _UserProfileState extends State<UserProfile> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
-                                          OutlineButton(
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                  context, "/add_product");
-                                            },
-                                            child: Text("New Product"),
-                                            textColor: Colors.blueAccent,
-                                            shape: RoundedRectangleBorder(
-                                              side: BorderSide(
-                                                  color: Colors.blueAccent,
-                                                  width: 1,
-                                                  style: BorderStyle.solid),
-                                            ),
-                                          ),
-                                          OutlineButton(
-                                            onPressed: () {
-                                              print("hello");
-                                            },
-                                            child: Text("Delete Shop"),
-                                            textColor: Colors.redAccent,
-                                            shape: RoundedRectangleBorder(
-                                              side: BorderSide(
-                                                  style: BorderStyle.solid),
+                                          ButtonTheme(
+                                            child: RaisedButton(
+                                              elevation: 0,
+                                              onPressed: () =>
+                                                  Navigator.pushNamed(
+                                                      context, "/add_product"),
+                                              child: Text(
+                                                "New Product",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
                                             ),
                                           ),
                                         ],

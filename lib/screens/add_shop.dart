@@ -27,6 +27,18 @@ class _AddShopState extends State<AddShop> {
     return SafeArea(
       child: Scaffold(
         key: AddShopProvider().scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(247, 250, 255, 1),
+          leading: IconButton(
+            color: Colors.black,
+            icon: Icon(
+              Icons.chevron_left,
+              size: 30,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          elevation: 0,
+        ),
         backgroundColor: Color.fromRGBO(248, 252, 255, 1),
         body: Container(
           padding: EdgeInsets.all(16),

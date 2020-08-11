@@ -97,8 +97,8 @@ class AddShopProvider with ChangeNotifier {
 
   // ignore: missing_return
   Future<File> getImageFileFromAssets() async {
-    final byteData = await rootBundle.load('assets/images/dummy_logo.jpg');
-    final file = File('${(await getTemporaryDirectory()).path}/dummy_logo.jpg');
+    final byteData = await rootBundle.load('assets/images/dummy_logo.png');
+    final file = File('${(await getTemporaryDirectory()).path}/dummy_logo.png');
     await file.writeAsBytes(byteData.buffer
         .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
     if (await file.exists()) {
@@ -106,6 +106,7 @@ class AddShopProvider with ChangeNotifier {
     }
   }
 
+  /////////////////////// Creates a new Shop ////////////////////////////
   Future<void> processAndSave(BuildContext context) async {
     if (!_formKey.currentState.validate()) {
       _autovalidate = true;
@@ -187,6 +188,8 @@ class AddShopProvider with ChangeNotifier {
         Scaffold.of(context).showSnackBar(snackBar(
             "New shop successfully registered as $_shopName",
             Color.fromRGBO(67, 216, 201, 1)));
+        Navigator.pushReplacementNamed(
+            _scaffoldKey.currentContext, "/main_screen_wrapper");
         _loading = false;
         notifyListeners();
       }
@@ -198,8 +201,6 @@ class AddShopProvider with ChangeNotifier {
     if (!_formKey.currentState.validate()) {
       return;
     } else {
-      // print(_logoUrl);
-      // print(_shopAvatar);
       if ((_logoUrl != null) || (_shopAvatar != null)) {
         _formKey.currentState.save();
         _loading = true;

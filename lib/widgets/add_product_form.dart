@@ -56,6 +56,18 @@ class _AddProductFormState extends State<AddProductForm> {
 
     return Consumer<AddProductProvider>(builder: (_, data, __) {
       return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(247, 250, 255, 1),
+          leading: IconButton(
+            color: Colors.black,
+            icon: Icon(
+              Icons.chevron_left,
+              size: 30,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          elevation: 0,
+        ),
         key: _addProduct.scaffoldKey,
         body: ModalProgressHUD(
           inAsyncCall: data.loading,
@@ -69,7 +81,7 @@ class _AddProductFormState extends State<AddProductForm> {
                     alignment: Alignment.topCenter,
                     margin: EdgeInsets.only(top: 30),
                     child: StreamBuilder<List<ShopsModel>>(
-                        stream: fetchShopService.shopsStream,
+                        stream: fetchShopService.shopsStream(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             print(snapshot.error);
@@ -105,7 +117,7 @@ class _AddProductFormState extends State<AddProductForm> {
                       // mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         StreamBuilder<List<ShopsModel>>(
-                            stream: fetchShopService.shopsStream,
+                            stream: fetchShopService.shopsStream(),
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
                                 return Text("");
@@ -222,8 +234,7 @@ class _AddProductFormState extends State<AddProductForm> {
                                             builder: (context,
                                                 BoxConstraints constraint) {
                                               return Container(
-                                                color: Color.fromRGBO(
-                                                    240, 240, 240, 1),
+                                                color: Colors.white,
                                                 child: Row(
                                                   children: [
 ///////////////////////////////////////////////////
@@ -243,9 +254,13 @@ class _AddProductFormState extends State<AddProductForm> {
                                                             fit:
                                                                 StackFit.expand,
                                                             children: [
-                                                              Image.network(
-                                                                data.existingImages[
-                                                                    index],
+                                                              FadeInImage
+                                                                  .assetNetwork(
+                                                                placeholder:
+                                                                    'assets/images/loader_network.gif',
+                                                                image:
+                                                                    data.existingImages[
+                                                                        index],
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),

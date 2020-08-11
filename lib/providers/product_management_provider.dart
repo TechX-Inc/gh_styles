@@ -224,6 +224,8 @@ class AddProductProvider with ChangeNotifier {
         _scaffoldKey.currentState.showSnackBar(snackBar(
             "product added successfully", Color.fromRGBO(36, 161, 156, 1)));
         _loading = false;
+        Navigator.pushReplacementNamed(
+            _scaffoldKey.currentContext, "/main_screen_wrapper");
         notifyListeners();
       }
     }
@@ -303,6 +305,8 @@ class AddProductProvider with ChangeNotifier {
           _scaffoldKey.currentState.showSnackBar(
               snackBar("Changes saved", Color.fromRGBO(36, 161, 156, 1)));
           _loading = false;
+          Navigator.pushReplacementNamed(
+              _scaffoldKey.currentContext, "/main_screen_wrapper");
           notifyListeners();
         } else {
           _scaffoldKey.currentState

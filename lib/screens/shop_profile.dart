@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/models/shops_model.dart';
+import 'package:gh_styles/models/users_auth_model.dart';
 import 'package:gh_styles/providers/shop_profile_provider.dart';
 import 'package:gh_styles/services/fetch_product_service.dart';
+import 'package:gh_styles/services/fetch_shop_service.dart';
 import 'package:gh_styles/widgets/nav_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -21,12 +23,17 @@ class ShopProfile extends StatefulWidget {
 }
 
 class _ShopProfileState extends State<ShopProfile> {
+  FetchShopService fetchShopService = new FetchShopService();
   ShopProfileProvider _shopProfileProvider;
+  User _user;
+
   @override
   void initState() {
     super.initState();
+    _user = Provider.of<User>(context, listen: false);
     _shopProfileProvider =
         Provider.of<ShopProfileProvider>(context, listen: false);
+    fetchShopService.setUid = _user.uid;
   }
 
   @override
@@ -51,7 +58,7 @@ class _ShopProfileState extends State<ShopProfile> {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: StreamBuilder<List<ProductModel>>(
-                stream: new FetchProductService().allProductsStream(),
+                stream: fetchShopService.shopProductsStream(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
@@ -60,34 +67,34 @@ class _ShopProfileState extends State<ShopProfile> {
                       size: 50.0,
                     ));
                   }
-                  List<ProductModel> products = snapshot.data;
 
+                  List<ProductModel> products = snapshot.data;
+                  products.removeWhere((value) => value == null);
                   if (products.isEmpty || products == null) {
                     return Center(
-                        child: Column(
-                      children: [
-                        Text("You have no products"),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          alignment: Alignment.topCenter,
-                          width: 100,
-                          height: 30,
-                          child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                              ),
-                              color: Color.fromRGBO(85, 179, 223, 1),
-                              child: Text(
-                                'Add Product',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "You have no products",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Color.fromRGBO(200, 200, 200, 1)),
+                          ),
+                          SizedBox(height: 10),
+                          new OutlineButton(
+                              child: new Text("New Product",
+                                  style: TextStyle(color: Colors.blueAccent)),
                               onPressed: () =>
-                                  Navigator.pushNamed(context, "/add_product")),
-                        ),
-                      ],
-                    ));
+                                  Navigator.pushNamed(context, "/add_product"),
+                              borderSide: BorderSide(color: Colors.blueAccent),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(30.0)))
+                        ],
+                      ),
+                    );
                   }
                   return ListView(
                     physics: BouncingScrollPhysics(),
@@ -194,7 +201,7 @@ class _ShopProfileState extends State<ShopProfile> {
                                                     BorderRadius.circular(8.0),
                                                 child: FadeInImage.assetNetwork(
                                                   placeholder:
-                                                      'assets/images/loading.gif',
+                                                      'assets/images/loader_network.gif',
                                                   image:
                                                       "${products[index].productPhotos[0]}",
                                                   fit: BoxFit.cover,

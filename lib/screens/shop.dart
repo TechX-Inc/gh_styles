@@ -28,7 +28,7 @@ class _ShopState extends State<Shop> {
     return Container(
       color: Color.fromRGBO(248, 252, 255, 1),
       child: StreamBuilder<List<ShopsModel>>(
-          stream: fetchShopService.shopsStream,
+          stream: fetchShopService.shopsStream(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Center(

@@ -80,7 +80,7 @@ class FetchProductService {
                 product.productRef.documentID,
             orElse: () => null);
         if (favouriteData != null) {
-          return ProductModel.productModelAsFavourite(product);
+          return ProductModel.fromSelf(product);
         }
       }).toList();
     });
