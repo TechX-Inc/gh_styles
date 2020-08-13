@@ -1,9 +1,12 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gh_styles/models/product_model.dart';
 import 'package:gh_styles/providers/main_app_state_provider.dart';
 import 'package:badges/badges.dart';
+import 'package:gh_styles/services/fetch_product_service.dart';
 import 'package:gh_styles/widgets/shimmer.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ProductGridContainer extends StatefulWidget {
@@ -17,13 +20,25 @@ class ProductGridContainer extends StatefulWidget {
 }
 
 class _ProductGridContainerState extends State<ProductGridContainer> {
-  MainAppStateProvider _homeHeaderProvider;
-  final f = new NumberFormat("###.0#", "en_US");
+  MainAppStateProvider _mainAppStateProvider;
+  FetchProductService _productService = new FetchProductService();
+  List<ProductModel> productModelList;
+
+  StreamController<List<ProductModel>> _streamController =
+      StreamController<List<ProductModel>>.broadcast();
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
-    _homeHeaderProvider =
+    _mainAppStateProvider =
         Provider.of<MainAppStateProvider>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
   }
 
   @override
@@ -37,135 +52,199 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
                 return ShimmerLoaderVertical();
               }
 
-              List<ProductModel> products = snapshot.data;
+              productModelList = snapshot.data;
               WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => _homeHeaderProvider.setscrollEnabled = true);
+                  (_) => _mainAppStateProvider.setscrollEnabled = true);
 
-              return products.isNotEmpty
-                  ? GridView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 25,
-                          childAspectRatio: .8),
-                      itemCount: products.length,
-                      itemBuilder: (context, int index) {
-                        return GestureDetector(
-                          onTap: () => Navigator.of(context)
-                              .pushNamed("/product_details", arguments: {
-                            "product_model": products[index],
-                            "hero_id": '$index${widget.heroID}',
-                            "index": index
-                          }),
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "\₵${computePrice(products[index].productDiscount, products[index].productPrice)}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline6
-                                        .copyWith(
-                                            color:
-                                                Color.fromRGBO(82, 87, 93, 1),
-                                            fontSize: 18),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Hero(
-                                        transitionOnUserGestures: true,
-                                        tag: '$index${widget.heroID}',
-                                        placeholderBuilder:
-                                            (context, heroSize, child) {
-                                          return Container(
-                                            height: 150.0,
-                                            width: 150.0,
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        },
-                                        child: FractionallySizedBox(
-                                            widthFactor: 0.9,
-                                            heightFactor: 1.0,
-                                            child: Stack(
-                                              fit: StackFit.expand,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child:
-                                                      FadeInImage.assetNetwork(
-                                                    placeholder:
-                                                        'assets/images/loading.gif',
-                                                    image:
-                                                        "${products[index].productPhotos[0]}",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                products[index]
-                                                            .productDiscount
-                                                            .toInt() !=
-                                                        0
-                                                    ? Positioned(
-                                                        top: 0,
-                                                        right: 0,
-                                                        child: Badge(
-                                                          badgeColor:
-                                                              Color.fromRGBO(
-                                                                  255,
-                                                                  103,
-                                                                  125,
-                                                                  1),
-                                                          // badgeColor: Color.fromRGBO(231, 48, 91, 1),
-                                                          shape:
-                                                              BadgeShape.square,
-                                                          borderRadius: 20,
-                                                          toAnimate: false,
-                                                          badgeContent: Text(
-                                                              '-${products[index].productDiscount.toInt()}%',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
-                                                        ),
-                                                      )
-                                                    : Container()
-                                              ],
-                                            ))),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10.0,
-                                ),
-                                Container(
-                                  // alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  width: double.infinity,
+              return productModelList.isNotEmpty
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: NotificationListener<ScrollNotification>(
+                            // ignore: missing_return
+                            onNotification: (ScrollNotification scrollInfo) {
+                              if (!isLoading &&
+                                  scrollInfo.metrics.pixels ==
+                                      scrollInfo.metrics.maxScrollExtent) {
+                                _loadData();
+                                setState(() {
+                                  isLoading = true;
+                                });
+                              }
+                            },
+                            child: GridView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 15,
+                                        mainAxisSpacing: 25,
+                                        childAspectRatio: .8),
+                                itemCount: productModelList.length,
+                                itemBuilder: (context, int index) {
+                                  return GestureDetector(
+                                    onTap: () => Navigator.of(context)
+                                        .pushNamed("/product_details",
+                                            arguments: {
+                                          "product_model":
+                                              productModelList[index],
+                                          "hero_id": '$index${widget.heroID}',
+                                          "index": index
+                                        }),
+                                    child: Container(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "\₵${_mainAppStateProvider.computePrice(productModelList[index].productDiscount, productModelList[index].productPrice)}",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6
+                                                  .copyWith(
+                                                      color: Color.fromRGBO(
+                                                          82, 87, 93, 1),
+                                                      fontSize: 18),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.center,
+                                              child: Hero(
+                                                  transitionOnUserGestures:
+                                                      true,
+                                                  tag: '$index${widget.heroID}',
+                                                  placeholderBuilder: (context,
+                                                      heroSize, child) {
+                                                    return Container(
+                                                      height: 150.0,
+                                                      width: 150.0,
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  },
+                                                  child: FractionallySizedBox(
+                                                      widthFactor: 0.9,
+                                                      heightFactor: 1.0,
+                                                      child: Stack(
+                                                        fit: StackFit.expand,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            child: FadeInImage
+                                                                .assetNetwork(
+                                                              placeholder:
+                                                                  'assets/images/loading.gif',
+                                                              image:
+                                                                  "${productModelList[index].productPhotos[0]}",
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                          productModelList[
+                                                                          index]
+                                                                      .productDiscount
+                                                                      .toInt() !=
+                                                                  0
+                                                              ? Positioned(
+                                                                  top: 0,
+                                                                  right: 0,
+                                                                  child: Badge(
+                                                                    badgeColor:
+                                                                        Color.fromRGBO(
+                                                                            255,
+                                                                            103,
+                                                                            125,
+                                                                            1),
+                                                                    // badgeColor: Color.fromRGBO(231, 48, 91, 1),
+                                                                    shape: BadgeShape
+                                                                        .square,
+                                                                    borderRadius:
+                                                                        20,
+                                                                    toAnimate:
+                                                                        false,
+                                                                    badgeContent: Text(
+                                                                        '-${productModelList[index].productDiscount.toInt()}%',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.white)),
+                                                                  ),
+                                                                )
+                                                              : Container()
+                                                        ],
+                                                      ))),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10.0,
+                                          ),
+                                          Container(
+                                            // alignment: Alignment.center,
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
+                                            width: double.infinity,
 
-                                  child: Text(
-                                    "${products[index].productName}",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .subtitle1
-                                        .copyWith(
-                                            color: Colors.black, fontSize: 17),
-                                  ),
-                                )
-                              ],
-                            ),
+                                            child: Text(
+                                              "${productModelList[index].productName}",
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1
+                                                  .copyWith(
+                                                      color: Colors.black,
+                                                      fontSize: 17),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
                           ),
-                        );
-                      })
+                        ),
+                        isLoading
+                            ? Container(
+                                margin: EdgeInsets.only(top: 20, bottom: 10),
+                                child: StreamBuilder<List<ProductModel>>(
+                                    stream:
+                                        _productService.loadMoreProductsStream(
+                                            productModelList.last),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return CircularProgressIndicator();
+                                      }
+                                      if (snapshot.data.isEmpty) {
+                                        return Container(
+                                          child:
+                                              Text("This seems like the end"),
+                                        );
+                                      }
+
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        setState(() {
+                                          productModelList
+                                              .addAll(snapshot.data);
+                                          isLoading = false;
+                                        });
+                                      });
+                                      return Container(
+                                        child: Text("New data loaded..."),
+                                      );
+                                    }),
+                              )
+                            : Container()
+                      ],
+                    )
                   : LayoutBuilder(builder: (context, constraints) {
                       return ConstrainedBox(
                         constraints: BoxConstraints.tightFor(
@@ -195,13 +274,7 @@ class _ProductGridContainerState extends State<ProductGridContainer> {
     });
   }
 
-  String computePrice(double discount, double price) {
-    String productPrice;
-    if (discount <= 0) {
-      productPrice = price.toString();
-    } else {
-      productPrice = (price - (discount / 100) * price).toString();
-    }
-    return f.format(double.parse(productPrice));
+  void _loadData() {
+    // print("hello");
   }
 }

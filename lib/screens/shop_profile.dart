@@ -109,24 +109,35 @@ class _ShopProfileState extends State<ShopProfile> {
                                   backgroundImage: NetworkImage(
                                       widget.shopModel[0]?.shopLogoPath))
                               : Container(),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Total Sales",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: Color.fromRGBO(140, 140, 140, 1)),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                "50,000 GHS",
-                                style: TextStyle(
-                                    color: Colors.green, fontSize: 16),
-                              ),
-                            ],
-                          )
+
+                          new OutlineButton(
+                              child: new Text("New Product",
+                                  style: TextStyle(color: Colors.blueAccent)),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, "/add_product"),
+                              borderSide: BorderSide(color: Colors.blueAccent),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(30.0)))
+
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.end,
+                          //   mainAxisAlignment: MainAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       "Total Sales",
+                          //       style: TextStyle(
+                          //           fontSize: 20,
+                          //           color: Color.fromRGBO(140, 140, 140, 1)),
+                          //     ),
+                          //     SizedBox(height: 10),
+                          //     Text(
+                          //       "50,000 GHS",
+                          //       style: TextStyle(
+                          //           color: Colors.green, fontSize: 16),
+                          //     ),
+                          //   ],
+                          // )
                         ],
                       ),
                       Row(

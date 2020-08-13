@@ -102,7 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             _cartService.shoppingCartProductStream(user?.uid),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            print(snapshot.error);
                             return Center(child: Icon(Icons.shopping_cart));
                           }
                           List<CartModel> cartData = snapshot?.data;
@@ -152,21 +151,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Container(
                   height: constraints.maxHeight,
                   child: Consumer<MainAppStateProvider>(builder: (_, data, __) {
-                    return SingleChildScrollView(
-                      physics: data.scrollEnabled
-                          ? BouncingScrollPhysics()
-                          : NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minHeight: constraints.maxHeight),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[_tabPages[index]],
-                        ),
-                      ),
-                    );
+                    return index == 0
+                        ? SingleChildScrollView(
+                            physics: data.scrollEnabled
+                                ? BouncingScrollPhysics()
+                                : NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[_tabPages[index]],
+                              ),
+                            ),
+                          )
+                        : _tabPages[index];
                   }),
                 );
               },

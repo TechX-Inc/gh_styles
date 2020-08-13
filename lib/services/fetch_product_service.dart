@@ -12,7 +12,7 @@ class FetchProductService {
   Stream<List<ProductModel>> productsOverviewStream(String key, String value) {
     return products
         .where("categories.$key", isEqualTo: value)
-        .limit(15)
+        .limit(5)
         .snapshots()
         .map((snapshot) {
       return snapshot.documents
@@ -21,10 +21,25 @@ class FetchProductService {
     });
   }
 
+  Stream<List<ProductModel>> loadMoreProductsStream(
+      ProductModel lastProductData) {
+    return products
+        .orderBy("product_name")
+        .startAfter([lastProductData.productName])
+        .limit(6)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.documents
+              .map<ProductModel>(
+                  (product) => ProductModel.fromSnapshot(product))
+              .toList();
+        });
+  }
+
   Stream<List<ProductModel>> get newProductsStream {
     return products
         .orderBy("date_posted", descending: true)
-        .limit(15)
+        .limit(25)
         .snapshots()
         .map((snapshot) {
       return snapshot.documents
@@ -44,6 +59,7 @@ class FetchProductService {
     });
   }
 
+///////// USED TO CHECK IF A PRODUCT HAS BEEN FAVOURITED ALREADY ////////////
   Stream<List<Stream<ProductModel>>> singleFavouriteProductsStream(
       String uid, DocumentReference favItemRef) {
     return _favourites
@@ -58,6 +74,7 @@ class FetchProductService {
     });
   }
 
+  //////////// GET ALL FAVOURITES FOR A PARTICULAR USER ///////////////////
   Stream<List<ProductModel>> allFavouriteProductsStream(String uid) {
     return _favourites
         .where('user_ref', isEqualTo: _userCollection.document(uid))
