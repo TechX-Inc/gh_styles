@@ -52,7 +52,14 @@ class ShopProfileProvider with ChangeNotifier {
                 .showSnackBar(snackBar("An unknown error occured"));
         }
       }
-    });
+    }).timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
+    ;
   }
 
   void deleteShop(String imageUrl, DocumentReference shopRef) {
@@ -91,6 +98,13 @@ class ShopProfileProvider with ChangeNotifier {
                 .showSnackBar(snackBar("An unknown error occured"));
         }
       }
-    });
+    }).timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
+    ;
   }
 }

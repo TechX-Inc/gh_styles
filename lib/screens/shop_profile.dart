@@ -109,7 +109,6 @@ class _ShopProfileState extends State<ShopProfile> {
                                   backgroundImage: NetworkImage(
                                       widget.shopModel[0]?.shopLogoPath))
                               : Container(),
-
                           new OutlineButton(
                               child: new Text("New Product",
                                   style: TextStyle(color: Colors.blueAccent)),
@@ -119,25 +118,6 @@ class _ShopProfileState extends State<ShopProfile> {
                               shape: new RoundedRectangleBorder(
                                   borderRadius:
                                       new BorderRadius.circular(30.0)))
-
-                          // Column(
-                          //   crossAxisAlignment: CrossAxisAlignment.end,
-                          //   mainAxisAlignment: MainAxisAlignment.start,
-                          //   children: [
-                          //     Text(
-                          //       "Total Sales",
-                          //       style: TextStyle(
-                          //           fontSize: 20,
-                          //           color: Color.fromRGBO(140, 140, 140, 1)),
-                          //     ),
-                          //     SizedBox(height: 10),
-                          //     Text(
-                          //       "50,000 GHS",
-                          //       style: TextStyle(
-                          //           color: Colors.green, fontSize: 16),
-                          //     ),
-                          //   ],
-                          // )
                         ],
                       ),
                       Row(
@@ -176,120 +156,132 @@ class _ShopProfileState extends State<ShopProfile> {
                           ),
                           itemCount: products.length,
                           itemBuilder: (context, int index) {
-                            return Container(
-                              padding: const EdgeInsets.only(
-                                  top: 8.0, left: 8.0, right: 8.0),
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(247, 250, 255, 1),
-                                borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(6),
-                                    bottomRight: Radius.circular(6)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    spreadRadius: 2,
-                                    blurRadius: 3,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: FractionallySizedBox(
-                                          widthFactor: 0.9,
-                                          heightFactor: 1.0,
-                                          child: Stack(
-                                            fit: StackFit.expand,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                child: FadeInImage.assetNetwork(
-                                                  placeholder:
-                                                      'assets/images/loader_network.gif',
-                                                  image:
-                                                      "${products[index].productPhotos[0]}",
-                                                  fit: BoxFit.cover,
+                            return GestureDetector(
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed("/product_details", arguments: {
+                                "product_model": products[index],
+                                "index": index
+                              }),
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                    top: 8.0, left: 8.0, right: 8.0),
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(247, 250, 255, 1),
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(6),
+                                      bottomRight: Radius.circular(6)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      spreadRadius: 2,
+                                      blurRadius: 3,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: FractionallySizedBox(
+                                            widthFactor: 0.9,
+                                            heightFactor: 1.0,
+                                            child: Stack(
+                                              fit: StackFit.expand,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                  child:
+                                                      FadeInImage.assetNetwork(
+                                                    placeholder:
+                                                        'assets/images/loader_network.gif',
+                                                    image:
+                                                        "${products[index].productPhotos[0]}",
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                bottom: 5,
-                                                right: 5,
-                                                child: Badge(
-                                                    padding: EdgeInsets.all(6),
-                                                    badgeColor: Colors.white,
-                                                    borderRadius: 20,
-                                                    shape: BadgeShape.square,
-                                                    toAnimate: false,
-                                                    badgeContent: Text(
-                                                      "Stock: ${products[index].productQuantity}",
-                                                      style: TextStyle(
-                                                          fontSize: 11),
-                                                    )),
-                                              ),
-                                            ],
-                                          )),
+                                                Positioned(
+                                                  bottom: 5,
+                                                  right: 5,
+                                                  child: Badge(
+                                                      padding:
+                                                          EdgeInsets.all(6),
+                                                      badgeColor: Colors.white,
+                                                      borderRadius: 20,
+                                                      shape: BadgeShape.square,
+                                                      toAnimate: false,
+                                                      badgeContent: Text(
+                                                        "Stock: ${products[index].productQuantity}",
+                                                        style: TextStyle(
+                                                            fontSize: 11),
+                                                      )),
+                                                ),
+                                              ],
+                                            )),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 10.0,
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(left: 10.0),
-                                    width: double.infinity,
-                                    child: Text(
-                                      products[index].productName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1
-                                          .copyWith(
-                                              color: Color.fromRGBO(
-                                                  118, 118, 118, 1),
-                                              fontSize: 16),
+                                    SizedBox(
+                                      height: 10.0,
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 10.0,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                          child: IconButton(
-                                        onPressed: () => Navigator.of(context)
-                                            .pushNamed("/edit_product",
-                                                arguments: {
-                                              "edit_mode": true,
-                                              "product_model": products[index]
-                                            }),
-                                        icon: Icon(Icons.edit,
-                                            size: 20, color: Colors.blueAccent),
-                                      )),
-                                      Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 10.0),
-                                          // width: double.infinity,
-                                          child: IconButton(
-                                            onPressed: () => showAlertDialog(
-                                                products[index]),
-                                            icon: Icon(
-                                              Icons.delete,
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
+                                      width: double.infinity,
+                                      child: Text(
+                                        products[index].productName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1
+                                            .copyWith(
+                                                color: Color.fromRGBO(
+                                                    118, 118, 118, 1),
+                                                fontSize: 16),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                            child: IconButton(
+                                          onPressed: () => Navigator.of(context)
+                                              .pushNamed("/edit_product",
+                                                  arguments: {
+                                                "edit_mode": true,
+                                                "product_model": products[index]
+                                              }),
+                                          icon: Icon(Icons.edit,
                                               size: 20,
-                                              color: Colors.redAccent,
-                                            ),
-                                          )),
-                                    ],
-                                  )
-                                ],
+                                              color: Colors.blueAccent),
+                                        )),
+                                        Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
+                                            // width: double.infinity,
+                                            child: IconButton(
+                                              onPressed: () => showAlertDialog(
+                                                  products[index]),
+                                              icon: Icon(
+                                                Icons.delete,
+                                                size: 20,
+                                                color: Colors.redAccent,
+                                              ),
+                                            )),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             );
                           })

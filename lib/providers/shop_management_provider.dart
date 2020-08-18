@@ -131,68 +131,76 @@ class AddShopProvider with ChangeNotifier {
         shopWebsite: _shopWebsite ?? "None",
         shopLogo: _shopAvatar ?? defaultLogo,
       );
-      dynamic createShop = await shop.createShop();
+      await shop.createShop().then((createShop) {
+        if (createShop != true) {
+          switch (createShop.code) {
+            case "FAILED_TO_CREATE_SHOP":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-      if (createShop != true) {
-        switch (createShop.code) {
-          case "FAILED_TO_CREATE_SHOP":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "NULL_REQUIRED_FIELD":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "NULL_REQUIRED_FIELD":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "UPDATE_SHOP_DOCUMENT_LOGO_FAIL":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "UPDATE_SHOP_DOCUMENT_LOGO_FAIL":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "SET_SHOP_OWNER_FALSE_FAILED":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "SET_SHOP_OWNER_FALSE_FAILED":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "SHOP_LOGO_UPLOAD_FAIL":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "SHOP_LOGO_UPLOAD_FAIL":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "SET_SHOP_OWNER_FALSE_FAILED":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "SET_SHOP_OWNER_FALSE_FAILED":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
-
-          case "NULL_IMAGE_FILE":
-            Scaffold.of(context).showSnackBar(snackBar(createShop.message));
-            _loading = false;
-            notifyListeners();
-            break;
-          default:
-            print(
-                "DEFAULT ==================== $createShop ==================");
-            Scaffold.of(context).showSnackBar(
-                snackBar("An unknown error, please contact support"));
-            _loading = false;
-            notifyListeners();
+            case "NULL_IMAGE_FILE":
+              Scaffold.of(context).showSnackBar(snackBar(createShop.message));
+              _loading = false;
+              notifyListeners();
+              break;
+            default:
+              print(
+                  "DEFAULT ==================== $createShop ==================");
+              Scaffold.of(context).showSnackBar(
+                  snackBar("An unknown error, please contact support"));
+              _loading = false;
+              notifyListeners();
+          }
+        } else {
+          Scaffold.of(context).showSnackBar(snackBar(
+              "New shop successfully registered as $_shopName",
+              Color.fromRGBO(67, 216, 201, 1)));
+          Navigator.pushReplacementNamed(
+              _scaffoldKey.currentContext, "/main_screen_wrapper");
+          _loading = false;
+          notifyListeners();
         }
-      } else {
-        Scaffold.of(context).showSnackBar(snackBar(
-            "New shop successfully registered as $_shopName",
-            Color.fromRGBO(67, 216, 201, 1)));
-        Navigator.pushReplacementNamed(
-            _scaffoldKey.currentContext, "/main_screen_wrapper");
-        _loading = false;
-        notifyListeners();
-      }
+      }).timeout(
+        Duration(seconds: 8),
+        onTimeout: () {
+          _scaffoldKey.currentState.showSnackBar(
+              snackBar("Poor internet connection", Colors.orange[300]));
+          _loading = false;
+          notifyListeners();
+        },
+      );
     }
   }
 
@@ -266,7 +274,15 @@ class AddShopProvider with ChangeNotifier {
             _loading = false;
             notifyListeners();
           }
-        });
+        }).timeout(
+          Duration(seconds: 8),
+          onTimeout: () {
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("Poor internet connection", Colors.orange[300]));
+            _loading = false;
+            notifyListeners();
+          },
+        );
       } else {
         Scaffold.of(context).showSnackBar(snackBar("Please choose logo"));
         _loading = false;
@@ -288,6 +304,14 @@ class AddShopProvider with ChangeNotifier {
         _scaffoldKey.currentState
             .showSnackBar(snackBar("Failed to remove image"));
       }
-    });
+    }).timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+        _loading = false;
+        notifyListeners();
+      },
+    );
   }
 }

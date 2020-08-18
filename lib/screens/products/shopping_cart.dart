@@ -169,6 +169,25 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                                   color: Color.fromRGBO(
                                                       200, 200, 200, 1)),
                                             ),
+                                            SizedBox(height: 20),
+                                            new OutlineButton(
+                                                child: new Text(
+                                                    "Continue Shopping",
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .blueAccent)),
+                                                onPressed: () => Navigator
+                                                    .pushReplacementNamed(
+                                                        context,
+                                                        "/main_screen_wrapper"),
+                                                borderSide: BorderSide(
+                                                    color: Colors.blueAccent),
+                                                shape:
+                                                    new RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            new BorderRadius
+                                                                    .circular(
+                                                                30.0)))
                                           ],
                                         );
                                 },
@@ -285,7 +304,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
 }
 
 //////////////////////////////////////////////CART LIST TILE///////////////////////////////////////////////
-
 class CartListTile extends StatelessWidget {
   final CartModel cartModel;
   final int index;
@@ -298,7 +316,6 @@ class CartListTile extends StatelessWidget {
       constraints: BoxConstraints(maxHeight: 160),
       child: LayoutBuilder(builder: (context, constraints) {
         return Container(
-          // color: Colors.blueAccent,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,11 +386,13 @@ class CartListTile extends StatelessWidget {
                       Icons.close,
                       color: Colors.redAccent,
                     ),
-                    onPressed: () => user != null
-                        ? _cartProvider.removeCartItem(user.uid,
-                            cartModel.productRef, cartModel.orderQuantity)
-                        : _cartProvider.removeHiveCartItem(index,
-                            cartModel.productID, cartModel.orderQuantity),
+                    onPressed: () {
+                      user != null
+                          ? _cartProvider.removeCartItem(user.uid,
+                              cartModel.productRef, cartModel.orderQuantity)
+                          : _cartProvider.removeHiveCartItem(index,
+                              cartModel.productID, cartModel.orderQuantity);
+                    },
                   ),
                 ],
               )
@@ -423,15 +442,14 @@ class _CartBottomSectionState extends State<CartBottomSection> {
             Expanded(
               child: Container(
                 child: ButtonTheme(
-                  height: computeDimensions(90, widget.height),
+                  height: computeDimensions(80, widget.height),
                   child: RaisedButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                     color: Color.fromRGBO(254, 52, 110, 1),
-                    // color: Color.fromRGBO(231, 48, 91, 1),
                     onPressed: () {
-                      print("Checking out...");
+                      Navigator.pushNamed(context, "/checkout");
                     },
                     child: Text(
                       "Checkout",

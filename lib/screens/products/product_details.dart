@@ -142,7 +142,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   children: [
                     Container(
                       height:
-                          computeDimensions(88, viewportConstraints.maxHeight),
+                          computeDimensions(91, viewportConstraints.maxHeight),
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +170,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             .map(
                                               (photo) => Image.network(
                                                 "$photo",
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.contain,
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
@@ -181,7 +181,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       )
                                     : Image.network(
                                         "${widget.productModel.productPhotos[0]}",
-                                        fit: BoxFit.fill,
+                                        fit: BoxFit.contain,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 .7,
@@ -371,21 +371,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.only(top: 10),
-                      height:
-                          computeDimensions(12, viewportConstraints.maxHeight),
+                      // padding: EdgeInsets.only(top: 10),
+                      // height:
+                      // computeDimensions(10, viewportConstraints.maxHeight),
                       child: Row(
                         children: [
                           Expanded(
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: ButtonTheme(
-                                height: 45,
+                                height: 55,
                                 child: RaisedButton(
-                                  color: Color.fromRGBO(231, 48, 91, 1),
+                                  color: Color.fromRGBO(254, 52, 110, 1),
                                   onPressed: () {
                                     user != null
-                                        ? detailsProvider.addToCart(context)
+                                        ? detailsProvider.addToCart()
                                         : detailsProvider
                                             .addCartToHive(CartModel.toHive(
                                                 detailsProvider.quantityCounter,

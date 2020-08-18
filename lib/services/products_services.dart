@@ -64,13 +64,16 @@ class ProductService {
           'product_photos': null
         }).then((value) async {
           print("PRODUCTS ADDED, sending image data....");
-          return await uploadProductPhotos(productPhotos, _productRef)
-              .then((value) {
-            if (value.runtimeType == PlatformException) {
-              return value;
-            } else {
-              return true;
-            }
+          return await _productRef.updateData(
+              {'product_id': _productRef.documentID}).then((value) async {
+            return await uploadProductPhotos(productPhotos, _productRef)
+                .then((value) {
+              if (value.runtimeType == PlatformException) {
+                return value;
+              } else {
+                return true;
+              }
+            });
           });
         }).catchError((onError) => throw new PlatformException(
             code: "PRODUCT_ADD_FAILED", message: "Failed to add product"));

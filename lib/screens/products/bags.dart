@@ -22,7 +22,8 @@ class _BagsState extends State<Bags> {
   Widget build(BuildContext context) {
     return ProductGridContainer(
       productsModelStream: bags,
-      heroID: "Bags",
+      producCategorytKey: "type",
+      productCategoryValue: "Bags",
     );
   }
 }

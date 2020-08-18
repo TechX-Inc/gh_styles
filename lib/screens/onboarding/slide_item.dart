@@ -10,13 +10,15 @@ class OnboardingSliderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Container(
           height: MediaQuery.of(context).size.width * 0.6,
           width: MediaQuery.of(context).size.height * 0.4,
           decoration: BoxDecoration(
+              // color: Color.fromRGBO(122, 34, 34, 1),
               image: DecorationImage(
+                  fit: BoxFit.contain,
                   image: AssetImage(sliderArrayList[index].sliderImageUrl))),
         ),
         SizedBox(

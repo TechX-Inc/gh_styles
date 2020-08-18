@@ -36,8 +36,7 @@ class _WrapperState extends State<Wrapper> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body:
-              firstStartup == true ? OnboardingScreen() : MainScreenWrapper()),
+          body: firstStartup ? OnboardingScreen() : MainScreenWrapper()),
     );
   }
 }

@@ -17,61 +17,75 @@ class CartProvider with ChangeNotifier {
 
   Future<void> removeCartItem(
       String uid, DocumentReference cartProductRef, int quantityRemoved) async {
-    dynamic removeCartItem = await _cartService.removeItemFromCart(
-        uid, cartProductRef, quantityRemoved);
+    await _cartService
+        .removeItemFromCart(uid, cartProductRef, quantityRemoved)
+        .then((removeCartItem) {
+      if (removeCartItem.runtimeType == PlatformException) {
+        switch (removeCartItem.code) {
+          case "REMOVE_ITEM_FAILED":
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar(removeCartItem.message));
+            break;
 
-    if (removeCartItem.runtimeType == PlatformException) {
-      switch (removeCartItem.code) {
-        case "REMOVE_ITEM_FAILED":
-          _scaffoldKey.currentState
-              .showSnackBar(snackBar(removeCartItem.message));
-          break;
-
-        case "RESTORE_STOCK_FAILED":
-          _scaffoldKey.currentState
-              .showSnackBar(snackBar(removeCartItem.message));
-          break;
-        default:
-          _scaffoldKey.currentState.showSnackBar(
-              snackBar("An unknown error occured, please try again"));
+          case "RESTORE_STOCK_FAILED":
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar(removeCartItem.message));
+            break;
+          default:
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("An unknown error occured, please try again"));
+        }
+      } else if (removeCartItem == true) {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Item removed", Color.fromRGBO(36, 161, 156, 1)));
+      } else {
+        _scaffoldKey.currentState
+            .showSnackBar(snackBar("An error occured, please try again"));
       }
-    } else if (removeCartItem == true) {
-      _scaffoldKey.currentState.showSnackBar(
-          snackBar("Item removed", Color.fromRGBO(36, 161, 156, 1)));
-    } else {
-      _scaffoldKey.currentState
-          .showSnackBar(snackBar("An error occured, please try again"));
-    }
+    }).timeout(
+      Duration(seconds: 4),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
   }
 
   Future<void> removeAllFromCart(String uid) async {
-    dynamic clearCart = await _cartService.removeAllFromCart(uid);
-    if (clearCart.runtimeType == PlatformException) {
-      switch (clearCart.code) {
-        case "EMPTY_CART":
-          _scaffoldKey.currentState.showSnackBar(
-              snackBar(clearCart.message, Color.fromRGBO(36, 161, 156, 1)));
-          break;
+    await _cartService.removeAllFromCart(uid).then((clearCart) {
+      if (clearCart.runtimeType == PlatformException) {
+        switch (clearCart.code) {
+          case "EMPTY_CART":
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar(clearCart.message, Color.fromRGBO(36, 161, 156, 1)));
+            break;
 
-        case "CLEAR_CART_FAILED":
-          _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
-          break;
+          case "CLEAR_CART_FAILED":
+            _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
+            break;
 
-        case "RESTORE_STOCK_FAILED":
-          _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
-          break;
-        default:
-          _scaffoldKey.currentState
-              .showSnackBar(snackBar("An unknown error occured, try again"));
+          case "RESTORE_STOCK_FAILED":
+            _scaffoldKey.currentState.showSnackBar(snackBar(clearCart.message));
+            break;
+          default:
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar("An unknown error occured, try again"));
+        }
+      } else if (clearCart == null) {
+        print(clearCart);
+        _scaffoldKey.currentState.showSnackBar(snackBar(
+            "Cart cleared successfully", Color.fromRGBO(36, 161, 156, 1)));
+      } else {
+        _scaffoldKey.currentState
+            .showSnackBar(snackBar("An error occured, please try again"));
       }
-    } else if (clearCart == null) {
-      print(clearCart);
-      _scaffoldKey.currentState.showSnackBar(snackBar(
-          "Cart cleared successfully", Color.fromRGBO(36, 161, 156, 1)));
-    } else {
-      _scaffoldKey.currentState
-          .showSnackBar(snackBar("An error occured, please try again"));
-    }
+    }).timeout(
+      Duration(seconds: 4),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
   }
 
   clearHiveCart() {
@@ -102,7 +116,13 @@ class CartProvider with ChangeNotifier {
         _scaffoldKey.currentState
             .showSnackBar(snackBar("An error occured, please try again"));
       }
-    });
+    }).timeout(
+      Duration(seconds: 4),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
   }
 
   removeHiveCartItem(int index, String cartProductID, int quantityRemoved) {
@@ -131,6 +151,12 @@ class CartProvider with ChangeNotifier {
         _scaffoldKey.currentState
             .showSnackBar(snackBar("An error occured, please try again"));
       }
-    });
+    }).timeout(
+      Duration(seconds: 4),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+      },
+    );
   }
 }

@@ -4,6 +4,7 @@ import 'package:gh_styles/screens/add_shop.dart';
 import 'package:gh_styles/screens/auth_screens/login.dart';
 import 'package:gh_styles/screens/auth_screens/register.dart';
 import 'package:gh_styles/screens/add_product.dart';
+import 'package:gh_styles/screens/checkout.dart';
 import 'package:gh_styles/screens/main_screen_wrapper.dart';
 import 'package:gh_styles/screens/products/product_details.dart';
 import 'package:gh_styles/screens/products/shopping_cart.dart';
@@ -33,6 +34,9 @@ class RouteGenerator {
 
       case '/cart':
         return MaterialPageRoute(builder: (_) => ShoppingCart());
+
+      case '/checkout':
+        return MaterialPageRoute(builder: (_) => Checkout());
 
       case '/add_product':
         return MaterialPageRoute(builder: (_) => AddProduct());

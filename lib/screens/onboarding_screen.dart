@@ -61,12 +61,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       alignment: Alignment.bottomRight,
                       child: Padding(
                         padding: EdgeInsets.only(right: 15.0, bottom: 15.0),
-                        child: Text(
-                          Constants.NEXT,
-                          style: TextStyle(
-                            fontFamily: Constants.OPEN_SANS,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0,
+                        child: FlatButton(
+                          onPressed: () {
+                            if (_currentPage < sliderArrayList.length) {
+                              setState(() {
+                                _currentPage++;
+                              });
+                            }
+                          },
+                          child: Text(
+                            Constants.NEXT,
+                            style: TextStyle(
+                              fontFamily: Constants.OPEN_SANS,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.0,
+                            ),
                           ),
                         ),
                       ),

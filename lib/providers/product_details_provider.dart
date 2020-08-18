@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gh_styles/models/cart_model.dart';
 import 'package:gh_styles/services/shopping_cart_services.dart';
 import 'package:intl/intl.dart';
+import 'package:toast/toast.dart';
 
 class ProductDetailsProvider with ChangeNotifier {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -75,14 +76,30 @@ class ProductDetailsProvider with ChangeNotifier {
 //*****************************************************************************************/
 //
 //*****************************************************************************************/
-  void addToCart(BuildContext context) {
+  void addToCart() {
     if (_uid != null) {
       if (_quantityInStock != 0) {
         _cartService
             .addToCart(_uid, _productRef, _quantityCounter, _quantityInStock,
                 _totalSelectionPrice)
-            .then((value) =>
-                {_quantityInStock -= _quantityCounter, notifyListeners()});
+            .then((value) {
+          _quantityInStock -= _quantityCounter;
+          notifyListeners();
+          Toast.show(
+              _quantityCounter > 1
+                  ? "$_quantityCounter items added to cart"
+                  : "1 item added to cart",
+              _scaffoldKey.currentContext,
+              duration: 3,
+              gravity: Toast.BOTTOM);
+        }).timeout(
+          Duration(seconds: 8),
+          onTimeout: () {
+            _scaffoldKey.currentState.showSnackBar(snackBar(
+                "Poor internet connection", Color.fromRGBO(144, 12, 63, 1)));
+            return null;
+          },
+        );
       } else {
         print("item out of stock");
         _scaffoldKey.currentState.showSnackBar(
@@ -99,8 +116,24 @@ class ProductDetailsProvider with ChangeNotifier {
     // print(index);
     if (cartModel != null) {
       if (_quantityInStock != 0) {
-        _cartService.addCartToHive(cartModel).then((value) =>
-            {_quantityInStock -= _quantityCounter, notifyListeners()});
+        _cartService.addCartToHive(cartModel).then((value) {
+          _quantityInStock -= _quantityCounter;
+          notifyListeners();
+          Toast.show(
+              _quantityCounter > 1
+                  ? "$_quantityCounter items added to cart"
+                  : "1 item added to cart",
+              _scaffoldKey.currentContext,
+              duration: 3,
+              gravity: Toast.BOTTOM);
+        }).timeout(
+          Duration(seconds: 8),
+          onTimeout: () {
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("Poor internet connection", Colors.orange[300]));
+            return null;
+          },
+        );
       } else {
         print("item out of stock");
         _scaffoldKey.currentState.showSnackBar(

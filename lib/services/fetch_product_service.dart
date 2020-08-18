@@ -12,7 +12,8 @@ class FetchProductService {
   Stream<List<ProductModel>> productsOverviewStream(String key, String value) {
     return products
         .where("categories.$key", isEqualTo: value)
-        .limit(5)
+        .limit(25)
+        .orderBy("product_id")
         .snapshots()
         .map((snapshot) {
       return snapshot.documents
@@ -22,11 +23,12 @@ class FetchProductService {
   }
 
   Stream<List<ProductModel>> loadMoreProductsStream(
-      ProductModel lastProductData) {
+      ProductModel lastProductData, String key, String value) {
     return products
-        .orderBy("product_name")
-        .startAfter([lastProductData.productName])
-        .limit(6)
+        .where("categories.$key", isEqualTo: value)
+        .orderBy("product_id")
+        .startAfter([lastProductData.productRef.documentID])
+        .limit(25)
         .snapshots()
         .map((snapshot) {
           return snapshot.documents

@@ -22,7 +22,8 @@ class _ShortsState extends State<Shorts> {
   Widget build(BuildContext context) {
     return ProductGridContainer(
       productsModelStream: shorts,
-      heroID: "Shorts",
+      producCategorytKey: "type",
+      productCategoryValue: "Shorts",
     );
   }
 }

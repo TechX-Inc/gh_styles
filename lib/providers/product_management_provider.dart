@@ -21,6 +21,23 @@ class AddProductProvider with ChangeNotifier {
   DocumentReference _userShopReference;
 
 //SNACKBAR FOR ERROR AND SUCCESS MESSAGES
+  Widget onTimeOutSnackBar(error, Function rerun, [color = Colors.orange]) =>
+      SnackBar(
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(error),
+            FlatButton(
+              onPressed: rerun,
+              child: Text("Retry",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          ],
+        ),
+        backgroundColor: color,
+      );
+
   Widget snackBar(error, [color = Colors.red]) => SnackBar(
         content: Text(error),
         backgroundColor: color,
@@ -174,60 +191,72 @@ class AddProductProvider with ChangeNotifier {
           productSize: (_productSize == null) ? null : _productSize,
           gender: _gender.trim(),
           collection: _collection.trim());
-      dynamic product = await newProduct.newProduct();
+      await newProduct.newProduct().then((product) {
+        if (product != true) {
+          switch (product.code) {
+            case "NULL_IN_REQUIRED_FIELD":
+              print(product.code);
+              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-      if (product != true) {
-        switch (product.code) {
-          case "NULL_IN_REQUIRED_FIELD":
-            print(product.code);
-            _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "PRODUCT_ADD_FAILED":
+              print(product.code);
+              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "PRODUCT_ADD_FAILED":
-            print(product.code);
-            _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "NO_IMAGE_FILE_FOUND":
+              print(product.code);
+              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "NO_IMAGE_FILE_FOUND":
-            print(product.code);
-            _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-            _loading = false;
-            notifyListeners();
-            break;
+            case "GET_DOWNLOAD_URL_FAILED":
+              print(product.code);
+              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
+              _loading = false;
+              notifyListeners();
+              break;
 
-          case "GET_DOWNLOAD_URL_FAILED":
-            print(product.code);
-            _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-            _loading = false;
-            notifyListeners();
-            break;
-
-          case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
-            print(product.code);
-            _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-            _loading = false;
-            notifyListeners();
-            break;
-          default:
-            print(
-                "DEFAULT <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
-            _scaffoldKey.currentState.showSnackBar(
-                snackBar("An unknown error, please contact support"));
-            _loading = false;
-            notifyListeners();
+            case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
+              print(product.code);
+              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
+              _loading = false;
+              notifyListeners();
+              break;
+            default:
+              print(
+                  "DEFAULT <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
+              _scaffoldKey.currentState.showSnackBar(
+                  snackBar("An unknown error, please contact support"));
+              _loading = false;
+              notifyListeners();
+          }
+        } else {
+          _scaffoldKey.currentState.showSnackBar(snackBar(
+              "product added successfully", Color.fromRGBO(36, 161, 156, 1)));
+          _loading = false;
+          // Navigator.pushReplacementNamed(
+          //     _scaffoldKey.currentContext, "/main_screen_wrapper");
+          notifyListeners();
         }
-      } else {
-        _scaffoldKey.currentState.showSnackBar(snackBar(
-            "product added successfully", Color.fromRGBO(36, 161, 156, 1)));
+      }).catchError((error) {
+        _scaffoldKey.currentState
+            .showSnackBar(snackBar("Something went wrong, try again"));
         _loading = false;
-        // Navigator.pushReplacementNamed(
-        //     _scaffoldKey.currentContext, "/main_screen_wrapper");
-        notifyListeners();
-      }
+      }).timeout(
+        Duration(seconds: 8),
+        onTimeout: () {
+          _scaffoldKey.currentState.showSnackBar(
+              snackBar("Poor internet connection", Colors.orange[300]));
+          _loading = false;
+          notifyListeners();
+        },
+      );
     }
   }
 
@@ -261,59 +290,72 @@ class AddProductProvider with ChangeNotifier {
             gender: _gender.trim(),
             collection: _collection.trim());
 
-        dynamic product = await productChanges.editProduct(
-            productReference, productCurrentImages);
+        await productChanges
+            .editProduct(productReference, productCurrentImages)
+            .then((product) {
+          if (product != true) {
+            switch (product.code) {
+              case "NULL_IN_REQUIRED_FIELD":
+                print(product.code);
+                _scaffoldKey.currentState
+                    .showSnackBar(snackBar(product.message));
+                _loading = false;
+                notifyListeners();
+                break;
 
-        if (product != true) {
-          switch (product.code) {
-            case "NULL_IN_REQUIRED_FIELD":
-              print(product.code);
-              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-              _loading = false;
-              notifyListeners();
-              break;
+              case "PRODUCT_UPDATE_FAILED":
+                print(product.code);
+                _scaffoldKey.currentState
+                    .showSnackBar(snackBar(product.message));
+                _loading = false;
+                notifyListeners();
+                break;
 
-            case "PRODUCT_UPDATE_FAILED":
-              print(product.code);
-              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-              _loading = false;
-              notifyListeners();
-              break;
+              case "GET_DOWNLOAD_URL_FAILED":
+                print(product.code);
+                _scaffoldKey.currentState
+                    .showSnackBar(snackBar(product.message));
+                _loading = false;
+                notifyListeners();
+                break;
 
-            case "GET_DOWNLOAD_URL_FAILED":
-              print(product.code);
-              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-              _loading = false;
-              notifyListeners();
-              break;
-
-            case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
-              print(product.code);
-              _scaffoldKey.currentState.showSnackBar(snackBar(product.message));
-              _loading = false;
-              notifyListeners();
-              break;
-            default:
-              print(
-                  "DEFAULT <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
-              _scaffoldKey.currentState.showSnackBar(
-                  snackBar("An unknown error, please contact support"));
-              _loading = false;
-              notifyListeners();
+              case "UPDATE_PRODUCT_DOCUMENT_WITH_PHOTO_FAIL":
+                print(product.code);
+                _scaffoldKey.currentState
+                    .showSnackBar(snackBar(product.message));
+                _loading = false;
+                notifyListeners();
+                break;
+              default:
+                print(
+                    "DEFAULT <<<<<<<<<<<<==================== $product ==================>>>>>>>>>>>");
+                _scaffoldKey.currentState.showSnackBar(
+                    snackBar("An unknown error, please contact support"));
+                _loading = false;
+                notifyListeners();
+            }
+          } else if (product == true) {
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("Changes saved", Color.fromRGBO(36, 161, 156, 1)));
+            _loading = false;
+            notifyListeners();
+            // Navigator.pushReplacementNamed(
+            //     _scaffoldKey.currentContext, "/main_screen_wrapper");
+          } else {
+            _scaffoldKey.currentState
+                .showSnackBar(snackBar("An unknown error occured"));
+            _loading = false;
+            notifyListeners();
           }
-        } else if (product == true) {
-          _scaffoldKey.currentState.showSnackBar(
-              snackBar("Changes saved", Color.fromRGBO(36, 161, 156, 1)));
-          _loading = false;
-          notifyListeners();
-          // Navigator.pushReplacementNamed(
-          //     _scaffoldKey.currentContext, "/main_screen_wrapper");
-        } else {
-          _scaffoldKey.currentState
-              .showSnackBar(snackBar("An unknown error occured"));
-          _loading = false;
-          notifyListeners();
-        }
+        }).timeout(
+          Duration(seconds: 8),
+          onTimeout: () {
+            _scaffoldKey.currentState.showSnackBar(
+                snackBar("Poor internet connection", Colors.orange[300]));
+            _loading = false;
+            notifyListeners();
+          },
+        );
       }
     }
   }
@@ -370,6 +412,15 @@ class AddProductProvider with ChangeNotifier {
             notifyListeners();
         }
       }
-    });
+    }).timeout(
+      Duration(seconds: 8),
+      onTimeout: () {
+        _scaffoldKey.currentState.showSnackBar(
+            snackBar("Poor internet connection", Colors.orange[300]));
+        _loading = false;
+        notifyListeners();
+      },
+    );
+    ;
   }
 }

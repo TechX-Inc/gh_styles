@@ -94,7 +94,7 @@ class ShoppingCartService {
       Firestore.instance.runTransaction((transaction) async {
         DocumentSnapshot freshSnapshot =
             await transaction.get(_products.document(productRef.documentID));
-        await transaction.update(freshSnapshot.reference, {
+        return transaction.update(freshSnapshot.reference, {
           'product_quantity': FieldValue.increment(productCurrentQuantityStock)
         }).then((value) => print("Product updated"));
       }).catchError((error) => throw new PlatformException(
